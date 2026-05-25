@@ -61,7 +61,10 @@ class ViewReturnRequest extends ViewRecord
                         ->rows(3),
                 ])
                 ->action(function (array $data) {
-                    $this->record->update(['return_status' => 'rejected']);
+                    $this->record->update([
+                        'return_status'        => 'rejected',
+                        'return_reject_reason' => $data['reject_reason'],
+                    ]);
 
                     // إشعار Push للتطبيق
                     if ($this->record->user) {
@@ -83,7 +86,7 @@ class ViewReturnRequest extends ViewRecord
                     }
 
                     Notification::make()->title('❌ تم رفض الإرجاع')->warning()->send();
-                    $this->refreshFormData(['return_status']);
+                    $this->refreshFormData(['return_status', 'return_reject_reason']);
                 }),
 
             Actions\Action::make('back')

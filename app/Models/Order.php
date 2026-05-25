@@ -16,7 +16,7 @@ class Order extends Model
         'admin_notes', 'confirmed_at', 'shipped_at', 'delivered_at',
         'last_edited_by', 'last_edited_at',
         'loyalty_points_redeemed', 'loyalty_discount',
-        'return_requested_at', 'return_reason', 'return_status',
+        'return_requested_at', 'return_reason', 'return_status', 'return_reject_reason',
     ];
 
     protected $casts = [

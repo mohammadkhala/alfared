@@ -101,6 +101,14 @@ class ReturnRequestResource extends Resource
                         default    => 'gray',
                     }),
 
+                Tables\Columns\TextColumn::make('return_reject_reason')
+                    ->label('سبب الرفض')
+                    ->limit(40)
+                    ->tooltip(fn($record) => $record->return_reject_reason)
+                    ->placeholder('—')
+                    ->visible(fn() => true)
+                    ->color('danger'),
+
                 Tables\Columns\TextColumn::make('return_requested_at')
                     ->label('تاريخ الطلب')
                     ->dateTime('d/m/Y H:i')
@@ -165,7 +173,11 @@ class ReturnRequestResource extends Resource
                             ->rows(3),
                     ])
                     ->action(function (Order $record, array $data) {
-                        $record->update(['return_status' => 'rejected']);
+                        // حفظ سبب الرفض في قاعدة البيانات
+                        $record->update([
+                            'return_status'        => 'rejected',
+                            'return_reject_reason' => $data['reject_reason'],
+                        ]);
 
                         // إشعار Push للتطبيق
                         if ($record->user) {
@@ -266,9 +278,17 @@ class ReturnRequestResource extends Resource
                             default    => 'gray',
                         }),
                     Infolists\Components\TextEntry::make('return_reason')
-                        ->label('سبب الإرجاع')
+                        ->label('سبب الإرجاع من العميل')
                         ->columnSpanFull()
                         ->extraAttributes(['class' => 'bg-red-50 rounded p-3']),
+
+                    Infolists\Components\TextEntry::make('return_reject_reason')
+                        ->label('سبب الرفض من الإدارة')
+                        ->columnSpanFull()
+                        ->visible(fn($record) => filled($record->return_reject_reason))
+                        ->extraAttributes(['class' => 'bg-orange-50 rounded p-3'])
+                        ->icon('heroicon-o-x-circle')
+                        ->iconColor('danger'),
                 ]),
 
             Infolists\Components\Section::make('🛍️ المنتجات')
