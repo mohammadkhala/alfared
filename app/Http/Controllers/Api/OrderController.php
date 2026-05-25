@@ -165,6 +165,7 @@ class OrderController extends Controller
             'return_requested_at'  => $order->return_requested_at?->toIso8601String(),
             'return_reason'        => $order->return_reason,
             'return_status'        => $order->return_status,
+            'return_reject_reason' => $order->return_reject_reason,
             'items'          => $order->items->map(fn ($i) => [
                 'id'           => $i->id,
                 'product_id'   => $i->product_id,
