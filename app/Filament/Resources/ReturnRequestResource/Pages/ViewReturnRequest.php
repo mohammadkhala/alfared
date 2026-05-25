@@ -4,6 +4,7 @@ namespace App\Filament\Resources\ReturnRequestResource\Pages;
 
 use App\Filament\Resources\ReturnRequestResource;
 use App\Models\Order;
+use App\Services\FcmService;
 use App\Services\WaSenderService;
 use Filament\Actions;
 use Filament\Forms;
@@ -27,8 +28,13 @@ class ViewReturnRequest extends ViewRecord
                 ->modalHeading('تأكيد قبول الإرجاع')
                 ->modalDescription('سيتم إشعار العميل عبر واتساب بقبول طلبه.')
                 ->action(function () {
-                    $this->record->update(['return_status' => 'approved']);
+                    // تغيير الحالتين — FCM يُطلق تلقائياً عند تغيير status
+                    $this->record->update([
+                        'return_status' => 'approved',
+                        'status'        => 'returned',
+                    ]);
 
+                    // إشعار واتساب
                     $phone = $this->record->customer_phone ?? $this->record->user?->phone;
                     if ($phone) {
                         app(WaSenderService::class)->send(
@@ -37,8 +43,8 @@ class ViewReturnRequest extends ViewRecord
                         );
                     }
 
-                    Notification::make()->title('✅ تم قبول الإرجاع')->success()->send();
-                    $this->refreshFormData(['return_status']);
+                    Notification::make()->title('✅ تم قبول الإرجاع وتغيير الحالة')->success()->send();
+                    $this->refreshFormData(['return_status', 'status']);
                 }),
 
             // ── رفض ──
@@ -57,6 +63,17 @@ class ViewReturnRequest extends ViewRecord
                 ->action(function (array $data) {
                     $this->record->update(['return_status' => 'rejected']);
 
+                    // إشعار Push للتطبيق
+                    if ($this->record->user) {
+                        FcmService::sendToUser(
+                            $this->record->user,
+                            '❌ طلب الإرجاع مرفوض',
+                            "طلبك رقم {$this->record->order_number} — {$data['reject_reason']}",
+                            ['type' => 'return_rejected', 'order_number' => $this->record->order_number],
+                        );
+                    }
+
+                    // إشعار واتساب
                     $phone = $this->record->customer_phone ?? $this->record->user?->phone;
                     if ($phone) {
                         app(WaSenderService::class)->send(
