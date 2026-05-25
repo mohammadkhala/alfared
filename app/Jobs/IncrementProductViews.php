@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Models\Product;
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
+
+class IncrementProductViews implements ShouldQueue
+{
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    public function __construct(private int $productId) {}
+
+    public function handle(): void
+    {
+        Product::where('id', $this->productId)->increment('views_count');
+    }
+}

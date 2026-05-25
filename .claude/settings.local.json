@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(php artisan *)",
+      "Bash(flutter --version)",
+      "Bash(flutter pub *)",
+      "Bash(findstr /i \"APP_URL DB_CONNECTION APP_ENV\")",
+      "Bash(Get-Content \"C:\\\\Users\\\\prog2\\\\OneDrive\\\\Documenten\\\\alfared-shop\\\\.env\")",
+      "Bash(Select-String \"APP_URL|DB_CONNECTION|APP_ENV|APP_NAME\")",
+      "Bash(curl -s http://127.0.0.1:8001/api/up)",
+      "Bash(curl -s http://127.0.0.1:8001/api/v1/banners)",
+      "Bash(curl -s http://127.0.0.1:8001/api/v1/products)",
+      "PowerShell(Get-ChildItem -Path \"C:\\\\Users\\\\prog2\\\\OneDrive\\\\Documenten\\\\alfared-shop\" -Recurse -Directory | Select-Object -First 50 | ForEach-Object { $_.FullName.Replace\\('C:\\\\Users\\\\prog2\\\\OneDrive\\\\Documenten\\\\alfared-shop', '.'\\) })",
+      "Bash(curl -s http://127.0.0.1:8001/api/v1/home)",
+      "Bash(flutter analyze *)",
+      "Bash(dart analyze *)",
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\prog2\\\\OneDrive\\\\Documenten\\\\alfared-shop\\\\app\\\\Filament\\\\Resources\\\\FlashSaleResource\\\\Pages\")",
+      "PowerShell(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\prog2\\\\OneDrive\\\\Documenten\\\\alfared-shop\\\\app\\\\Filament\\\\Resources\\\\FlashSaleResource\\\\RelationManagers\")",
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\prog2\\\\OneDrive\\\\Documenten\\\\alfared-shop\\\\mobile-app\\\\lib\\\\l10n\" -Recurse -File)",
+      "Bash(Select-Object FullName)",
+      "Bash(Select-String -Path \"C:\\\\Users\\\\prog2\\\\OneDrive\\\\Documenten\\\\alfared-shop\\\\public\\\\css\\\\store.css\" -Pattern \"footer-bottom|float-social|float-wa\")",
+      "Bash(Select-Object -First 10)"
+    ]
+  }
+}
