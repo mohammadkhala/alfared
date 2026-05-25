@@ -4,6 +4,7 @@ namespace App\Filament\Resources;
 
 use App\Filament\Resources\ReturnRequestResource\Pages;
 use App\Models\Order;
+use App\Services\FcmService;
 use App\Services\WaSenderService;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -127,9 +128,14 @@ class ReturnRequestResource extends Resource
                     ->modalHeading('قبول طلب الإرجاع')
                     ->modalDescription('هل أنت متأكد من قبول هذا الطلب؟ سيتم إشعار العميل عبر واتساب.')
                     ->action(function (Order $record) {
-                        $record->update(['return_status' => 'approved']);
+                        // تغيير حالة الإرجاع + حالة الطلب → مُرجَّع
+                        // (تغيير status يُطلق FCM تلقائياً عبر Order::boot)
+                        $record->update([
+                            'return_status' => 'approved',
+                            'status'        => 'returned',
+                        ]);
 
-                        // إشعار واتساب للعميل
+                        // إشعار واتساب
                         $phone = $record->customer_phone ?? $record->user?->phone;
                         if ($phone) {
                             app(WaSenderService::class)->send(
@@ -139,8 +145,8 @@ class ReturnRequestResource extends Resource
                         }
 
                         Notification::make()
-                            ->title('تم قبول الإرجاع')
-                            ->body("طلب {$record->order_number} — تم إشعار العميل")
+                            ->title('✅ تم قبول الإرجاع')
+                            ->body("طلب {$record->order_number} — تم تغيير الحالة وإشعار العميل")
                             ->success()
                             ->send();
                     }),
@@ -161,7 +167,17 @@ class ReturnRequestResource extends Resource
                     ->action(function (Order $record, array $data) {
                         $record->update(['return_status' => 'rejected']);
 
-                        // إشعار واتساب للعميل
+                        // إشعار Push للتطبيق
+                        if ($record->user) {
+                            FcmService::sendToUser(
+                                $record->user,
+                                '❌ طلب الإرجاع مرفوض',
+                                "طلبك رقم {$record->order_number} — {$data['reject_reason']}",
+                                ['type' => 'return_rejected', 'order_number' => $record->order_number],
+                            );
+                        }
+
+                        // إشعار واتساب
                         $phone = $record->customer_phone ?? $record->user?->phone;
                         if ($phone) {
                             app(WaSenderService::class)->send(
@@ -171,7 +187,7 @@ class ReturnRequestResource extends Resource
                         }
 
                         Notification::make()
-                            ->title('تم رفض الإرجاع')
+                            ->title('❌ تم رفض الإرجاع')
                             ->body("طلب {$record->order_number} — تم إشعار العميل")
                             ->warning()
                             ->send();
@@ -186,10 +202,14 @@ class ReturnRequestResource extends Resource
                     ->action(function ($records) {
                         foreach ($records as $record) {
                             if ($record->return_status === 'pending') {
-                                $record->update(['return_status' => 'approved']);
+                                // تغيير الحالتين — FCM يُطلق تلقائياً عند تغيير status
+                                $record->update([
+                                    'return_status' => 'approved',
+                                    'status'        => 'returned',
+                                ]);
                             }
                         }
-                        Notification::make()->title('تم قبول الطلبات المحددة')->success()->send();
+                        Notification::make()->title('✅ تم قبول الطلبات المحددة')->success()->send();
                     }),
             ])
             ->emptyStateIcon('heroicon-o-arrow-uturn-left')
