@@ -56,19 +56,23 @@ class FcmService {
   }
 
   static void _handleForeground(RemoteMessage msg) {
-    final n = msg.notification;
-    if (n == null) return;
+    final n     = msg.notification;
+    final title = n?.title ?? msg.data['title'] ?? '';
+    final body  = n?.body  ?? msg.data['body']  ?? '';
+    if (title.isEmpty && body.isEmpty) return;
+
     _local.show(
       msg.hashCode,
-      n.title,
-      n.body,
+      title,
+      body,
       const NotificationDetails(
         android: AndroidNotificationDetails(
           'orders_channel',
           'إشعارات الطلبات',
           channelDescription: 'تحديثات حالة الطلبات',
-          importance: Importance.high,
+          importance: Importance.max,
           priority: Priority.high,
+          playSound: true,
         ),
         iOS: DarwinNotificationDetails(),
       ),
