@@ -53,8 +53,9 @@ class FcmService
                 'data' => array_merge(['title' => $title, 'body' => $body], $data),
             ];
 
-            $resp = Http::withToken($key, 'key=')->withHeaders([
-                'Content-Type' => 'application/json',
+            $resp = Http::withHeaders([
+                'Content-Type'  => 'application/json',
+                'Authorization' => 'key=' . $key,
             ])->post('https://fcm.googleapis.com/fcm/send', $payload);
 
             return $resp->successful();
