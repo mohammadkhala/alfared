@@ -24,11 +24,22 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   @override
   void initState() { super.initState(); _load(); }
 
+  String? _debugError;
+
   Future<void> _load() async {
     try {
+      // Try authenticated endpoint first (for logged-in users)
       final res = await ApiService.instance.get('/orders/${widget.orderNumber}');
       _order = AppOrder.fromJson((res as Map)['order'] as Map<String, dynamic>);
-    } catch (_) {}
+    } catch (e1) {
+      // Fallback to public track endpoint (works without auth / from notifications)
+      try {
+        final res = await ApiService.instance.get('/orders/${widget.orderNumber}/track');
+        _order = AppOrder.fromJson((res as Map)['order'] as Map<String, dynamic>);
+      } catch (e2) {
+        _debugError = 'Auth: $e1\n\nTrack: $e2';
+      }
+    }
     if (mounted) setState(() => _loading = false);
   }
 
@@ -81,7 +92,17 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
   Widget build(BuildContext context) {
     final s = context.watch<LocaleProvider>().s;
     if (_loading) return const Scaffold(body: Center(child: CircularProgressIndicator(color: AppColors.orange)));
-    if (_order == null) return Scaffold(appBar: AppBar(), body: Center(child: Text(s.orderNotFound)));
+    if (_order == null) return Scaffold(
+      appBar: AppBar(),
+      body: Center(child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: SelectableText(
+          _debugError ?? s.orderNotFound,
+          style: const TextStyle(fontFamily: 'Cairo', fontSize: 12, color: Colors.red),
+          textAlign: TextAlign.center,
+        ),
+      )),
+    );
 
     final o = _order!;
     final idx = _steps.indexOf(o.status);
