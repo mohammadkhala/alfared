@@ -94,13 +94,19 @@ class OrderItem {
   });
 
   factory OrderItem.fromJson(Map<String, dynamic> j) => OrderItem(
-    id:           j['id']           as int,
-    productId:    j['product_id']   as int,
+    id:           _toInt(j['id']),
+    productId:    _toInt(j['product_id']),
     productName:  j['product_name'] as String? ?? '',
     productImage: j['product_image']as String?,
-    price:       (j['price']        as num?)?.toDouble() ?? 0,
+    price:       (j['price']        as num?)?.toDouble() ?? (double.tryParse(j['price'].toString()) ?? 0),
     quantity:    (j['quantity']     as num?)?.toInt() ?? 1,
-    total:       (j['total']        as num?)?.toDouble() ?? 0,
+    total:       (j['total']        as num?)?.toDouble() ?? (double.tryParse(j['total'].toString()) ?? 0),
     variantInfo:  j['variant_info'] as String?,
   );
+
+  static int _toInt(dynamic v) {
+    if (v is int) return v;
+    if (v is num) return v.toInt();
+    return int.tryParse(v?.toString() ?? '0') ?? 0;
+  }
 }

@@ -167,8 +167,8 @@ class OrderController extends Controller
             'return_status'        => $order->return_status,
             'return_reject_reason' => $order->return_reject_reason,
             'items'          => $order->items->map(fn ($i) => [
-                'id'           => $i->id,
-                'product_id'   => $i->product_id,
+                'id'           => (int) $i->id,
+                'product_id'   => (int) $i->product_id,
                 'product_name' => $i->product_name,
                 'product_image'=> $i->product_image ? url('storage/' . $i->product_image) : null,
                 'price'        => (float) $i->price,
