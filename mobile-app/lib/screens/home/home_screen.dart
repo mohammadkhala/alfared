@@ -151,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       const SizedBox(height: 10),
                       _ProductGrid(
                         products: _featured.take(4).toList(),
-                        badgeLabel: '⭐ رائج',
+                        badgeLabel: s.badgeTrending,
                         badgeColor: const Color(0xFFEF4444),
                       ),
                       const SizedBox(height: 24),
@@ -441,9 +441,6 @@ class _MarqueeBar extends StatefulWidget {
 class _MarqueeBarState extends State<_MarqueeBar> with SingleTickerProviderStateMixin {
   late AnimationController _ctrl;
 
-  static const _text =
-      '   🛵 توصيل لجميع مناطق فلسطين والداخل   •   🏆 أكثر من 10,000 عميل سعيد   •   🎁 اكسب نقاط مع كل طلب   •   💳 أسعار الجملة للمحلات والمتاجر   •   🗂️ +5000 منتج متوفر   •   ';
-
   static const _style = TextStyle(
     color: Colors.white, fontSize: 11,
     fontFamily: 'Cairo', fontWeight: FontWeight.w700,
@@ -463,13 +460,14 @@ class _MarqueeBarState extends State<_MarqueeBar> with SingleTickerProviderState
 
   @override
   Widget build(BuildContext context) {
+    final text = context.watch<LocaleProvider>().s.marqueeText;
     return Container(
       height: 32,
       clipBehavior: Clip.hardEdge,
       decoration: const BoxDecoration(color: AppColors.orange),
       child: LayoutBuilder(builder: (ctx, _) {
         final tp = TextPainter(
-          text: const TextSpan(text: _text, style: _style),
+          text: TextSpan(text: text, style: _style),
           textDirection: TextDirection.ltr,
         )..layout(maxWidth: double.infinity);
         final tw = tp.width;
@@ -483,7 +481,7 @@ class _MarqueeBarState extends State<_MarqueeBar> with SingleTickerProviderState
                 left: -dx, top: 0, bottom: 0,
                 child: Align(
                   alignment: Alignment.center,
-                  child: Text(_text + _text, style: _style, softWrap: false, maxLines: 1),
+                  child: Text(text + text, style: _style, softWrap: false, maxLines: 1),
                 ),
               ),
             ]);
@@ -788,6 +786,7 @@ class _FlashSaleSectionState extends State<_FlashSaleSection> {
 
   @override
   Widget build(BuildContext context) {
+    final s  = context.watch<LocaleProvider>().s;
     final h  = _pad(_remaining.inHours);
     final m  = _pad(_remaining.inMinutes.remainder(60));
     final sc = _pad(_remaining.inSeconds.remainder(60));
@@ -813,10 +812,10 @@ class _FlashSaleSectionState extends State<_FlashSaleSection> {
             const Text('⚡', style: TextStyle(fontSize: 36)),
             const SizedBox(width: 12),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('عروض اليوم فقط!',
-                style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
-              const Text('لا تفوّت الفرصة — الأسعار تتغير غداً',
-                style: TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'Cairo')),
+              Text(s.flashSaleTitle,
+                style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+              Text(s.flashSaleSubtitle,
+                style: const TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'Cairo')),
             ])),
             const SizedBox(width: 12),
             // Countdown timer
@@ -827,15 +826,15 @@ class _FlashSaleSectionState extends State<_FlashSaleSection> {
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(children: [
-                const Text('ينتهي خلال',
-                  style: TextStyle(color: Colors.white60, fontSize: 8, fontFamily: 'Cairo')),
+                Text(s.flashSaleEndsIn,
+                  style: const TextStyle(color: Colors.white60, fontSize: 8, fontFamily: 'Cairo')),
                 const SizedBox(height: 4),
                 Row(children: [
-                  _TimeUnit(value: h, label: 'س'),
+                  _TimeUnit(value: h, label: s.timeUnitHour),
                   const _TimeSep(),
-                  _TimeUnit(value: m, label: 'د'),
+                  _TimeUnit(value: m, label: s.timeUnitMin),
                   const _TimeSep(),
-                  _TimeUnit(value: sc, label: 'ث'),
+                  _TimeUnit(value: sc, label: s.timeUnitSec),
                 ]),
               ]),
             ),
@@ -856,7 +855,7 @@ class _FlashSaleSectionState extends State<_FlashSaleSection> {
               width: 145,
               child: ProductCard(
                 product: widget.offers[i],
-                badgeLabel: '💥 عرض',
+                badgeLabel: s.badgeOffer,
                 badgeColor: const Color(0xFFC85E10),
               ),
             ),
@@ -910,6 +909,7 @@ class _LoyaltyFeedCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final s        = context.watch<LocaleProvider>().s;
     final pts      = user.loyaltyPoints as int;
     final progress = (user.tierProgress as double).clamp(0.0, 1.0);
     final tier     = user.tierLabel  as String;
@@ -936,12 +936,12 @@ class _LoyaltyFeedCard extends StatelessWidget {
             Text(emoji, style: const TextStyle(fontSize: 28)),
             const SizedBox(width: 10),
             Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-              const Text('نقاط الولاء الخاصة بك',
-                style: TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'Cairo')),
+              Text(s.loyaltyCardTitle,
+                style: const TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'Cairo')),
               Row(children: [
                 Text('$pts', style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
                 const SizedBox(width: 6),
-                Text('نقطة  •  $tier', style: const TextStyle(color: Colors.white60, fontSize: 11, fontFamily: 'Cairo')),
+                Text('${s.loyaltyPointUnit}  •  $tier', style: const TextStyle(color: Colors.white60, fontSize: 11, fontFamily: 'Cairo')),
               ]),
             ])),
             // Value chip
@@ -968,7 +968,7 @@ class _LoyaltyFeedCard extends StatelessWidget {
           ),
           if (nextTier != null) ...[
             const SizedBox(height: 6),
-            Text('${(progress * 100).round()}% نحو مستوى $nextTier',
+            Text(s.loyaltyProgress((progress * 100).round(), nextTier),
               style: const TextStyle(color: Colors.white60, fontSize: 10, fontFamily: 'Cairo')),
           ],
         ]),

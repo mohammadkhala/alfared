@@ -233,6 +233,21 @@ class S {
   String get wishlistLabel     => _t('wishlistLabel');
   String get pointsShortLabel  => _t('pointsShortLabel');
   String get loyaltyPointsCard => _t('loyaltyPointsCard');
+
+  // ── home marquee + flash sale + loyalty card ─────────────────
+  String get marqueeText        => _t('marqueeText');
+  String get flashSaleTitle     => _t('flashSaleTitle');
+  String get flashSaleSubtitle  => _t('flashSaleSubtitle');
+  String get flashSaleEndsIn    => _t('flashSaleEndsIn');
+  String get timeUnitHour       => _t('timeUnitHour');
+  String get timeUnitMin        => _t('timeUnitMin');
+  String get timeUnitSec        => _t('timeUnitSec');
+  String get badgeOffer         => _t('badgeOffer');
+  String get badgeTrending      => _t('badgeTrending');
+  String get loyaltyCardTitle   => _t('loyaltyCardTitle');
+  String get loyaltyPointUnit   => _t('loyaltyPointUnit');
+  String loyaltyProgress(int pct, String tier) =>
+      _t('loyaltyProgressBase').replaceFirst('%d', '$pct').replaceFirst('%s', tier);
   String toReachTier(String emoji, String name) =>
       _t('toReachTierBase').replaceFirst('%s', '$emoji $name');
   String remainingAmount(String amount) => _t('remainingAmountBase').replaceFirst('%s', amount);
@@ -483,6 +498,24 @@ class AppStrings {
     'bronzeTierLabel':    {'ar': 'برونزي',         'he': 'ברונזה',        'en': 'Bronze'},
     'silverTierLabel':    {'ar': 'فضي',            'he': 'כסף',           'en': 'Silver'},
     'goldTierLabel':      {'ar': 'ذهبي',           'he': 'זהב',           'en': 'Gold'},
+
+    // ── home marquee + flash sale + loyalty card ────────────────
+    'marqueeText':        {
+      'ar': '   🛵 توصيل لجميع مناطق فلسطين والداخل   •   🏆 أكثر من 10,000 عميل سعيد   •   🎁 اكسب نقاط مع كل طلب   •   💳 أسعار الجملة للمحلات والمتاجر   •   🗂️ +5000 منتج متوفر   •   ',
+      'he': '   🛵 משלוח לכל אזורי פלסטין והפנים   •   🏆 יותר מ-10,000 לקוחות מרוצים   •   🎁 צבור נקודות עם כל הזמנה   •   💳 מחירי סיטונאי לחנויות   •   🗂️ +5000 מוצרים זמינים   •   ',
+      'en': '   🛵 Delivery to all areas of Palestine   •   🏆 Over 10,000 happy customers   •   🎁 Earn points with every order   •   💳 Wholesale prices for shops   •   🗂️ +5000 products available   •   ',
+    },
+    'flashSaleTitle':     {'ar': 'عروض اليوم فقط!',                    'he': 'מבצעים להיום בלבד!',             'en': 'Today\'s Deals Only!'},
+    'flashSaleSubtitle':  {'ar': 'لا تفوّت الفرصة — الأسعار تتغير غداً','he': 'אל תפספס — המחירים משתנים מחר', 'en': 'Don\'t miss out — prices change tomorrow'},
+    'flashSaleEndsIn':    {'ar': 'ينتهي خلال',                          'he': 'מסתיים בעוד',                    'en': 'Ends in'},
+    'timeUnitHour':       {'ar': 'س',   'he': 'ש',   'en': 'h'},
+    'timeUnitMin':        {'ar': 'د',   'he': 'ד',   'en': 'm'},
+    'timeUnitSec':        {'ar': 'ث',   'he': 'ש',   'en': 's'},
+    'badgeOffer':         {'ar': '💥 عرض', 'he': '💥 מבצע', 'en': '💥 Deal'},
+    'badgeTrending':      {'ar': '⭐ رائج', 'he': '⭐ פופולרי', 'en': '⭐ Trending'},
+    'loyaltyCardTitle':   {'ar': 'نقاط الولاء الخاصة بك', 'he': 'נקודות הנאמנות שלך', 'en': 'Your Loyalty Points'},
+    'loyaltyPointUnit':   {'ar': 'نقطة', 'he': 'נקודות', 'en': 'pts'},
+    'loyaltyProgressBase':{'ar': '%d% نحو مستوى %s', 'he': '%d% לקראת רמה %s', 'en': '%d% toward %s tier'},
 
     // ── language names ──────────────────────────────────────────
     'lang_ar':            {'ar': 'العربية',    'he': 'ערבית',   'en': 'Arabic'},
