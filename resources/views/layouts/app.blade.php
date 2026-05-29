@@ -195,10 +195,10 @@
         <h4>{{ __('footer_support') }}</h4>
         <ul>
           <li><a href="https://wa.me/970598191312" target="_blank">{{ __('whatsapp') }}</a></li>
-          <li><a href="tel:+970598191312">{{ __('contact_us') }}</a></li>
-          <li><a href="#">{{ __('footer_return_policy') }}</a></li>
-          <li><a href="#">{{ __('footer_shipping') }}</a></li>
-          <li><a href="#">{{ __('footer_faq') }}</a></li>
+          <li><a href="{{ route('contact') }}">{{ __('contact_us') }}</a></li>
+          <li><a href="{{ route('returns') }}">{{ __('footer_return_policy') }}</a></li>
+          <li><a href="{{ route('shipping') }}">{{ __('footer_shipping') }}</a></li>
+          <li><a href="{{ route('faq') }}">{{ __('footer_faq') }}</a></li>
         </ul>
       </div>
     </div>
