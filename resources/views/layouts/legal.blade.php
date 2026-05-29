@@ -1,272 +1,229 @@
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>@yield('title') — شركة أبناء الفريد</title>
-  <meta name="description" content="@yield('description','شركة أبناء الفريد — فلسطين')"/>
-  <link rel="icon" href="/images/logo.png"/>
-  <link rel="preconnect" href="https://fonts.googleapis.com"/>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+@extends('layouts.app')
 
-    :root {
-      --orange: #F97316;
-      --blue:   #3B82F6;
-    }
-
-    body {
-      font-family: 'Cairo', sans-serif;
-      background: #080810;
-      color: rgba(255,255,255,.82);
-      min-height: 100vh;
-      line-height: 1.8;
-    }
-
-    /* Grid background */
-    body::before {
-      content: '';
-      position: fixed; inset: 0; z-index: 0;
-      background-image:
-        linear-gradient(rgba(255,255,255,.02) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(255,255,255,.02) 1px, transparent 1px);
-      background-size: 55px 55px;
-      pointer-events: none;
-    }
-
-    /* Glows */
-    body::after {
-      content: '';
-      position: fixed;
-      width: 600px; height: 600px;
-      border-radius: 50%;
-      background: radial-gradient(circle, rgba(249,115,22,.1) 0%, transparent 68%);
-      top: -150px; right: -150px;
-      pointer-events: none; z-index: 0;
-    }
-
-    /* ── Topbar ── */
-    .topbar {
-      position: sticky; top: 0; z-index: 100;
-      background: rgba(8,8,16,.85);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border-bottom: 1px solid rgba(255,255,255,.07);
-      padding: 0 24px;
-    }
-
-    .topbar-inner {
-      max-width: 900px; margin: 0 auto;
-      display: flex; align-items: center;
-      justify-content: space-between;
-      height: 60px; gap: 16px;
-    }
-
-    .brand {
-      display: flex; align-items: center; gap: 10px;
-      text-decoration: none;
-    }
-
-    .brand img {
-      width: 34px; height: 34px;
-      object-fit: contain; border-radius: 8px;
-    }
-
-    .brand-name {
-      font-size: 15px; font-weight: 700;
-      color: #fff;
-    }
-
-    .brand-name span { color: var(--orange); }
-
-    .back-btn {
-      display: flex; align-items: center; gap: 6px;
-      font-size: 13px; font-weight: 600;
-      color: rgba(255,255,255,.5);
-      text-decoration: none;
-      padding: 6px 14px; border-radius: 8px;
-      border: 1px solid rgba(255,255,255,.08);
-      transition: color .2s, border-color .2s, background .2s;
-    }
-
-    .back-btn:hover {
-      color: #fff;
-      border-color: rgba(249,115,22,.3);
-      background: rgba(249,115,22,.07);
-    }
-
-    /* ── Main content ── */
-    .container {
-      position: relative; z-index: 1;
-      max-width: 780px; margin: 0 auto;
-      padding: 48px 24px 80px;
-    }
-
-    /* Page header */
-    .page-header {
-      text-align: center;
-      margin-bottom: 48px;
-      padding-bottom: 36px;
-      border-bottom: 1px solid rgba(255,255,255,.06);
-    }
-
-    .page-icon {
-      font-size: 48px; margin-bottom: 16px;
-      display: block;
-      filter: drop-shadow(0 0 20px rgba(249,115,22,.3));
-    }
-
-    .page-header h1 {
-      font-size: 32px; font-weight: 900;
-      color: #fff; margin-bottom: 8px;
-    }
-
-    .page-header p {
-      font-size: 13px; color: rgba(255,255,255,.3);
-    }
-
-    /* Sections */
-    .section {
-      margin-bottom: 36px;
-      background: rgba(255,255,255,.03);
-      border: 1px solid rgba(255,255,255,.06);
-      border-radius: 16px;
-      overflow: hidden;
-    }
-
-    .section-header {
-      padding: 16px 24px;
-      background: rgba(249,115,22,.07);
-      border-bottom: 1px solid rgba(255,255,255,.05);
-      display: flex; align-items: center; gap: 10px;
-    }
-
-    .section-header h2 {
-      font-size: 15px; font-weight: 700;
-      color: var(--orange);
-    }
-
-    .section-icon { font-size: 18px; }
-
-    .section-body {
-      padding: 20px 24px;
-    }
-
-    .section-body p {
-      font-size: 14px;
-      color: rgba(255,255,255,.65);
-      margin-bottom: 12px;
-    }
-
-    .section-body p:last-child { margin-bottom: 0; }
-
-    .section-body ul {
-      list-style: none;
-      padding: 0;
-    }
-
-    .section-body ul li {
-      font-size: 14px;
-      color: rgba(255,255,255,.65);
-      padding: 6px 0;
-      padding-right: 20px;
-      position: relative;
-      border-bottom: 1px solid rgba(255,255,255,.04);
-    }
-
-    .section-body ul li:last-child { border-bottom: none; }
-
-    .section-body ul li::before {
-      content: '›';
-      position: absolute; right: 0;
-      color: var(--orange);
-      font-weight: 900;
-    }
-
-    .highlight-box {
-      background: rgba(249,115,22,.08);
-      border: 1px solid rgba(249,115,22,.2);
-      border-radius: 10px;
-      padding: 14px 18px;
-      font-size: 13px;
-      color: rgba(255,255,255,.7);
-      margin-top: 12px;
-    }
-
-    .highlight-box strong { color: var(--orange); }
-
-    /* Contact section */
-    .contact-row {
-      display: flex; gap: 10px; flex-wrap: wrap;
-      margin-top: 8px;
-    }
-
-    .contact-chip {
-      display: inline-flex; align-items: center; gap: 7px;
-      padding: 8px 16px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.08);
-      border-radius: 8px;
-      font-size: 13px; color: rgba(255,255,255,.7);
-      text-decoration: none;
-      transition: background .2s, border-color .2s;
-    }
-
-    .contact-chip:hover {
-      background: rgba(249,115,22,.1);
-      border-color: rgba(249,115,22,.3);
-      color: #fff;
-    }
-
-    /* Footer */
-    .legal-footer {
-      text-align: center;
-      padding-top: 36px;
-      border-top: 1px solid rgba(255,255,255,.05);
-      font-size: 12px;
-      color: rgba(255,255,255,.2);
-    }
-
-    .legal-footer a {
-      color: var(--orange); text-decoration: none; opacity: .75;
-      margin: 0 8px;
-    }
-    .legal-footer a:hover { opacity: 1; }
-
-    @media (max-width: 600px) {
-      .topbar-inner { height: 54px; }
-      .page-header h1 { font-size: 26px; }
-      .section-body { padding: 16px; }
-      .section-header { padding: 14px 16px; }
-    }
-  </style>
-</head>
-<body>
-
-  <nav class="topbar">
-    <div class="topbar-inner">
-      <a href="/" class="brand">
-        <img src="/images/logo.png" alt="أبناء الفريد"
-             onerror="this.style.display='none'"/>
-        <span class="brand-name">أبناء <span>الفريد</span></span>
-      </a>
-      <a href="/" class="back-btn">← العودة للرئيسية</a>
-    </div>
-  </nav>
-
+@section('content')
+<div class="legal-page">
   <div class="container">
-    @yield('content')
 
-    <footer class="legal-footer">
-      <p>© 2025 شركة أبناء الفريد — فلسطين</p>
-      <p style="margin-top:8px;">
-        <a href="/privacy-policy">سياسة الخصوصية</a>
-        <a href="/returns">سياسة الإرجاع</a>
-        <a href="/terms">شروط الاستخدام</a>
-      </p>
-    </footer>
+    {{-- Breadcrumb --}}
+    <nav class="legal-breadcrumb">
+      <a href="{{ route('home') }}">🏠 الرئيسية</a>
+      <span>›</span>
+      <span>@yield('title')</span>
+    </nav>
+
+    {{-- Page Header --}}
+    <div class="legal-header">
+      <div class="legal-header-icon">@yield('icon', '📄')</div>
+      <div>
+        <h1>@yield('title')</h1>
+        <p class="legal-date">آخر تحديث: يناير 2025 &nbsp;·&nbsp; شركة أبناء الفريد — فلسطين</p>
+      </div>
+    </div>
+
+    {{-- Content --}}
+    <div class="legal-content">
+      @yield('page-content')
+    </div>
+
+    {{-- Footer links --}}
+    <div class="legal-footer-links">
+      <a href="{{ route('privacy-policy') }}" class="{{ request()->routeIs('privacy-policy') ? 'active' : '' }}">🔒 سياسة الخصوصية</a>
+      <a href="{{ route('returns') }}"        class="{{ request()->routeIs('returns')        ? 'active' : '' }}">🔄 سياسة الإرجاع</a>
+      <a href="{{ route('terms') }}"          class="{{ request()->routeIs('terms')          ? 'active' : '' }}">📜 شروط الاستخدام</a>
+    </div>
+
   </div>
+</div>
 
-</body>
-</html>
+<style>
+/* ── Legal Page Styles ── */
+.legal-page {
+  background: var(--gray-bg);
+  min-height: 60vh;
+  padding: 40px 0 64px;
+}
+
+.legal-breadcrumb {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--gray);
+  margin-bottom: 28px;
+}
+.legal-breadcrumb a {
+  color: var(--blue);
+  font-weight: 600;
+  transition: color .2s;
+}
+.legal-breadcrumb a:hover { color: var(--orange); }
+.legal-breadcrumb span { color: #CBD5E1; }
+
+/* ── Header ── */
+.legal-header {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  background: white;
+  border-radius: 16px;
+  padding: 28px 32px;
+  margin-bottom: 28px;
+  box-shadow: 0 2px 12px rgba(27,59,140,.06);
+  border-right: 4px solid var(--orange);
+}
+.legal-header-icon {
+  font-size: 44px;
+  line-height: 1;
+  flex-shrink: 0;
+}
+.legal-header h1 {
+  font-size: 26px;
+  font-weight: 900;
+  color: var(--blue);
+  margin-bottom: 4px;
+}
+.legal-date {
+  font-size: 12px;
+  color: var(--gray);
+}
+
+/* ── Content area ── */
+.legal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* ── Section card ── */
+.ls {
+  background: white;
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(27,59,140,.05);
+  overflow: hidden;
+}
+
+.ls-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 24px;
+  background: var(--blue-lt);
+  border-bottom: 1px solid rgba(27,59,140,.08);
+}
+.ls-head h2 {
+  font-size: 14px;
+  font-weight: 800;
+  color: var(--blue);
+}
+.ls-head-icon { font-size: 18px; }
+
+.ls-body {
+  padding: 20px 24px;
+}
+.ls-body p {
+  font-size: 14px;
+  color: #374151;
+  line-height: 1.9;
+  margin-bottom: 10px;
+}
+.ls-body p:last-child { margin-bottom: 0; }
+
+.ls-body ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.ls-body ul li {
+  font-size: 14px;
+  color: #374151;
+  padding: 7px 20px 7px 0;
+  border-bottom: 1px solid #F3F4F6;
+  position: relative;
+  line-height: 1.7;
+}
+.ls-body ul li:last-child { border-bottom: none; }
+.ls-body ul li::before {
+  content: '›';
+  position: absolute;
+  right: 0;
+  color: var(--orange);
+  font-weight: 900;
+  font-size: 16px;
+}
+
+.ls-highlight {
+  background: var(--orange-lt);
+  border: 1px solid rgba(232,113,26,.2);
+  border-radius: 10px;
+  padding: 12px 16px;
+  font-size: 13px;
+  color: #374151;
+  margin-top: 12px;
+  line-height: 1.8;
+}
+.ls-highlight strong { color: var(--orange); }
+
+/* ── Contact chips ── */
+.ls-contact-row {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 10px;
+}
+.ls-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 16px;
+  background: var(--blue-lt);
+  border: 1px solid rgba(27,59,140,.12);
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--blue);
+  text-decoration: none;
+  transition: all .2s;
+}
+.ls-chip:hover {
+  background: var(--orange-lt);
+  border-color: rgba(232,113,26,.3);
+  color: var(--orange);
+}
+
+/* ── Footer links ── */
+.legal-footer-links {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid #E5E7EB;
+}
+.legal-footer-links a {
+  padding: 8px 18px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--gray);
+  background: white;
+  border: 1.5px solid #E5E7EB;
+  transition: all .2s;
+  text-decoration: none;
+}
+.legal-footer-links a:hover,
+.legal-footer-links a.active {
+  color: var(--orange);
+  border-color: var(--orange);
+  background: var(--orange-lt);
+}
+
+@media (max-width: 640px) {
+  .legal-header { padding: 20px; gap: 14px; }
+  .legal-header h1 { font-size: 20px; }
+  .legal-header-icon { font-size: 34px; }
+  .ls-body { padding: 16px; }
+  .ls-head { padding: 12px 16px; }
+}
+</style>
+@endsection
