@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_strings.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../theme/app_theme.dart';
 import '../home/main_navigation.dart';
 import 'register_screen.dart';
@@ -56,6 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s    = context.watch<LocaleProvider>().s;
     final auth = context.watch<AuthProvider>();
 
     return Scaffold(
@@ -102,16 +105,16 @@ class _LoginScreenState extends State<LoginScreen> {
                     boxShadow: AppShadows.card,
                   ),
                   child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                    const Text('مرحباً بعودتك! 👋',
-                      style: TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.blueDark, fontFamily: 'Cairo')),
+                    Text(s.loginWelcome,
+                      style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w900, color: AppColors.blueDark, fontFamily: 'Cairo')),
                     const SizedBox(height: 4),
-                    const Text('سجّل دخولك برقم هاتفك',
-                      style: TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 13)),
+                    Text(s.loginSubtitle,
+                      style: const TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 13)),
                     const SizedBox(height: 22),
 
                     // ── Phone field ──────────────────────────────────────
-                    const Text('رقم الهاتف',
-                      style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700,
+                    Text(s.loginPhoneLabel,
+                      style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700,
                           fontSize: 13, color: AppColors.blueDark)),
                     const SizedBox(height: 8),
                     Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
@@ -168,10 +171,10 @@ class _LoginScreenState extends State<LoginScreen> {
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: AppColors.grayBg,
-                            hintText: 'XXXXXXXXX',
+                            hintText: s.loginPhoneHint,
                             hintStyle: const TextStyle(color: AppColors.border, letterSpacing: 1.5, fontSize: 14),
                             prefixIcon: const Icon(Icons.phone_outlined, size: 18, color: AppColors.gray),
-                            helperText: '9 أرقام (بدون الصفر)',
+                            helperText: s.loginPhoneHelper,
                             helperStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 10, color: AppColors.grayLight),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -189,7 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           validator: (v) {
                             var d = (v ?? '').replaceAll(RegExp(r'\D'), '');
                             if (d.startsWith('0')) d = d.substring(1);
-                            if (d.length != 9) return 'أدخل 9 أرقام صحيحة';
+                            if (d.length != 9) return s.loginPhoneErr;
                             return null;
                           },
                         ),
@@ -198,8 +201,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 16),
 
                     // ── Password ─────────────────────────────────────────
-                    const Text('كلمة المرور',
-                      style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700,
+                    Text(s.loginPassLabel,
+                      style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700,
                           fontSize: 13, color: AppColors.blueDark)),
                     const SizedBox(height: 8),
                     TextFormField(
@@ -234,7 +237,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           borderSide: const BorderSide(color: AppColors.orange, width: 1.8),
                         ),
                       ),
-                      validator: (v) => (v == null || v.length < 6) ? '6 أحرف على الأقل' : null,
+                      validator: (v) => (v == null || v.length < 6) ? s.loginPassErr : null,
                     ),
                     const SizedBox(height: 24),
 
@@ -247,8 +250,8 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: auth.loading
                         ? const SizedBox(width: 22, height: 22,
                             child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                        : const Text('تسجيل الدخول',
-                            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
+                        : Text(s.loginBtn,
+                            style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
                     ),
                   ]),
                 ),
@@ -256,13 +259,13 @@ class _LoginScreenState extends State<LoginScreen> {
 
                 // ── Register link ────────────────────────────────────────
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                  const Text('ليس لديك حساب؟ ',
-                    style: TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 13)),
+                  Text(s.loginNoAccount,
+                    style: const TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 13)),
                   TextButton(
                     onPressed: () => Navigator.of(context).push(
                       MaterialPageRoute(builder: (_) => const RegisterScreen())),
-                    child: const Text('إنشاء حساب',
-                      style: TextStyle(color: AppColors.orange, fontWeight: FontWeight.w900,
+                    child: Text(s.loginCreate,
+                      style: const TextStyle(color: AppColors.orange, fontWeight: FontWeight.w900,
                           fontFamily: 'Cairo', fontSize: 13)),
                   ),
                 ]),

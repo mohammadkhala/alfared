@@ -49,6 +49,53 @@ class _AccountScreenState extends State<AccountScreen> {
     } catch (_) {}
   }
 
+  Future<void> _showDeleteAccountDialog(BuildContext context, S s) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Text(s.deleteAccountTitle,
+          style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900,
+              fontSize: 16, color: AppColors.danger)),
+        content: Text(s.deleteAccountMsg,
+          style: const TextStyle(fontFamily: 'Cairo', fontSize: 13, color: AppColors.text, height: 1.6)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text(s.cancel, style: const TextStyle(fontFamily: 'Cairo', color: AppColors.gray)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.danger,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text(s.deleteAccountConfirm,
+              style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 12)),
+          ),
+        ],
+      ),
+    );
+    if (confirmed != true || !mounted) return;
+
+    try {
+      await ApiService.instance.delete('/auth/account');
+      if (!mounted) return;
+      await context.read<AuthProvider>().logout();
+      Fluttertoast.showToast(
+        msg: s.deleteAccountDone,
+        backgroundColor: AppColors.success,
+        textColor: Colors.white,
+      );
+    } catch (_) {
+      Fluttertoast.showToast(
+        msg: s.deleteAccountFail,
+        backgroundColor: AppColors.danger,
+        textColor: Colors.white,
+      );
+    }
+  }
+
   void _showEditProfile(BuildContext context, user) {
     final s         = context.read<LocaleProvider>().s;
     final nameCtrl  = TextEditingController(text: user.name);
@@ -306,6 +353,11 @@ class _AccountScreenState extends State<AccountScreen> {
               _MenuDivider(),
               _MenuItem(icon: '🚪', iconBg: AppColors.dangerLight, label: s.logout, labelColor: AppColors.danger,
                 onTap: () async { await context.read<AuthProvider>().logout(); }),
+              _MenuDivider(),
+              _MenuItem(
+                icon: '🗑️', iconBg: AppColors.dangerLight, label: s.deleteAccount, labelColor: AppColors.danger,
+                onTap: () => _showDeleteAccountDialog(context, s),
+              ),
             ]),
           ),
 

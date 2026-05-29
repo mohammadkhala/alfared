@@ -227,6 +227,36 @@ class AuthController extends Controller
         return response()->json(['user' => $this->formatUser($user)]);
     }
 
+    /**
+     * Permanently delete the authenticated user's account.
+     * - Revokes all Sanctum tokens
+     * - Clears FCM token (no more push)
+     * - Anonymises orders (keeps order history for admin)
+     * - Hard-deletes the user row
+     */
+    public function deleteAccount(Request $request): JsonResponse
+    {
+        $user = $request->user();
+
+        // Revoke all tokens
+        $user->tokens()->delete();
+
+        // Anonymise orders so admin keeps the history
+        $user->orders()->update([
+            'customer_name'  => 'حساب محذوف',
+            'customer_phone' => null,
+            'customer_email' => null,
+        ]);
+
+        // Clear cart (Darryldecode cart uses session; wipe loyalty & address data)
+        $user->addresses()->delete();
+
+        // Delete user (cascades to loyalty_transactions, otp_codes, etc.)
+        $user->delete();
+
+        return response()->json(['message' => 'تم حذف الحساب نهائياً']);
+    }
+
     /** Update FCM token from app (re-registered, refreshed, etc.). */
     public function updateFcmToken(Request $request): JsonResponse
     {
@@ -243,14 +273,29 @@ class AuthController extends Controller
 
     protected function formatUser(User $user): array
     {
-        $tier = \App\Services\TierService::summary($user);
+        try {
+            $tier = \App\Services\TierService::summary($user);
+        } catch (\Throwable $e) {
+            report($e);
+            $tier = [
+                'total_spent'      => 0,
+                'tier_key'         => 'new',
+                'tier_label'       => 'جديد',
+                'tier_emoji'       => '🎯',
+                'next_tier_label'  => null,
+                'next_tier_emoji'  => null,
+                'next_tier_min'    => null,
+                'amount_to_next'   => 200,
+                'tier_progress'    => 0,
+            ];
+        }
 
         return [
             'id'             => $user->id,
             'name'           => $user->name,
             'email'          => $user->email,
             'phone'          => $user->phone,
-            'loyalty_points' => (int) $user->loyalty_points,
+            'loyalty_points' => (int) ($user->loyalty_points ?? 0),
             'created_at'     => $user->created_at,
 
             // ── Tier fields ──

@@ -190,12 +190,17 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     MaterialPageRoute(builder: (_) => const AddressesScreen(selectMode: true)));
                   if (a == null) return;
                   setState(() {
-                    _zoneId       = a['delivery_zone_id'] as int?;
-                    _city.text    = a['city']?.toString() ?? '';
-                    _area.text    = a['area']?.toString() ?? '';
-                    _address.text = a['address_line']?.toString() ?? '';
-                    _building.text= a['building']?.toString() ?? '';
-                    _notes.text   = a['notes']?.toString() ?? '';
+                    // Safe int cast — MySQL may return IDs as String on some hosts
+                    final zid = a['delivery_zone_id'];
+                    _zoneId = zid is int
+                        ? zid
+                        : int.tryParse(zid?.toString() ?? '');
+
+                    _city.text     = a['city']?.toString() ?? '';
+                    _area.text     = a['area']?.toString() ?? '';
+                    _address.text  = a['address_line']?.toString() ?? '';
+                    _building.text = a['building']?.toString() ?? '';
+                    _notes.text    = a['notes']?.toString() ?? '';
                     final p = a['phone']?.toString() ?? '';
                     if (p.startsWith('+972'))      { _phonePrefix = '+972'; _phone.text = p.substring(4); }
                     else if (p.startsWith('+970')) { _phonePrefix = '+970'; _phone.text = p.substring(4); }

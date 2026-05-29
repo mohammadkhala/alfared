@@ -44,9 +44,14 @@ class TierService
     /** Compute the user's total spent (non-cancelled/returned orders). */
     public static function totalSpent(User $user): float
     {
-        return (float) $user->orders()
-            ->whereNotIn('status', ['cancelled', 'returned'])
-            ->sum('total');
+        try {
+            return (float) $user->orders()
+                ->whereNotIn('status', ['cancelled', 'returned'])
+                ->sum('total');
+        } catch (\Throwable $e) {
+            report($e);
+            return 0.0;
+        }
     }
 
     /** Return full tier data array for a given spend amount. */
@@ -72,10 +77,16 @@ class TierService
         return null;
     }
 
-    /** Full tier summary for a user — used in API responses. */
+    /** Full tier summary for a user — used in API responses. Never throws. */
     public static function summary(User $user): array
     {
-        $spent   = self::totalSpent($user);
+        try {
+            $spent = self::totalSpent($user);
+        } catch (\Throwable $e) {
+            report($e);
+            $spent = 0.0;
+        }
+
         $current = self::tierForAmount($spent);
         $next    = self::nextTierForAmount($spent);
 

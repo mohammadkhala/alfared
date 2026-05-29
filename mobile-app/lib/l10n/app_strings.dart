@@ -248,6 +248,61 @@ class S {
   String get loyaltyPointUnit   => _t('loyaltyPointUnit');
   String loyaltyProgress(int pct, String tier) =>
       _t('loyaltyProgressBase').replaceFirst('%d', '$pct').replaceFirst('%s', tier);
+
+  // ── onboarding ───────────────────────────────────────────────
+  String get onboardTag1      => _t('onboardTag1');
+  String get onboardTitle1    => _t('onboardTitle1');
+  String get onboardSub1      => _t('onboardSub1');
+  String get onboardTag2      => _t('onboardTag2');
+  String get onboardTitle2    => _t('onboardTitle2');
+  String get onboardSub2      => _t('onboardSub2');
+  String get onboardTag3      => _t('onboardTag3');
+  String get onboardTitle3    => _t('onboardTitle3');
+  String get onboardSub3      => _t('onboardSub3');
+  String get onboardNext      => _t('onboardNext');
+  String get onboardStart     => _t('onboardStart');
+  String get onboardSkipOr    => _t('onboardSkipOr');
+  String get onboardSkip      => _t('onboardSkip');
+
+  // ── login ────────────────────────────────────────────────────
+  String get loginWelcome     => _t('loginWelcome');
+  String get loginSubtitle    => _t('loginSubtitle');
+  String get loginPhoneLabel  => _t('loginPhoneLabel');
+  String get loginPhoneHint   => _t('loginPhoneHint');
+  String get loginPhoneHelper => _t('loginPhoneHelper');
+  String get loginPassLabel   => _t('loginPassLabel');
+  String get loginBtn         => _t('loginBtn');
+  String get loginNoAccount   => _t('loginNoAccount');
+  String get loginCreate      => _t('loginCreate');
+  String get loginPhoneErr    => _t('loginPhoneErr');
+  String get loginPassErr     => _t('loginPassErr');
+
+  // ── register ─────────────────────────────────────────────────
+  String get registerTitle    => _t('registerTitle');
+  String get registerWelcome  => _t('registerWelcome');
+  String get registerNameLbl  => _t('registerNameLbl');
+  String get registerNameHint => _t('registerNameHint');
+  String get registerNameErr  => _t('registerNameErr');
+  String get registerEmailLbl => _t('registerEmailLbl');
+  String get registerEmailErr => _t('registerEmailErr');
+  String get registerPassLbl  => _t('registerPassLbl');
+  String get registerPassHelp => _t('registerPassHelp');
+  String get registerPassErr  => _t('registerPassErr');
+  String get registerBtn          => _t('registerBtn');
+  String get registerWaNote       => _t('registerWaNote');
+  String get registerDuplicate    => _t('registerDuplicate');
+  String get registerOtpFailed    => _t('registerOtpFailed');
+
+  // ── account deletion ─────────────────────────────────────
+  String get deleteAccount        => _t('deleteAccount');
+  String get deleteAccountTitle   => _t('deleteAccountTitle');
+  String get deleteAccountMsg     => _t('deleteAccountMsg');
+  String get deleteAccountConfirm => _t('deleteAccountConfirm');
+  String get deleteAccountDone    => _t('deleteAccountDone');
+  String get deleteAccountFail    => _t('deleteAccountFail');
+
+  // ── language picker (onboarding) ─────────────────────────
+  String get chooseLanguage       => _t('chooseLanguage');
   String toReachTier(String emoji, String name) =>
       _t('toReachTierBase').replaceFirst('%s', '$emoji $name');
   String remainingAmount(String amount) => _t('remainingAmountBase').replaceFirst('%s', amount);
@@ -498,6 +553,61 @@ class AppStrings {
     'bronzeTierLabel':    {'ar': 'برونزي',         'he': 'ברונזה',        'en': 'Bronze'},
     'silverTierLabel':    {'ar': 'فضي',            'he': 'כסף',           'en': 'Silver'},
     'goldTierLabel':      {'ar': 'ذهبي',           'he': 'זהב',           'en': 'Gold'},
+
+    // ── onboarding ──────────────────────────────────────────────
+    'onboardTag1':    {'ar': '✦ متجر التجميل الأول',      'he': '✦ חנות היופי הראשונה',      'en': '✦ #1 Beauty Store'},
+    'onboardTitle1':  {'ar': 'اكتشف عالم\nالجمال الفاخر', 'he': 'גלה את עולם\nהיופי היוקרתי', 'en': 'Discover the World\nof Luxury Beauty'},
+    'onboardSub1':    {'ar': 'أكثر من 5000 منتج أصيل للمحلات والمتاجر وصفحات التسويق الإلكتروني', 'he': 'יותר מ-5000 מוצרים מקוריים לחנויות ועמודי שיווק', 'en': 'Over 5000 authentic products for shops and online stores'},
+    'onboardTag2':    {'ar': '✦ توصيل سريع',              'he': '✦ משלוח מהיר',               'en': '✦ Fast Delivery'},
+    'onboardTitle2':  {'ar': 'توصيل سريع\nلجميع فلسطين 🇵🇸','he': 'משלוח מהיר\nלכל פלסטין 🇵🇸', 'en': 'Fast Delivery\nAcross Palestine 🇵🇸'},
+    'onboardSub2':    {'ar': 'نوصّل لجميع مناطق فلسطين والداخل في أسرع وقت وبأقل الأسعار', 'he': 'אנחנו מגיעים לכל אזורי פלסטין והפנים במהירות ובמחירים הטובים ביותר', 'en': 'We deliver to all areas of Palestine and inside at the fastest time and lowest prices'},
+    'onboardTag3':    {'ar': '✦ برنامج الولاء',           'he': '✦ תוכנית נאמנות',            'en': '✦ Loyalty Program'},
+    'onboardTitle3':  {'ar': 'نقاط ومكافآت\nحقيقية',      'he': 'נקודות ופרסים\nאמיתיים',      'en': 'Real Points\n& Rewards'},
+    'onboardSub3':    {'ar': 'اجمع نقاطاً مع كل طلب وارتقِ لمستوى VIP واحصل على خصومات حصرية', 'he': 'צבור נקודות עם כל הזמנה, עלה לרמת VIP וקבל הנחות בלעדיות', 'en': 'Earn points with every order, reach VIP level and get exclusive discounts'},
+    'onboardNext':    {'ar': 'التالي ←',                  'he': '← הבא',                      'en': 'Next →'},
+    'onboardStart':   {'ar': 'ابدأ التسوق 🛍️',            'he': 'התחל לקנות 🛍️',              'en': 'Start Shopping 🛍️'},
+    'onboardSkipOr':  {'ar': 'أو ',                       'he': 'או ',                        'en': 'or '},
+    'onboardSkip':    {'ar': 'تخطى للمتجر',               'he': 'עבור לחנות',                 'en': 'Skip to store'},
+
+    // ── login ────────────────────────────────────────────────────
+    'loginWelcome':   {'ar': 'مرحباً بعودتك! 👋',         'he': 'ברוך שובך! 👋',              'en': 'Welcome back! 👋'},
+    'loginSubtitle':  {'ar': 'سجّل دخولك برقم هاتفك',     'he': 'התחבר עם מספר הטלפון שלך',   'en': 'Sign in with your phone number'},
+    'loginPhoneLabel':{'ar': 'رقم الهاتف',                 'he': 'מספר טלפון',                 'en': 'Phone Number'},
+    'loginPhoneHint': {'ar': 'XXXXXXXXX',                  'he': 'XXXXXXXXX',                  'en': 'XXXXXXXXX'},
+    'loginPhoneHelper':{'ar':'9 أرقام (بدون الصفر)',       'he': '9 ספרות (ללא אפס)',          'en': '9 digits (without 0)'},
+    'loginPassLabel': {'ar': 'كلمة المرور',                'he': 'סיסמה',                      'en': 'Password'},
+    'loginBtn':       {'ar': 'تسجيل الدخول',               'he': 'התחברות',                    'en': 'Sign In'},
+    'loginNoAccount': {'ar': 'ليس لديك حساب؟ ',            'he': 'אין לך חשבון? ',             'en': 'Don\'t have an account? '},
+    'loginCreate':    {'ar': 'إنشاء حساب',                 'he': 'הרשמה',                      'en': 'Create account'},
+    'loginPhoneErr':  {'ar': 'أدخل 9 أرقام صحيحة',        'he': 'הזן 9 ספרות תקינות',         'en': 'Enter 9 valid digits'},
+    'loginPassErr':   {'ar': '6 أحرف على الأقل',           'he': 'לפחות 6 תווים',              'en': 'At least 6 characters'},
+
+    // ── register ─────────────────────────────────────────────────
+    'registerTitle':  {'ar': 'إنشاء حساب جديد',           'he': 'יצירת חשבון חדש',            'en': 'Create New Account'},
+    'registerWelcome':{'ar': 'انضم لعائلة أبناء الفريد 🎉','he': 'הצטרף למשפחת אבנא אלפריד 🎉','en': 'Join Alfared Family 🎉'},
+    'registerNameLbl':{'ar': 'الاسم الكامل',               'he': 'שם מלא',                     'en': 'Full Name'},
+    'registerNameHint':{'ar':'محمد أبو سالم',              'he': 'מוחמד אבו סאלם',             'en': 'John Smith'},
+    'registerNameErr':{'ar': 'الرجاء إدخال الاسم',         'he': 'נא להזין שם',                'en': 'Please enter your name'},
+    'registerEmailLbl':{'ar':'البريد الإلكتروني',          'he': 'דואר אלקטרוני',              'en': 'Email Address'},
+    'registerEmailErr':{'ar':'بريد غير صحيح',              'he': 'דואר אלקטרוני לא תקין',      'en': 'Invalid email'},
+    'registerPassLbl':{'ar': 'كلمة المرور',                'he': 'סיסמה',                      'en': 'Password'},
+    'registerPassHelp':{'ar':'8 أحرف على الأقل',           'he': 'לפחות 8 תווים',              'en': 'At least 8 characters'},
+    'registerPassErr':{'ar': '8 أحرف على الأقل',           'he': 'לפחות 8 תווים',              'en': 'At least 8 characters'},
+    'registerBtn':    {'ar': 'إرسال رمز التحقق عبر واتساب','he': 'שלח קוד אימות בוואטסאפ',    'en': 'Send OTP via WhatsApp'},
+    'registerWaNote':     {'ar': 'سيتم إرسال رمز التحقق عبر واتساب إلى رقم هاتفك', 'he': 'קוד האימות יישלח בוואטסאפ למספר הטלפון שלך', 'en': 'OTP will be sent via WhatsApp to your phone number'},
+    'registerDuplicate':  {'ar': 'هذا الرقم أو البريد مسجل مسبقاً',               'he': 'מספר זה או הדואר כבר רשומים',                'en': 'This phone or email is already registered'},
+    'registerOtpFailed':  {'ar': 'فشل إرسال رمز التحقق',                          'he': 'שליחת קוד האימות נכשלה',                   'en': 'Failed to send OTP'},
+
+    // ── account deletion ─────────────────────────────────────────
+    'deleteAccount':        {'ar': 'حذف الحساب',                         'he': 'מחק חשבון',                          'en': 'Delete Account'},
+    'deleteAccountTitle':   {'ar': 'حذف الحساب نهائياً',                 'he': 'מחיקת חשבון לצמיתות',               'en': 'Permanently Delete Account'},
+    'deleteAccountMsg':     {'ar': 'سيتم حذف حسابك وجميع بياناتك نهائياً، ولا يمكن التراجع عن هذا الإجراء.', 'he': 'חשבונך וכל הנתונים שלך יימחקו לצמיתות ולא ניתן לבטל פעולה זו.', 'en': 'Your account and all data will be permanently deleted. This cannot be undone.'},
+    'deleteAccountConfirm': {'ar': 'نعم، احذف حسابي',                   'he': 'כן, מחק את חשבוני',                 'en': 'Yes, Delete My Account'},
+    'deleteAccountDone':    {'ar': '✓ تم حذف حسابك بنجاح',             'he': '✓ החשבון שלך נמחק בהצלחה',          'en': '✓ Your account has been deleted'},
+    'deleteAccountFail':    {'ar': 'حدث خطأ، حاول مجدداً',             'he': 'שגיאה, נסה שוב',                    'en': 'An error occurred, please try again'},
+
+    // ── language picker ──────────────────────────────────────────
+    'chooseLanguage':       {'ar': 'اختر لغتك',                         'he': 'בחר שפה',                           'en': 'Choose Your Language'},
 
     // ── home marquee + flash sale + loyalty card ────────────────
     'marqueeText':        {

@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import '../models/user.dart';
 import '../services/api_service.dart' show ApiService, ApiException;
@@ -33,17 +35,32 @@ class AuthProvider extends ChangeNotifier {
     _loading = true; notifyListeners();
     try {
       final res = await ApiService.instance.post('/auth/login', data: {
-        'phone':       phone.trim(),
-        'password':    password,
-        if (fcmToken != null)   'fcm_token':   fcmToken,
-        if (deviceType != null) 'device_type': deviceType,
+        'phone':    phone.trim(),
+        'password': password,
       });
       final m = res as Map<String, dynamic>;
       await ApiService.instance.setToken(m['token'] as String);
       _user = AppUser.fromJson(m['user'] as Map<String, dynamic>);
+      // Push FCM token to backend after login — fire & forget, never blocks login
+      _syncFcmToken();
     } finally {
       _loading = false; notifyListeners();
     }
+  }
+
+  /// Sends the current FCM token to the backend. Called after login/register.
+  /// Runs in the background — never throws or blocks the caller.
+  Future<void> _syncFcmToken() async {
+    try {
+      final token = await FirebaseMessaging.instance
+          .getToken()
+          .timeout(const Duration(seconds: 8));
+      if (token == null) return;
+      await ApiService.instance.put('/auth/fcm-token', data: {
+        'fcm_token':   token,
+        'device_type': Platform.isIOS ? 'ios' : 'android',
+      });
+    } catch (_) {}
   }
 
   Future<void> register({
@@ -62,12 +79,12 @@ class AuthProvider extends ChangeNotifier {
         'phone':                 phone,
         'password':              password,
         'password_confirmation': password,
-        if (fcmToken != null)    'fcm_token':   fcmToken,
-        if (deviceType != null)  'device_type': deviceType,
       });
       final m = res as Map<String, dynamic>;
       await ApiService.instance.setToken(m['token'] as String);
       _user = AppUser.fromJson(m['user'] as Map<String, dynamic>);
+      // Push FCM token after register — fire & forget
+      _syncFcmToken();
     } finally {
       _loading = false; notifyListeners();
     }
