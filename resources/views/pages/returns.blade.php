@@ -1,40 +1,23 @@
 @extends('layouts.legal')
 @section('title', 'سياسة الإرجاع والاستبدال')
-@section('description', 'سياسة الإرجاع والاستبدال والاسترداد لشركة أبناء الفريد')
+@section('icon', '🔄')
+@section('description', 'سياسة الإرجاع والاستبدال لشركة أبناء الفريد')
 
-@section('content')
+@section('page-content')
 
-<div class="page-header">
-  <span class="page-icon">🔄</span>
-  <h1>سياسة الإرجاع والاستبدال</h1>
-  <p>آخر تحديث: يناير 2025 &nbsp;|&nbsp; شركة أبناء الفريد — فلسطين</p>
-</div>
-
-{{-- التزامنا --}}
-<div class="section">
-  <div class="section-header">
-    <span class="section-icon">🌟</span>
-    <h2>التزامنا برضاك</h2>
-  </div>
-  <div class="section-body">
-    <p>
-      رضا عملائنا هو أولويتنا الأولى. إذا لم تكن راضياً عن أي منتج وصلك،
-      نحن هنا لمساعدتك وإيجاد الحل المناسب.
-    </p>
-    <div class="highlight-box">
+<div class="ls">
+  <div class="ls-head"><span class="ls-head-icon">🌟</span><h2>التزامنا برضاك</h2></div>
+  <div class="ls-body">
+    <p>رضا عملائنا هو أولويتنا الأولى. إذا لم تكن راضياً عن أي منتج وصلك، نحن هنا لمساعدتك وإيجاد الحل المناسب.</p>
+    <div class="ls-highlight">
       <strong>مدة الإرجاع: 7 أيام</strong> من تاريخ استلام المنتج
     </div>
   </div>
 </div>
 
-{{-- شروط الإرجاع --}}
-<div class="section">
-  <div class="section-header">
-    <span class="section-icon">✅</span>
-    <h2>شروط قبول الإرجاع</h2>
-  </div>
-  <div class="section-body">
-    <p>يُقبل الإرجاع في الحالات التالية:</p>
+<div class="ls">
+  <div class="ls-head"><span class="ls-head-icon">✅</span><h2>شروط قبول الإرجاع</h2></div>
+  <div class="ls-body">
     <ul>
       <li>المنتج معيب أو تالف عند الاستلام</li>
       <li>المنتج لا يطابق الوصف أو الصور المعروضة</li>
@@ -45,13 +28,9 @@
   </div>
 </div>
 
-{{-- حالات عدم القبول --}}
-<div class="section">
-  <div class="section-header">
-    <span class="section-icon">❌</span>
-    <h2>حالات لا يُقبل فيها الإرجاع</h2>
-  </div>
-  <div class="section-body">
+<div class="ls">
+  <div class="ls-head"><span class="ls-head-icon">❌</span><h2>حالات لا يُقبل فيها الإرجاع</h2></div>
+  <div class="ls-body">
     <ul>
       <li>مرور أكثر من 7 أيام على الاستلام</li>
       <li>المنتجات الغذائية أو القابلة للتلف</li>
@@ -63,13 +42,9 @@
   </div>
 </div>
 
-{{-- خطوات الإرجاع --}}
-<div class="section">
-  <div class="section-header">
-    <span class="section-icon">📝</span>
-    <h2>خطوات الإرجاع</h2>
-  </div>
-  <div class="section-body">
+<div class="ls">
+  <div class="ls-head"><span class="ls-head-icon">📝</span><h2>خطوات الإرجاع</h2></div>
+  <div class="ls-body">
     <ul>
       <li><strong>الخطوة 1:</strong> تواصل معنا خلال 7 أيام من الاستلام عبر واتساب أو التطبيق</li>
       <li><strong>الخطوة 2:</strong> أرسل صوراً واضحة للمنتج مع توضيح المشكلة</li>
@@ -80,35 +55,24 @@
   </div>
 </div>
 
-{{-- خيارات الاسترداد --}}
-<div class="section">
-  <div class="section-header">
-    <span class="section-icon">💰</span>
-    <h2>خيارات الاسترداد</h2>
-  </div>
-  <div class="section-body">
-    <p>عند قبول طلب الإرجاع، يمكنك الاختيار من بين:</p>
+<div class="ls">
+  <div class="ls-head"><span class="ls-head-icon">💰</span><h2>خيارات الاسترداد</h2></div>
+  <div class="ls-body">
     <ul>
       <li><strong>استبدال المنتج:</strong> بمنتج مماثل أو بديل مناسب</li>
       <li><strong>رصيد في الحساب:</strong> يُضاف لمحفظتك للاستخدام في طلبات قادمة</li>
       <li><strong>استرداد المبلغ كاملاً:</strong> يتم التنسيق حسب طريقة الدفع الأصلية</li>
     </ul>
-    <div class="highlight-box">
+    <div class="ls-highlight">
       <strong>ملاحظة:</strong> رسوم التوصيل غير قابلة للاسترداد إلا في حالة الخطأ من طرفنا.
     </div>
   </div>
 </div>
 
-{{-- تلف أثناء التوصيل --}}
-<div class="section">
-  <div class="section-header">
-    <span class="section-icon">🚚</span>
-    <h2>تلف أثناء التوصيل</h2>
-  </div>
-  <div class="section-body">
-    <p>
-      إذا وصلك المنتج تالفاً بسبب عملية التوصيل، يرجى التصرف فوراً:
-    </p>
+<div class="ls">
+  <div class="ls-head"><span class="ls-head-icon">🚚</span><h2>تلف أثناء التوصيل</h2></div>
+  <div class="ls-body">
+    <p>إذا وصلك المنتج تالفاً بسبب عملية التوصيل، تصرّف فوراً:</p>
     <ul>
       <li>التقط صوراً للمنتج والتغليف قبل فتحه بالكامل</li>
       <li>تواصل معنا خلال <strong>24 ساعة</strong> من الاستلام</li>
@@ -117,17 +81,13 @@
   </div>
 </div>
 
-{{-- تواصل --}}
-<div class="section">
-  <div class="section-header">
-    <span class="section-icon">💬</span>
-    <h2>تواصل معنا للإرجاع</h2>
-  </div>
-  <div class="section-body">
+<div class="ls">
+  <div class="ls-head"><span class="ls-head-icon">💬</span><h2>تواصل معنا</h2></div>
+  <div class="ls-body">
     <p>فريق دعم العملاء جاهز لمساعدتك:</p>
-    <div class="contact-row">
-      <a href="https://wa.me/970598191312" target="_blank" class="contact-chip">💬 واتساب — متاح يومياً</a>
-      <a href="mailto:faredahmad615@gmail.com" class="contact-chip">📧 البريد الإلكتروني</a>
+    <div class="ls-contact-row">
+      <a href="https://wa.me/970598191312" target="_blank" class="ls-chip">💬 واتساب — متاح يومياً</a>
+      <a href="mailto:faredahmad615@gmail.com" class="ls-chip">📧 البريد الإلكتروني</a>
     </div>
   </div>
 </div>
