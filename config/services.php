@@ -36,7 +36,9 @@ return [
     ],
 
     'fcm' => [
-        'server_key' => env('FCM_SERVER_KEY'),
+        'server_key'      => env('FCM_SERVER_KEY'),       // legacy (unused)
+        'project_id'      => env('FCM_PROJECT_ID'),       // v1 API: your Firebase project ID
+        'service_account' => env('FCM_SERVICE_ACCOUNT_PATH'), // v1 API: path to service account JSON
     ],
 
     'wasender' => [

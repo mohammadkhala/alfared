@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../l10n/app_strings.dart';
+import '../../providers/locale_provider.dart';
 import '../../theme/app_theme.dart';
+
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key, required this.dest, required this.prefs});
@@ -15,25 +19,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final _controller = PageController();
   int _page = 0;
 
-  static const _slides = [
-    _Slide(
-      emoji: '🛍️',
-      tag: '✦ متجر التجميل الأول',
-      title: 'اكتشف عالم\nالجمال الفاخر',
-      subtitle: 'أكثر من 5000 منتج أصيل للمحلات والمتاجر وصفحات التسويق الإلكتروني',
-    ),
-    _Slide(
-      emoji: '🚀',
-      tag: '✦ توصيل سريع',
-      title: 'توصيل سريع\nلجميع فلسطين 🇵🇸',
-      subtitle: 'نوصّل لجميع مناطق فلسطين والداخل في أسرع وقت وبأقل الأسعار',
-    ),
-    _Slide(
-      emoji: '💎',
-      tag: '✦ برنامج الولاء',
-      title: 'نقاط ومكافآت\nحقيقية',
-      subtitle: 'اجمع نقاطاً مع كل طلب وارتقِ لمستوى VIP واحصل على خصومات حصرية',
-    ),
+  List<_Slide> _slides(S s) => [
+    _Slide(emoji: '🛍️', tag: s.onboardTag1, title: s.onboardTitle1, subtitle: s.onboardSub1),
+    _Slide(emoji: '🚀', tag: s.onboardTag2, title: s.onboardTitle2, subtitle: s.onboardSub2),
+    _Slide(emoji: '💎', tag: s.onboardTag3, title: s.onboardTitle3, subtitle: s.onboardSub3),
   ];
 
   void _finish() {
@@ -43,8 +32,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  void _next() {
-    if (_page < _slides.length - 1) {
+  void _next(int total) {
+    if (_page < total - 1) {
       _controller.nextPage(duration: const Duration(milliseconds: 400), curve: Curves.easeInOut);
     } else {
       _finish();
@@ -59,6 +48,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s      = context.watch<LocaleProvider>().s;
+    final slides = _slides(s);
+
     return Scaffold(
       body: Stack(children: [
         // Blue gradient background
@@ -81,9 +73,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Expanded(
             child: PageView.builder(
               controller: _controller,
-              itemCount: _slides.length,
+              itemCount: slides.length,
               onPageChanged: (i) => setState(() => _page = i),
-              itemBuilder: (_, i) => _SlideView(slide: _slides[i]),
+              itemBuilder: (_, i) => _SlideView(slide: slides[i]),
             ),
           ),
 
@@ -93,10 +85,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
             ),
-            padding: EdgeInsets.fromLTRB(24, 24, 24, MediaQuery.of(context).padding.bottom + 24),
+            padding: EdgeInsets.fromLTRB(24, 20, 24, MediaQuery.of(context).padding.bottom + 20),
             child: Column(mainAxisSize: MainAxisSize.min, children: [
+
+              // ── Language picker (3 flag buttons) ────────────────
+              _LanguagePicker(s: s),
+              const SizedBox(height: 18),
+
               // Dots
-              Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(_slides.length, (i) {
+              Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(slides.length, (i) {
                 final active = i == _page;
                 return AnimatedContainer(
                   duration: const Duration(milliseconds: 300),
@@ -108,14 +105,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   ),
                 );
               })),
-              const SizedBox(height: 24),
+              const SizedBox(height: 20),
 
               // Main button
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: _next,
+                  onPressed: () => _next(slides.length),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.orange,
                     foregroundColor: Colors.white,
@@ -123,24 +120,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     elevation: 0,
                   ),
                   child: Text(
-                    _page < _slides.length - 1 ? 'التالي ←' : 'ابدأ التسوق 🛍️',
+                    _page < slides.length - 1 ? s.onboardNext : s.onboardStart,
                     style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w800, fontFamily: 'Cairo'),
                   ),
                 ),
               ),
-              const SizedBox(height: 14),
+              const SizedBox(height: 12),
 
               // Skip link
               GestureDetector(
                 onTap: _finish,
                 child: RichText(
-                  text: const TextSpan(
-                    text: 'أو ',
-                    style: TextStyle(fontSize: 12, color: AppColors.gray, fontFamily: 'Cairo'),
+                  text: TextSpan(
+                    text: s.onboardSkipOr,
+                    style: const TextStyle(fontSize: 12, color: AppColors.gray, fontFamily: 'Cairo'),
                     children: [
                       TextSpan(
-                        text: 'تخطى للمتجر',
-                        style: TextStyle(color: AppColors.blue, fontWeight: FontWeight.w700),
+                        text: s.onboardSkip,
+                        style: const TextStyle(color: AppColors.blue, fontWeight: FontWeight.w700),
                       ),
                     ],
                   ),
@@ -239,5 +236,65 @@ class _SlideView extends StatelessWidget {
         ]),
       ),
     );
+  }
+}
+
+// ── Language Picker ───────────────────────────────────────────────────────────
+
+class _LanguagePicker extends StatelessWidget {
+  const _LanguagePicker({required this.s});
+  final S s;
+
+  static const _langs = [
+    ('ar', '🇸🇦', 'العربية'),
+    ('he', '🇮🇱', 'עברית'),
+    ('en', '🇬🇧', 'English'),
+  ];
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<LocaleProvider>();
+    return Column(children: [
+      Text(s.chooseLanguage,
+        style: const TextStyle(
+          fontSize: 11, fontWeight: FontWeight.w700,
+          fontFamily: 'Cairo', color: AppColors.gray,
+        )),
+      const SizedBox(height: 10),
+      Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: _langs.map((lang) {
+          final (code, flag, name) = lang;
+          final active = provider.code == code;
+          return GestureDetector(
+            onTap: () => provider.setLocale(code),
+            child: AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              margin: const EdgeInsets.symmetric(horizontal: 5),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+              decoration: BoxDecoration(
+                color: active ? AppColors.orange : const Color(0xFFF1F5F9),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: active ? AppColors.orange : const Color(0xFFE2E8F0),
+                  width: active ? 2 : 1,
+                ),
+              ),
+              child: Row(mainAxisSize: MainAxisSize.min, children: [
+                Text(flag, style: const TextStyle(fontSize: 16)),
+                const SizedBox(width: 6),
+                Text(name,
+                  style: TextStyle(
+                    fontSize: 11,
+                    fontFamily: 'Cairo',
+                    fontWeight: FontWeight.w700,
+                    color: active ? Colors.white : AppColors.text,
+                  )),
+              ]),
+            ),
+          );
+        }).toList(),
+      ),
+    ]);
   }
 }

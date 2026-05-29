@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import '../../l10n/app_strings.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../services/api_service.dart' show ApiService, ApiException;
 import '../../theme/app_theme.dart';
 import 'otp_screen.dart';
@@ -50,9 +52,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } on ApiException catch (e) {
       if (!mounted) return;
       setState(() => _sending = false);
+      final s2 = context.read<LocaleProvider>().s;
       final msg = (e.message != null && e.message!.isNotEmpty)
           ? e.message!
-          : 'هذا الرقم أو البريد مسجل مسبقاً';
+          : s2.registerDuplicate;
       Fluttertoast.showToast(
         msg: msg, backgroundColor: AppColors.danger, textColor: Colors.white,
         toastLength: Toast.LENGTH_LONG,
@@ -82,8 +85,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
     } on ApiException catch (e) {
       if (!mounted) return;
       setState(() => _sending = false);
+      final s2 = context.read<LocaleProvider>().s;
       Fluttertoast.showToast(
-        msg: e.message ?? 'فشل إرسال رمز التحقق',
+        msg: e.message ?? s2.registerOtpFailed,
         backgroundColor: AppColors.danger, textColor: Colors.white,
         toastLength: Toast.LENGTH_LONG,
       );
@@ -91,7 +95,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       if (!mounted) return;
       setState(() => _sending = false);
       Fluttertoast.showToast(
-        msg: 'خطأ: $e',
+        msg: 'Error: $e',
         backgroundColor: AppColors.danger, textColor: Colors.white,
       );
     }
@@ -99,12 +103,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final s           = context.watch<LocaleProvider>().s;
     final authLoading = context.watch<AuthProvider>().loading;
-    final busy = _sending || authLoading;
+    final busy        = _sending || authLoading;
 
     return Scaffold(
       backgroundColor: AppColors.grayBg,
-      appBar: AppBar(title: const Text('إنشاء حساب جديد')),
+      appBar: AppBar(title: Text(s.registerTitle)),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
@@ -130,9 +135,9 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                const Center(
-                  child: Text('انضم لعائلة أبناء الفريد 🎉',
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900,
+                Center(
+                  child: Text(s.registerWelcome,
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w900,
                         color: AppColors.blue, fontFamily: 'Cairo')),
                 ),
                 const SizedBox(height: 24),
@@ -149,18 +154,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
 
-                      _Label('الاسم الكامل'),
+                      _Label(s.registerNameLbl),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _name,
                         textCapitalization: TextCapitalization.words,
                         style: _inputStyle,
-                        decoration: _dec(hint: 'محمد أبو سالم', icon: Icons.person_outline_rounded),
-                        validator: (v) => (v == null || v.trim().length < 2) ? 'الرجاء إدخال الاسم' : null,
+                        decoration: _dec(hint: s.registerNameHint, icon: Icons.person_outline_rounded),
+                        validator: (v) => (v == null || v.trim().length < 2) ? s.registerNameErr : null,
                       ),
                       const SizedBox(height: 16),
 
-                      _Label('البريد الإلكتروني'),
+                      _Label(s.registerEmailLbl),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _email,
@@ -168,11 +173,11 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         textDirection: TextDirection.ltr,
                         style: _inputStyle,
                         decoration: _dec(hint: 'example@email.com', icon: Icons.email_outlined),
-                        validator: (v) => (v == null || !v.contains('@')) ? 'بريد غير صحيح' : null,
+                        validator: (v) => (v == null || !v.contains('@')) ? s.registerEmailErr : null,
                       ),
                       const SizedBox(height: 16),
 
-                      _Label('رقم الهاتف'),
+                      _Label(s.loginPhoneLabel),
                       const SizedBox(height: 8),
                       Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
                         Container(
@@ -207,10 +212,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             style: _inputStyle.copyWith(letterSpacing: 1.5),
                             decoration: InputDecoration(
                               filled: true, fillColor: AppColors.grayBg,
-                              hintText: 'XXXXXXXXX',
+                              hintText: s.loginPhoneHint,
                               hintStyle: const TextStyle(color: AppColors.border, letterSpacing: 1.5, fontSize: 14),
                               prefixIcon: const Icon(Icons.phone_outlined, size: 18, color: AppColors.gray),
-                              helperText: '9 أرقام (بدون الصفر)',
+                              helperText: s.loginPhoneHelper,
                               helperStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 10, color: AppColors.grayLight),
                               border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border, width: 1.2)),
                               enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border, width: 1.2)),
@@ -219,7 +224,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             validator: (v) {
                               var d = (v ?? '').replaceAll(RegExp(r'\D'), '');
                               if (d.startsWith('0')) d = d.substring(1);
-                              if (d.length != 9) return 'أدخل 9 أرقام صحيحة';
+                              if (d.length != 9) return s.loginPhoneErr;
                               return null;
                             },
                           ),
@@ -227,7 +232,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       ]),
                       const SizedBox(height: 16),
 
-                      _Label('كلمة المرور'),
+                      _Label(s.registerPassLbl),
                       const SizedBox(height: 8),
                       TextFormField(
                         controller: _pass,
@@ -242,13 +247,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             icon: Icon(_showPass ? Icons.visibility_off_outlined : Icons.visibility_outlined, size: 18, color: AppColors.gray),
                             onPressed: () => setState(() => _showPass = !_showPass),
                           ),
-                          helperText: '8 أحرف على الأقل',
+                          helperText: s.registerPassHelp,
                           helperStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 10, color: AppColors.grayLight),
                           border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border, width: 1.2)),
                           enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.border, width: 1.2)),
                           focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.orange, width: 1.8)),
                         ),
-                        validator: (v) => (v == null || v.length < 8) ? '8 أحرف على الأقل' : null,
+                        validator: (v) => (v == null || v.length < 8) ? s.registerPassErr : null,
                       ),
                       const SizedBox(height: 24),
 
@@ -257,8 +262,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: ElevatedButton.styleFrom(padding: const EdgeInsets.symmetric(vertical: 15)),
                         child: busy
                           ? const SizedBox(width: 22, height: 22, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                          : const Text('إرسال رمز التحقق عبر واتساب',
-                              style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
+                          : Text(s.registerBtn,
+                              style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
                       ),
                     ],
                   ),
@@ -276,10 +281,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   child: Row(children: [
                     const Text('💬', style: TextStyle(fontSize: 18)),
                     const SizedBox(width: 10),
-                    const Expanded(
+                    Expanded(
                       child: Text(
-                        'سيتم إرسال رمز التحقق عبر واتساب إلى رقم هاتفك',
-                        style: TextStyle(fontFamily: 'Cairo', fontSize: 11,
+                        s.registerWaNote,
+                        style: const TextStyle(fontFamily: 'Cairo', fontSize: 11,
                             color: Color(0xFF1A6B35), height: 1.5),
                       ),
                     ),

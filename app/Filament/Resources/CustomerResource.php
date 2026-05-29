@@ -238,7 +238,7 @@ class CustomerResource extends Resource
                     ])
                     ->query(function ($query, array $data) {
                         if (empty($data['value'])) return $query;
-                        $tiers = TierService::TIERS;
+                        $tiers = TierService::tiers();
                         $idx   = array_search($data['value'], array_column($tiers, 'key'));
                         if ($idx === false) return $query;
                         $min = $tiers[$idx]['min'];
@@ -268,6 +268,32 @@ class CustomerResource extends Resource
                         : null)
                     ->openUrlInNewTab()
                     ->visible(fn(User $record) => (bool) $record->phone),
+                Tables\Actions\Action::make('delete_account')
+                    ->label('حذف الحساب')
+                    ->icon('heroicon-o-trash')
+                    ->color('danger')
+                    ->requiresConfirmation()
+                    ->modalHeading('حذف حساب العميل نهائياً')
+                    ->modalDescription(fn(User $record) =>
+                        "هل تريد حذف حساب {$record->name} ({$record->email}) نهائياً؟ سيتم الاحتفاظ بسجل الطلبات."
+                    )
+                    ->modalSubmitActionLabel('نعم، احذف الحساب')
+                    ->action(function (User $record) {
+                        // Keep orders anonymised
+                        $record->orders()->update([
+                            'customer_name'  => 'حساب محذوف',
+                            'customer_phone' => null,
+                            'customer_email' => null,
+                        ]);
+                        $record->addresses()->delete();
+                        $record->tokens()->delete();
+                        $record->delete();
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('تم حذف الحساب بنجاح')
+                            ->success()
+                            ->send();
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

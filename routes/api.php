@@ -38,10 +38,11 @@ Route::prefix('v1')->group(function () {
     // ── Authenticated endpoints ────────────────────────────
     Route::middleware('auth:sanctum')->group(function () {
         // Auth + profile
-        Route::post('auth/logout',     [AuthController::class, 'logout']);
-        Route::get ('auth/me',         [AuthController::class, 'me']);
-        Route::put ('auth/profile',    [AuthController::class, 'updateProfile']);
-        Route::put ('auth/fcm-token',  [AuthController::class, 'updateFcmToken']);
+        Route::post  ('auth/logout',          [AuthController::class, 'logout']);
+        Route::get   ('auth/me',              [AuthController::class, 'me']);
+        Route::put   ('auth/profile',         [AuthController::class, 'updateProfile']);
+        Route::put   ('auth/fcm-token',       [AuthController::class, 'updateFcmToken']);
+        Route::delete('auth/account',         [AuthController::class, 'deleteAccount']);
 
         // Cart
         Route::get   ('cart',                  [CartController::class, 'index']);

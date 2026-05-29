@@ -12,7 +12,12 @@ class UserAddress extends Model
         'address_line', 'building', 'phone', 'notes', 'is_default',
     ];
 
-    protected $casts = ['is_default' => 'boolean'];
+    protected $casts = [
+        'id'               => 'integer',
+        'user_id'          => 'integer',
+        'delivery_zone_id' => 'integer',
+        'is_default'       => 'boolean',
+    ];
 
     public function user(): BelongsTo { return $this->belongsTo(User::class); }
     public function deliveryZone(): BelongsTo { return $this->belongsTo(DeliveryZone::class); }
