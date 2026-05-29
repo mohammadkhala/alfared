@@ -16,6 +16,21 @@ class PageController extends Controller
         return view('pages.about');
     }
 
+    public function privacyPolicy()
+    {
+        return view('pages.privacy-policy');
+    }
+
+    public function returns()
+    {
+        return view('pages.returns');
+    }
+
+    public function terms()
+    {
+        return view('pages.terms');
+    }
+
     public function sendContact(Request $request)
     {
         $data = $request->validate([

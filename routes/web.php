@@ -41,7 +41,10 @@ Route::get('admin-api/latest-notification', function () {
 })->middleware('auth')->name('admin.latest-notification');
 
 // ── Store Pages ──
-Route::get('/', [HomeController::class, 'index'])->name('home');
+// Temporarily redirect root to coming-soon page until app launch
+Route::get('/', function () {
+    return redirect('/coming-soon.html', 302);
+})->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/category/{slug}', [ProductController::class, 'category'])->name('products.category');
@@ -81,6 +84,11 @@ Route::prefix('account')->name('account.')->middleware('auth')->group(function (
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
 Route::post('/contact', [PageController::class, 'sendContact'])->name('contact.send');
 Route::get('/about', [PageController::class, 'about'])->name('about');
+
+// ── Legal Pages ──
+Route::get('/privacy-policy', [PageController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/returns',        [PageController::class, 'returns'])->name('returns');
+Route::get('/terms',          [PageController::class, 'terms'])->name('terms');
 
 // ── Wishlist ──
 Route::post('/wishlist/toggle/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
