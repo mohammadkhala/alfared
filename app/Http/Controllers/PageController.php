@@ -31,6 +31,16 @@ class PageController extends Controller
         return view('pages.terms');
     }
 
+    public function shipping()
+    {
+        return view('pages.shipping');
+    }
+
+    public function faq()
+    {
+        return view('pages.faq');
+    }
+
     public function sendContact(Request $request)
     {
         $data = $request->validate([

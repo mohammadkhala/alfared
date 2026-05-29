@@ -89,6 +89,8 @@ Route::get('/about', [PageController::class, 'about'])->name('about');
 Route::get('/privacy-policy', [PageController::class, 'privacyPolicy'])->name('privacy-policy');
 Route::get('/returns',        [PageController::class, 'returns'])->name('returns');
 Route::get('/terms',          [PageController::class, 'terms'])->name('terms');
+Route::get('/shipping',       [PageController::class, 'shipping'])->name('shipping');
+Route::get('/faq',            [PageController::class, 'faq'])->name('faq');
 
 // ── Wishlist ──
 Route::post('/wishlist/toggle/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');

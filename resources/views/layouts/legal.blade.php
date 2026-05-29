@@ -29,7 +29,9 @@
     <div class="legal-footer-links">
       <a href="{{ route('privacy-policy') }}" class="{{ request()->routeIs('privacy-policy') ? 'active' : '' }}">🔒 سياسة الخصوصية</a>
       <a href="{{ route('returns') }}"        class="{{ request()->routeIs('returns')        ? 'active' : '' }}">🔄 سياسة الإرجاع</a>
+      <a href="{{ route('shipping') }}"       class="{{ request()->routeIs('shipping')       ? 'active' : '' }}">🚚 الشحن والتوصيل</a>
       <a href="{{ route('terms') }}"          class="{{ request()->routeIs('terms')          ? 'active' : '' }}">📜 شروط الاستخدام</a>
+      <a href="{{ route('faq') }}"            class="{{ request()->routeIs('faq')            ? 'active' : '' }}">❓ الأسئلة الشائعة</a>
     </div>
 
   </div>
