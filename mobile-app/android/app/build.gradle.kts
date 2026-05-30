@@ -17,7 +17,7 @@ if (keyPropertiesFile.exists()) {
 }
 
 android {
-    namespace = "com.alfared.alfared_app"
+    namespace = "ps.alfared.shop"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = "27.0.12077973"
 
@@ -41,7 +41,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.alfared.alfared_app"
+        applicationId = "ps.alfared.shop"
         minSdk = 23  // firebase_auth requires minimum API 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
