@@ -8,7 +8,7 @@ import '../../providers/locale_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
-import '../auth/login_screen.dart';
+import '../../widgets/guest_wall.dart';
 import '../notifications_screen.dart';
 import '../orders/orders_screen.dart';
 import 'addresses_screen.dart';
@@ -184,7 +184,7 @@ class _AccountScreenState extends State<AccountScreen> {
     final auth = context.watch<AuthProvider>();
     final s    = context.watch<LocaleProvider>().s;
 
-    if (!auth.isLoggedIn) return _LoginPrompt();
+    if (!auth.isLoggedIn) return const GuestWall(icon: Icons.person_outline_rounded);
 
     final u = auth.user!;
     final balance = _loyalty?['balance'] as int? ?? u.loyaltyPoints;
@@ -674,27 +674,3 @@ class _SocialBtn extends StatelessWidget {
   }
 }
 
-class _LoginPrompt extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    final s = context.watch<LocaleProvider>().s;
-    return Scaffold(
-      backgroundColor: AppColors.grayBg,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(40),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.person_outline, size: 70, color: AppColors.gray),
-            const SizedBox(height: 14),
-            Text(s.loginPrompt, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w800, color: AppColors.blue, fontFamily: 'Cairo')),
-            const SizedBox(height: 18),
-            SizedBox(width: double.infinity, child: ElevatedButton(
-              onPressed: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const LoginScreen())),
-              child: Text(s.login, style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800)),
-            )),
-          ]),
-        ),
-      ),
-    );
-  }
-}

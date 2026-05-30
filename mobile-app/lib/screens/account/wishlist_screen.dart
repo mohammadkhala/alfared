@@ -2,9 +2,11 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
+import '../../providers/auth_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
+import '../../widgets/guest_wall.dart';
 import '../products/product_detail_screen.dart';
 
 class WishlistScreen extends StatefulWidget {
@@ -38,6 +40,11 @@ class _WishlistScreenState extends State<WishlistScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final auth = context.watch<AuthProvider>();
+    if (!auth.isLoggedIn) {
+      return const GuestWall(icon: Icons.favorite_border_rounded);
+    }
+
     final s = context.watch<LocaleProvider>().s;
 
     return Scaffold(

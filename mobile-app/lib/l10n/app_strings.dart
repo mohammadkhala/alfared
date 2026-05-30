@@ -265,6 +265,12 @@ class S {
   String get onboardSkip      => _t('onboardSkip');
 
   // ── login ────────────────────────────────────────────────────
+  // ── guest wall ──────────────────────────────────────────────
+  String get guestLoginTitle  => _t('guestLoginTitle');
+  String get guestLoginSub    => _t('guestLoginSub');
+  String get continueAsGuest  => _t('continueAsGuest');
+
+  // ── login ────────────────────────────────────────────────────
   String get loginWelcome     => _t('loginWelcome');
   String get loginSubtitle    => _t('loginSubtitle');
   String get loginPhoneLabel  => _t('loginPhoneLabel');
@@ -626,6 +632,11 @@ class AppStrings {
     'loyaltyCardTitle':   {'ar': 'نقاط الولاء الخاصة بك', 'he': 'נקודות הנאמנות שלך', 'en': 'Your Loyalty Points'},
     'loyaltyPointUnit':   {'ar': 'نقطة', 'he': 'נקודות', 'en': 'pts'},
     'loyaltyProgressBase':{'ar': '%d% نحو مستوى %s', 'he': '%d% לקראת רמה %s', 'en': '%d% toward %s tier'},
+
+    // ── guest wall ──────────────────────────────────────────────
+    'guestLoginTitle': {'ar': 'سجّل دخولك للمتابعة',                                                                   'he': 'התחבר להמשיך',                                        'en': 'Sign in to continue'},
+    'guestLoginSub':   {'ar': 'سجّل الدخول أو أنشئ حساباً للوصول إلى السلة والمفضلة والطلبات',                       'he': 'התחבר או צור חשבון לגישה לעגלה, מועדפים והזמנות',     'en': 'Sign in or create an account to access cart, wishlist & orders'},
+    'continueAsGuest': {'ar': 'تصفح بدون حساب',                                                                        'he': 'גלוש ללא חשבון',                                       'en': 'Browse without account'},
 
     // ── language names ──────────────────────────────────────────
     'lang_ar':            {'ar': 'العربية',    'he': 'ערבית',   'en': 'Arabic'},
