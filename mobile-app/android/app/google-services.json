@@ -9,6 +9,25 @@
       "client_info": {
         "mobilesdk_app_id": "1:993023160915:android:8641cdf57d23433e730ca6",
         "android_client_info": {
+          "package_name": "com.alfared.alfared_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBCEpDRDMa1Xer4dI42-P6cGW_13Kk9EiQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:993023160915:android:e88317db3be4ddc0730ca6",
+        "android_client_info": {
           "package_name": "ps.alfared.shop"
         }
       },
