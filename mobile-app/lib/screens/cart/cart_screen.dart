@@ -9,7 +9,7 @@ import '../../providers/locale_provider.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
 import '../../widgets/empty_state.dart';
-import '../auth/login_screen.dart';
+import '../../widgets/guest_wall.dart';
 import '../checkout/checkout_screen.dart';
 import '../products/products_screen.dart';
 
@@ -39,7 +39,7 @@ class _CartScreenState extends State<CartScreen> {
     final cart = context.watch<CartProvider>();
     final s    = context.watch<LocaleProvider>().s;
 
-    if (!auth.isLoggedIn) return _LoginPrompt(s: s);
+    if (!auth.isLoggedIn) return const GuestWall(icon: Icons.shopping_bag_outlined);
 
     return Scaffold(
       backgroundColor: AppColors.grayBg,
@@ -529,44 +529,3 @@ class _Empty extends StatelessWidget {
   }
 }
 
-// ─── Login prompt ──────────────────────────────────────────────────────────────
-class _LoginPrompt extends StatelessWidget {
-  const _LoginPrompt({required this.s});
-  final S s;
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.grayBg,
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(40),
-          child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            Container(
-              width: 90, height: 90,
-              decoration: BoxDecoration(color: AppColors.blueLight, shape: BoxShape.circle),
-              child: const Icon(Icons.lock_outline_rounded, size: 44, color: AppColors.blue),
-            ),
-            const SizedBox(height: 18),
-            Text(
-              s.loginToViewCart,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                fontSize: 17, fontWeight: FontWeight.w800,
-                color: AppColors.blue, fontFamily: 'Cairo',
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.of(context).push(
-                    MaterialPageRoute(builder: (_) => const LoginScreen())),
-                child: Text(s.login),
-              ),
-            ),
-          ]),
-        ),
-      ),
-    );
-  }
-}

@@ -4,7 +4,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/auth_provider.dart';
 import '../providers/cart_provider.dart';
 import '../theme/app_theme.dart';
-import 'auth/login_screen.dart';
 import 'home/main_navigation.dart';
 import 'onboarding/onboarding_screen.dart';
 
@@ -37,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     if (!mounted) return;
 
     final onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
-    final dest = auth.isLoggedIn ? const MainNavigation() : const LoginScreen();
+    const dest = MainNavigation(); // guests go straight to the store
     if (!onboardingSeen) {
       Navigator.of(context).pushReplacement(MaterialPageRoute(
         builder: (_) => OnboardingScreen(dest: dest, prefs: prefs),

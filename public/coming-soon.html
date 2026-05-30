@@ -203,50 +203,29 @@
       justify-content: center;
     }
 
-    /* Countdown */
-    .cd-label {
-      font-size: 11px; font-weight: 700;
-      color: rgba(255,255,255,.3);
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      margin-bottom: 14px;
-      text-align: center;
-    }
-
-    .countdown {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
+    /* Coming soon badge */
+    .coming-soon-badge {
+      display: flex;
+      align-items: center;
+      justify-content: center;
       gap: 10px;
-      margin-bottom: 32px;
-    }
-
-    .count-box {
-      position: relative;
-      padding: 16px 8px 12px;
+      background: rgba(249,115,22,.1);
+      border: 1px solid rgba(249,115,22,.3);
       border-radius: 14px;
-      background: rgba(255,255,255,.04);
-      border: 1px solid rgba(255,255,255,.07);
-      text-align: center;
-      overflow: hidden;
+      padding: 18px 24px;
+      margin-bottom: 32px;
+      font-size: 18px;
+      font-weight: 900;
+      color: #fff;
+      letter-spacing: .5px;
     }
-    .count-box::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0; height: 1px;
-      background: linear-gradient(90deg, transparent, rgba(249,115,22,.5), transparent);
-    }
-    .count-box .num {
-      display: block;
-      font-size: 34px; font-weight: 900;
-      color: #fff; line-height: 1;
-      font-variant-numeric: tabular-nums;
-      transition: transform .15s, opacity .15s;
-    }
-    .count-box .num.flip { transform: translateY(-5px); opacity: .3; }
-    .count-box .lbl {
-      display: block;
-      font-size: 10px; color: rgba(255,255,255,.35);
-      margin-top: 5px; letter-spacing: .5px;
+    .cs-dot {
+      width: 10px; height: 10px;
+      border-radius: 50%;
+      background: var(--orange);
+      box-shadow: 0 0 10px var(--orange);
+      animation: blink 1.4s ease-in-out infinite;
+      flex-shrink: 0;
     }
 
     .divider {
@@ -425,25 +404,9 @@
     <!-- ══ RIGHT: Countdown + Form ══ -->
     <div class="panel-right">
 
-      <p class="cd-label">⏳ الوقت المتبقي للإطلاق</p>
-
-      <div class="countdown">
-        <div class="count-box">
-          <span class="num" id="cd-days">00</span>
-          <span class="lbl">يوم</span>
-        </div>
-        <div class="count-box">
-          <span class="num" id="cd-hours">00</span>
-          <span class="lbl">ساعة</span>
-        </div>
-        <div class="count-box">
-          <span class="num" id="cd-mins">00</span>
-          <span class="lbl">دقيقة</span>
-        </div>
-        <div class="count-box">
-          <span class="num" id="cd-secs">00</span>
-          <span class="lbl">ثانية</span>
-        </div>
+      <div class="coming-soon-badge">
+        <span class="cs-dot"></span>
+        🚀 قريباً — ترقّب الإطلاق!
       </div>
 
       <div class="divider"></div>
@@ -534,33 +497,6 @@
     }
     draw();
 
-    /* ── Countdown ── */
-    const launch = new Date('2026-09-01T00:00:00');
-    const els = ['cd-days','cd-hours','cd-mins','cd-secs'].map(id => document.getElementById(id));
-
-    function flip(el, v) {
-      if (el.textContent === v) return;
-      el.classList.add('flip');
-      setTimeout(() => { el.textContent = v; el.classList.remove('flip'); }, 150);
-    }
-
-    function tick() {
-      const diff = launch - new Date();
-      if (diff <= 0) {
-        document.querySelector('.countdown').innerHTML =
-          '<div style="grid-column:1/-1;color:#F97316;font-weight:900;font-size:18px;text-align:center">🎉 التطبيق متاح الآن!</div>';
-        return;
-      }
-      const vals = [
-        String(Math.floor(diff/86400000)).padStart(2,'0'),
-        String(Math.floor(diff%86400000/3600000)).padStart(2,'0'),
-        String(Math.floor(diff%3600000/60000)).padStart(2,'0'),
-        String(Math.floor(diff%60000/1000)).padStart(2,'0'),
-      ];
-      vals.forEach((v,i) => flip(els[i], v));
-    }
-    tick();
-    setInterval(tick, 1000);
 
     /* ── Notify ── */
     function notify() {

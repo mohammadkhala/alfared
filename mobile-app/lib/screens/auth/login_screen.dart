@@ -11,7 +11,10 @@ import '../home/main_navigation.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+  /// When [returnAfterLogin] is true the screen pops on success instead of
+  /// pushing a new MainNavigation (used when called from within the app).
+  final bool returnAfterLogin;
+  const LoginScreen({super.key, this.returnAfterLogin = false});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
@@ -38,8 +41,14 @@ class _LoginScreenState extends State<LoginScreen> {
       await auth.login(_fullPhone, _pass.text);
       if (!mounted) return;
       await context.read<CartProvider>().load();
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const MainNavigation()));
+      if (widget.returnAfterLogin) {
+        Navigator.of(context).pop();
+      } else {
+        Navigator.of(context).pushAndRemoveUntil(
+          MaterialPageRoute(builder: (_) => const MainNavigation()),
+          (_) => false,
+        );
+      }
     } catch (e) {
       Fluttertoast.showToast(
         msg: e.toString(),
@@ -269,6 +278,27 @@ class _LoginScreenState extends State<LoginScreen> {
                           fontFamily: 'Cairo', fontSize: 13)),
                   ),
                 ]),
+
+                // ── Continue as guest ────────────────────────────────────
+                TextButton(
+                  onPressed: () {
+                    if (widget.returnAfterLogin) {
+                      Navigator.of(context).pop();
+                    } else {
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (_) => const MainNavigation()),
+                        (_) => false,
+                      );
+                    }
+                  },
+                  child: Text(
+                    s.continueAsGuest,
+                    style: const TextStyle(
+                      color: AppColors.gray, fontFamily: 'Cairo',
+                      fontSize: 12, decoration: TextDecoration.underline,
+                    ),
+                  ),
+                ),
 
                 // ── Phone preview ────────────────────────────────────────
                 if (_phone.text.isNotEmpty)
