@@ -12,7 +12,7 @@ class WaSenderService
 
     public function __construct()
     {
-        $this->apiKey = config('services.wasender.api_key', '');
+        $this->apiKey = config('services.wasender.api_key') ?? '';
     }
 
     /**
