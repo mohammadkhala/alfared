@@ -17,6 +17,7 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\SecurityHeaders::class,
             \App\Http\Middleware\SetLocale::class,
             \App\Http\Middleware\TrackVisits::class,
+            \App\Http\Middleware\CheckMaintenanceMode::class,
         ]);
         $middleware->api(prepend: [
             \App\Http\Middleware\CloudflareRealIp::class,

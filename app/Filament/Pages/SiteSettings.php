@@ -361,6 +361,54 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
                                 ]),
                         ]),
 
+                    // ── Tab: Maintenance ──────────────────────────────────
+                    Forms\Components\Tabs\Tab::make('🚧 وضع الصيانة')
+                        ->icon('heroicon-o-wrench-screwdriver')
+                        ->schema([
+                            Forms\Components\Section::make('تفعيل وضع الصيانة / قريباً')
+                                ->description('عند التفعيل، سيرى الزوار صفحة "تحت الصيانة" بدلاً من الموقع. لوحة التحكم تبقى تعمل.')
+                                ->schema([
+                                    Forms\Components\Toggle::make('maintenance_mode')
+                                        ->label('تفعيل وضع الصيانة')
+                                        ->helperText('عند التشغيل → يُوجَّه كل الزوار لصفحة الصيانة فوراً')
+                                        ->onColor('danger')
+                                        ->offColor('success')
+                                        ->live()
+                                        ->afterStateUpdated(function ($state) {
+                                            \App\Models\Setting::set('maintenance_mode', $state ? '1' : '0', 'maintenance');
+                                        }),
+
+                                    Forms\Components\Select::make('maintenance_type')
+                                        ->label('نوع الصفحة')
+                                        ->options([
+                                            'maintenance' => '🔧 تحت الصيانة',
+                                            'coming_soon' => '🚀 قريباً',
+                                        ])
+                                        ->default('maintenance')
+                                        ->helperText('اختر التصميم المناسب للصفحة'),
+
+                                    Forms\Components\TextInput::make('maintenance_title')
+                                        ->label('العنوان الرئيسي')
+                                        ->placeholder('نحن نُحسّن تجربتك')
+                                        ->helperText('يظهر بخط كبير في منتصف الصفحة'),
+
+                                    Forms\Components\Textarea::make('maintenance_message')
+                                        ->label('الرسالة للزوار')
+                                        ->rows(3)
+                                        ->placeholder('نعمل على تحسين الموقع وسنعود قريباً...'),
+
+                                    Forms\Components\TextInput::make('maintenance_launch_date')
+                                        ->label('تاريخ الإطلاق (اختياري)')
+                                        ->placeholder('2026-06-15')
+                                        ->helperText('يظهر عداد تنازلي في صفحة "قريباً"'),
+
+                                    Forms\Components\TextInput::make('maintenance_whatsapp')
+                                        ->label('رقم واتساب للتواصل')
+                                        ->placeholder('+970598191312')
+                                        ->helperText('يظهر في صفحة الصيانة / قريباً'),
+                                ]),
+                        ]),
+
                 ])->columnSpanFull(),
             ])
             ->statePath('data');
@@ -395,6 +443,7 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
                 'daily_checkin_points','referral_bonus',
             ],
             'tiers'         => ['tier_min_bronze', 'tier_min_silver', 'tier_min_gold', 'tier_min_vip'],
+            'maintenance'   => ['maintenance_mode','maintenance_type','maintenance_title','maintenance_message','maintenance_launch_date','maintenance_whatsapp'],
         ];
 
         foreach ($groups as $group => $keys) {
