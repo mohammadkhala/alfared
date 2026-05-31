@@ -441,13 +441,9 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
                                 ->schema([
                                     Forms\Components\Toggle::make('maintenance_mode')
                                         ->label('تفعيل وضع الصيانة')
-                                        ->helperText('عند التشغيل → يُوجَّه كل الزوار لصفحة الصيانة فوراً')
+                                        ->helperText('عند التشغيل → يُوجَّه كل الزوار لصفحة الصيانة فوراً ثم اضغط حفظ')
                                         ->onColor('danger')
-                                        ->offColor('success')
-                                        ->live()
-                                        ->afterStateUpdated(function ($state) {
-                                            \App\Models\Setting::set('maintenance_mode', $state ? '1' : '0', 'maintenance');
-                                        }),
+                                        ->offColor('success'),
 
                                     Forms\Components\Select::make('maintenance_type')
                                         ->label('نوع الصفحة')
@@ -498,7 +494,15 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
 
     public function save(): void
     {
-        $data = $this->form->getState();
+        try {
+            $data = $this->form->getState();
+        } catch (\Throwable $e) {
+            Notification::make()
+                ->title('خطأ في التحقق: ' . $e->getMessage())
+                ->danger()
+                ->send();
+            return;
+        }
 
         $groups = [
             'store'         => ['store_name','store_name_he','store_tagline','store_phone','store_email','store_address','store_city','store_country','store_logo','store_favicon'],
@@ -513,29 +517,36 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
                 'first_order_bonus','signup_bonus','points_expiry_days',
                 'daily_checkin_points','referral_bonus',
             ],
-            'tiers'         => ['tier_min_bronze', 'tier_min_silver', 'tier_min_gold', 'tier_min_vip'],
+            'tiers'         => ['tier_min_bronze','tier_min_silver','tier_min_gold','tier_min_vip'],
             'maintenance'   => ['maintenance_mode','maintenance_type','maintenance_title','maintenance_message','maintenance_launch_date','maintenance_whatsapp'],
         ];
 
         foreach ($groups as $group => $keys) {
             foreach ($keys as $key) {
-                if (array_key_exists($key, $data)) {
-                    $raw = $data[$key];
-                    if (is_array($raw)) {
-                        $value = json_encode($raw);
-                    } elseif (is_bool($raw)) {
-                        $value = $raw ? '1' : '0';
-                    } else {
-                        $value = (string) ($raw ?? '');
-                    }
-                    Setting::set($key, $value, $group);
+                if (!array_key_exists($key, $data)) continue;
+
+                $raw = $data[$key];
+
+                if (is_array($raw)) {
+                    $value = json_encode($raw);
+                } elseif (is_bool($raw) || $raw === 1 || $raw === 0) {
+                    $value = ($raw == true) ? '1' : '0';
+                } elseif ($raw === null) {
+                    $value = '';
+                } else {
+                    $value = (string) $raw;
                 }
+
+                Setting::set($key, $value, $group);
             }
         }
 
+        $isOn = ($data['maintenance_mode'] ?? false) == true;
+
         Notification::make()
-            ->title('تم حفظ الإعدادات بنجاح')
-            ->success()
+            ->title('تم حفظ الإعدادات ✓')
+            ->body($isOn ? '🔴 وضع الصيانة مفعّل — الموقع محجوب الآن' : '🟢 الموقع يعمل بشكل طبيعي')
+            ->color($isOn ? 'danger' : 'success')
             ->send();
     }
 }
