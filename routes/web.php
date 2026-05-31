@@ -51,10 +51,7 @@ Route::get('admin-api/latest-notification', function () {
 })->middleware('auth')->name('admin.latest-notification');
 
 // ── Store Pages ──
-// Temporarily redirect root to coming-soon page until app launch
-Route::get('/', function () {
-    return redirect('/coming-soon.html', 302);
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/category/{slug}', [ProductController::class, 'category'])->name('products.category');
