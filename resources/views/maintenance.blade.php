@@ -194,7 +194,6 @@
     <div class="logo-wrap">
       <div class="logo-icon">🛍️</div>
       <div class="logo-name">شركة أبناء الفريد</div>
-      <div class="logo-sub">alfared.online</div>
     </div>
 
     @if($type === 'coming_soon')
