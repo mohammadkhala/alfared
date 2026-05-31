@@ -313,5 +313,22 @@
   "invoice_printed_by": "by",
   "invoice_payment_cod": "💵 Cash on Delivery",
   "invoice_payment_card": "💳 Card",
-  "invoice_payment_transfer": "🏦 Bank Transfer"
+  "invoice_payment_transfer": "🏦 Bank Transfer",
+
+  "offers_today_title": "Today's Offers",
+  "offers_today_sub": "Real discounts on selected products — limited time",
+  "flash_ends_in": "Offer ends in:",
+  "see_all_offers": "View All Offers ←",
+
+  "location_title": "Our Location",
+  "working_hours_title": "Working Hours",
+  "working_hours_value": "Sat – Thu: 9 AM – 9 PM",
+  "contact_whatsapp_btn": "💬 Contact Us on WhatsApp",
+
+  "download_app_title": "Download Our App Now",
+  "download_app_sub": "Shop easily from your phone",
+  "download_from": "Download from",
+  "float_app_title": "📱 Download Our App",
+  "float_app_toggle_title": "Download the App",
+  "made_with_love": "Made with love ❤️ by"
 }

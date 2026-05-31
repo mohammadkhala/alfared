@@ -313,5 +313,22 @@
   "invoice_printed_by": "بواسطة",
   "invoice_payment_cod": "💵 دفع عند الاستلام",
   "invoice_payment_card": "💳 بطاقة",
-  "invoice_payment_transfer": "🏦 تحويل بنكي"
+  "invoice_payment_transfer": "🏦 تحويل بنكي",
+
+  "offers_today_title": "عروض اليوم",
+  "offers_today_sub": "خصومات حقيقية على منتجات مختارة — لفترة محدودة",
+  "flash_ends_in": "ينتهي العرض خلال:",
+  "see_all_offers": "عرض كل العروض ←",
+
+  "location_title": "موقعنا",
+  "working_hours_title": "ساعات العمل",
+  "working_hours_value": "السبت – الخميس: 9 ص – 9 م",
+  "contact_whatsapp_btn": "💬 تواصل معنا عبر واتساب",
+
+  "download_app_title": "حمّل تطبيقنا الآن",
+  "download_app_sub": "تسوّق بسهولة من هاتفك",
+  "download_from": "تحميل من",
+  "float_app_title": "📱 حمّل تطبيقنا",
+  "float_app_toggle_title": "حمّل التطبيق",
+  "made_with_love": "صنع بحب ❤️ بواسطة"
 }

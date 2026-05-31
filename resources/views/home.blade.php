@@ -225,19 +225,19 @@
             <h2>⚡ {{ $flashSale->name_ar }}</h2>
             @if($flashSale->ends_at)
               <p class="flash-countdown-wrap">
-                ينتهي العرض خلال:
+                {{ __('flash_ends_in') }}
                 <span class="flash-countdown" data-ends="{{ $flashSale->ends_at->toIso8601String() }}"></span>
               </p>
             @else
-              <p>خصومات حقيقية على منتجات مختارة — لفترة محدودة</p>
+              <p>{{ __('offers_today_sub') }}</p>
             @endif
           @else
-            <h2>🔥 عروض اليوم</h2>
-            <p>خصومات حقيقية على منتجات مختارة — لفترة محدودة</p>
+            <h2>🔥 {{ __('offers_today_title') }}</h2>
+            <p>{{ __('offers_today_sub') }}</p>
           @endif
           <div class="title-line"></div>
         </div>
-        <a href="{{ route('products.index', ['on_sale' => 1]) }}" class="see-all">عرض كل العروض ←</a>
+        <a href="{{ route('products.index', ['on_sale' => 1]) }}" class="see-all">{{ __('see_all_offers') }}</a>
       </div>
       <div class="products-grid">
         @foreach($offerProducts as $product)
@@ -423,7 +423,7 @@
   <div class="container">
     <div class="section-head">
       <div class="section-title">
-        <h2>📍 موقعنا</h2>
+        <h2>📍 {{ __('location_title') }}</h2>
         <p>{{ __('location') }}</p>
         <div class="title-line"></div>
       </div>
@@ -454,12 +454,12 @@
         <div class="loc-item">
           <div class="loc-icon">🕐</div>
           <div>
-            <h4>ساعات العمل</h4>
-            <p>السبت – الخميس: 9 ص – 9 م</p>
+            <h4>{{ __('working_hours_title') }}</h4>
+            <p>{{ __('working_hours_value') }}</p>
           </div>
         </div>
         <a href="https://wa.me/970598191312" target="_blank" class="btn-orange" style="display:inline-flex;align-items:center;gap:8px;margin-top:8px;text-decoration:none;">
-          💬 تواصل معنا عبر واتساب
+          {{ __('contact_whatsapp_btn') }}
         </a>
       </div>
       <div class="location-map">
