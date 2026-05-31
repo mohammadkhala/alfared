@@ -313,5 +313,22 @@
   "invoice_printed_by": "ע״י",
   "invoice_payment_cod": "💵 מזומן בקבלה",
   "invoice_payment_card": "💳 כרטיס",
-  "invoice_payment_transfer": "🏦 העברה בנקאית"
+  "invoice_payment_transfer": "🏦 העברה בנקאית",
+
+  "offers_today_title": "מבצעי היום",
+  "offers_today_sub": "הנחות אמיתיות על מוצרים נבחרים — לזמן מוגבל",
+  "flash_ends_in": "ההצעה מסתיימת בעוד:",
+  "see_all_offers": "הצג את כל המבצעים ←",
+
+  "location_title": "המיקום שלנו",
+  "working_hours_title": "שעות עבודה",
+  "working_hours_value": "שבת – חמישי: 9:00 – 21:00",
+  "contact_whatsapp_btn": "💬 צור קשר דרך וואטסאפ",
+
+  "download_app_title": "הורד את האפליקציה שלנו עכשיו",
+  "download_app_sub": "קנה בקלות מהטלפון שלך",
+  "download_from": "הורד מ",
+  "float_app_title": "📱 הורד את האפליקציה",
+  "float_app_toggle_title": "הורד את האפליקציה",
+  "made_with_love": "נוצר באהבה ❤️ על ידי"
 }

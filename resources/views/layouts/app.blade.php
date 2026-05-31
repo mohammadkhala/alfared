@@ -113,11 +113,11 @@
       style="background:none;border:none;font-size:24px;color:#1B3B8C;cursor:pointer;line-height:1;">✕</button>
   </div>
   <ul class="mobile-drawer-links">
-    <li><a href="{{ route('home') }}">🏠 الرئيسية</a></li>
-    <li><a href="{{ route('products.index') }}">🛍️ المتجر</a></li>
-    <li><a href="{{ route('products.index') }}?on_sale=1">🔥 العروض</a></li>
-    <li><a href="{{ route('about') }}" onclick="document.body.classList.remove('mobile-drawer-open')">🏢 من نحن</a></li>
-    <li><a href="{{ route('contact') }}" onclick="document.body.classList.remove('mobile-drawer-open')">📞 اتصل بنا</a></li>
+    <li><a href="{{ route('home') }}">🏠 {{ __('nav_home') }}</a></li>
+    <li><a href="{{ route('products.index') }}">🛍️ {{ __('nav_store') }}</a></li>
+    <li><a href="{{ route('products.index') }}?on_sale=1">🔥 {{ __('nav_offers') }}</a></li>
+    <li><a href="{{ route('about') }}" onclick="document.body.classList.remove('mobile-drawer-open')">🏢 {{ __('nav_about') }}</a></li>
+    <li><a href="{{ route('contact') }}" onclick="document.body.classList.remove('mobile-drawer-open')">📞 {{ __('nav_contact') }}</a></li>
     <li class="separator"></li>
     @auth
       <li><a href="{{ route('account.index') }}">👤 {{ __('my_account') }}</a></li>
@@ -208,22 +208,22 @@
       <div class="app-download-text">
         <span class="app-download-icon">📱</span>
         <div>
-          <strong>حمّل تطبيقنا الآن</strong>
-          <p>تسوّق بسهولة من هاتفك</p>
+          <strong>{{ __('download_app_title') }}</strong>
+          <p>{{ __('download_app_sub') }}</p>
         </div>
       </div>
       <div class="app-download-btns">
         <a href="#" class="app-store-btn android" title="Google Play">
           <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M3.18 23.75c.3.17.65.18.96.04l12.47-7.21-2.79-2.79-10.64 9.96zm-1.43-20.5C1.44 3.58 1.25 4 1.25 4.5v15c0 .5.19.92.5 1.25l.07.07 8.4-8.4v-.2L1.75 3.25zm14.63 8.56l-2.49-2.49-2.49 2.49 2.49 2.49 2.49-2.49zm1.24-.71l-2.12 2.12 2.12 2.12 3.26-1.88c.93-.54.93-1.41 0-1.95l-3.26-1.88 0 1.47z"/></svg>
           <div>
-            <span>تحميل من</span>
+            <span>{{ __('download_from') }}</span>
             <strong>Google Play</strong>
           </div>
         </a>
         <a href="#" class="app-store-btn ios" title="App Store">
           <svg viewBox="0 0 24 24" fill="currentColor" width="18" height="18"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
           <div>
-            <span>تحميل من</span>
+            <span>{{ __('download_from') }}</span>
             <strong>App Store</strong>
           </div>
         </a>
@@ -234,7 +234,7 @@
       <div class="footer-bottom-right">
         <span>© {{ date('Y') }} {{ __('footer_copyright') }}</span>
         <span class="footer-sep">·</span>
-        <span class="made-with-love">صنع بحب ❤️ بواسطة <a href="https://mohammad-khallaf.vercel.app/" target="_blank" rel="noopener">mohammad khallaf</a></span>
+        <span class="made-with-love">{{ __('made_with_love') }} <a href="https://mohammad-khallaf.vercel.app/" target="_blank" rel="noopener">mohammad khallaf</a></span>
       </div>
       <div class="payment-icons">
         <span class="pay-icon">{{ __('payment_cod') }}</span>
@@ -246,11 +246,11 @@
 
 {{-- ════ FLOATING APP DOWNLOAD ════ --}}
 <div class="float-app" id="floatApp">
-  <button class="float-app-toggle" onclick="document.getElementById('floatApp').classList.toggle('open')" title="حمّل التطبيق">
+  <button class="float-app-toggle" onclick="document.getElementById('floatApp').classList.toggle('open')" title="{{ __('float_app_toggle_title') }}">
     📱
   </button>
   <div class="float-app-panel">
-    <p class="float-app-title">📱 حمّل تطبيقنا</p>
+    <p class="float-app-title">{{ __('float_app_title') }}</p>
     <a href="#" class="float-app-btn android" target="_blank">
       <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M3.18 23.75c.3.17.65.18.96.04l12.47-7.21-2.79-2.79-10.64 9.96zm-1.43-20.5C1.44 3.58 1.25 4 1.25 4.5v15c0 .5.19.92.5 1.25l.07.07 8.4-8.4v-.2L1.75 3.25zm14.63 8.56l-2.49-2.49-2.49 2.49 2.49 2.49 2.49-2.49zm1.24-.71l-2.12 2.12 2.12 2.12 3.26-1.88c.93-.54.93-1.41 0-1.95l-3.26-1.88 0 1.47z"/></svg>
       Google Play
