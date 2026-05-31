@@ -30,7 +30,7 @@ class CategorySeeder extends Seeder
             [
                 'name_ar' => 'العطور', 'name_he' => 'בשמים', 'name_en' => 'Perfumes',
                 'slug' => 'perfume', 'icon' => '🌸', 'color' => '#C9B8FF', 'sort_order' => 4,
-                'image' => 'https://images.unsplash.com/photo-1541643600914-78b084683702?w=600&q=80&fit=crop',
+                'image' => 'https://images.unsplash.com/photo-1588776814546-daab30f310ce?w=600&q=80',
             ],
             [
                 'name_ar' => 'العناية بالأظافر', 'name_he' => 'טיפוח ציפורניים', 'name_en' => 'Nail Care',
