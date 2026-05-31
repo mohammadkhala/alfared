@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Inquiry;
 use Illuminate\Http\Request;
 
 class PageController extends Controller
@@ -50,7 +51,10 @@ class PageController extends Controller
             'message' => 'required|string|max:2000',
         ]);
 
-        // Build WhatsApp message and redirect
+        // Save to database
+        Inquiry::create($data);
+
+        // Also open WhatsApp for quick reply
         $text = "رسالة جديدة من الموقع\n"
               . "الاسم: {$data['name']}\n"
               . "الهاتف: {$data['phone']}\n"
