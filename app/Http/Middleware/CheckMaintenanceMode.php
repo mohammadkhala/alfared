@@ -24,6 +24,11 @@ class CheckMaintenanceMode
             return $next($request);
         }
 
+        // Always allow authenticated (admin) users through
+        if (auth()->check()) {
+            return $next($request);
+        }
+
         // Read setting safely
         try {
             $isOn = Setting::where('key', 'maintenance_mode')->value('value');
