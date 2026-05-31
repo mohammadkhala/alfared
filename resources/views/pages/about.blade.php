@@ -79,10 +79,9 @@
   border-radius:24px;
   overflow:hidden;
   box-shadow:0 8px 40px rgba(27,59,140,0.15);
-  aspect-ratio:4/3;
 }
 .story-img img {
-  width:100%;height:100%;object-fit:cover;display:block;
+  width:100%;height:auto;display:block;border-radius:24px;
 }
 
 /* ── Feature banner ── */
