@@ -520,9 +520,14 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
         foreach ($groups as $group => $keys) {
             foreach ($keys as $key) {
                 if (array_key_exists($key, $data)) {
-                    $value = is_array($data[$key])
-                        ? json_encode($data[$key])
-                        : (string) ($data[$key] ?? '');
+                    $raw = $data[$key];
+                    if (is_array($raw)) {
+                        $value = json_encode($raw);
+                    } elseif (is_bool($raw)) {
+                        $value = $raw ? '1' : '0';
+                    } else {
+                        $value = (string) ($raw ?? '');
+                    }
                     Setting::set($key, $value, $group);
                 }
             }
