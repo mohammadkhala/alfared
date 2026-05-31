@@ -273,6 +273,13 @@
 
 </div>
 
+{{-- Feature banner --}}
+<div class="container">
+  <div class="feature-banner">
+    <img src="{{ asset('images/store-assets/feature-graphic-1024x500.png') }}" alt="ابناء الفريد — أضخم معرض منتجات" loading="lazy"/>
+  </div>
+</div>
+
 {{-- Why us ── full width --}}
 <div class="container">
   <div class="why-section">
