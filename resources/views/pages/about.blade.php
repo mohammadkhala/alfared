@@ -224,7 +224,7 @@
         </p>
       </div>
       <div class="story-img">
-        <img src="{{ asset('images/banner.jpeg') }}" alt="شركة ابناء الفريد التجارية" loading="lazy"/>
+        <img src="{{ asset('images/banner.png') }}" alt="شركة ابناء الفريد التجارية" loading="lazy"/>
       </div>
     </div>
   </div>
