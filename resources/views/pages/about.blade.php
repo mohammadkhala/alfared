@@ -12,14 +12,23 @@
   position: relative;
   overflow: hidden;
 }
+.about-hero-bg {
+  position:absolute;inset:0;
+  background-image: url('{{ asset("images/banner.jpg") }}');
+  background-size:cover;background-position:center;
+  opacity:0.18;
+}
 .about-hero::before {
   content:'';position:absolute;width:380px;height:380px;border-radius:50%;
-  background:rgba(232,113,26,0.10);top:-140px;right:-100px;
+  background:rgba(232,113,26,0.10);top:-140px;right:-100px;z-index:1;
 }
 .about-hero::after {
   content:'';position:absolute;width:240px;height:240px;border-radius:50%;
-  background:rgba(255,255,255,0.04);bottom:-80px;left:-60px;
+  background:rgba(255,255,255,0.04);bottom:-80px;left:-60px;z-index:1;
 }
+.about-hero .pill,
+.about-hero h1,
+.about-hero p { position:relative;z-index:2; }
 .about-hero h1 { font-size:38px;font-weight:900;color:white;margin-bottom:14px; }
 .about-hero p  { font-size:16px;color:rgba(255,255,255,0.65);max-width:560px;margin:0 auto;line-height:1.8; }
 .about-hero .pill {
@@ -76,9 +85,20 @@
   overflow:hidden;
   box-shadow:0 8px 40px rgba(27,59,140,0.15);
   aspect-ratio:4/3;
-  background:linear-gradient(135deg,var(--blue-lt),#E0E7FF);
-  display:flex;align-items:center;justify-content:center;
-  font-size:80px;
+}
+.story-img img {
+  width:100%;height:100%;object-fit:cover;display:block;
+}
+
+/* ── Feature banner ── */
+.feature-banner {
+  border-radius:24px;
+  overflow:hidden;
+  box-shadow:0 8px 40px rgba(27,59,140,0.15);
+  margin:0 0 64px;
+}
+.feature-banner img {
+  width:100%;height:auto;display:block;
 }
 
 /* ── Values ── */
@@ -161,6 +181,7 @@
 
 {{-- Hero --}}
 <div class="about-hero">
+  <div class="about-hero-bg"></div>
   <div class="pill">✦ شركة ابناء الفريد التجارية</div>
   <h1>من نحن</h1>
   <p>الصين بين يديك — أضخم معرض للمنتجات في فلسطين، نجمع لك آلاف المنتجات في مكان واحد</p>
@@ -207,7 +228,9 @@
           مع توصيل سريع وخدمة عملاء تضع رضاك فوق كل اعتبار.
         </p>
       </div>
-      <div class="story-img">🏢</div>
+      <div class="story-img">
+        <img src="{{ asset('images/banner.jpg') }}" alt="شركة ابناء الفريد التجارية" loading="lazy"/>
+      </div>
     </div>
   </div>
 
@@ -248,6 +271,13 @@
     </div>
   </div>
 
+</div>
+
+{{-- Feature banner --}}
+<div class="container">
+  <div class="feature-banner">
+    <img src="{{ asset('images/store-assets/feature-graphic-1024x500.png') }}" alt="ابناء الفريد — أضخم معرض منتجات" loading="lazy"/>
+  </div>
 </div>
 
 {{-- Why us ── full width --}}
