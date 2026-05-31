@@ -67,6 +67,10 @@ class CartController extends Controller
             ]);
         }
 
+        if ($request->boolean('buy_now')) {
+            return redirect()->route('checkout.index');
+        }
+
         return back()->with('success', 'تمت إضافة المنتج للسلة ✓');
     }
 

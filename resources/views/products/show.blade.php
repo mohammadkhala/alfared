@@ -136,15 +136,21 @@
             </div>
           </div>
 
-          <div style="display:flex;gap:12px;flex-wrap:wrap;">
-            <button type="submit" class="add-to-cart-btn btn btn-orange" style="flex:1;padding:16px;font-size:16px;min-width:180px;">
-              🛒 أضف للسلة
+          <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:10px;">
+            <button type="submit" class="add-to-cart-btn btn btn-orange" style="flex:1;padding:16px;font-size:16px;min-width:160px;">
+              🛒 {{ __('add_to_cart') }}
             </button>
             <form action="{{ route('wishlist.toggle', $product) }}" method="POST" style="display:inline;">
               @csrf
               <button type="submit" style="padding:16px;background:#F3F4F6;border:none;border-radius:12px;cursor:pointer;font-size:20px;" title="أضف للمفضلة">♡</button>
             </form>
           </div>
+
+          {{-- Buy Now --}}
+          <button type="submit" name="buy_now" value="1"
+            style="width:100%;padding:15px;font-size:16px;font-weight:700;background:#1B3B8C;color:#fff;border:none;border-radius:12px;cursor:pointer;letter-spacing:0.3px;">
+            ⚡ {{ __('buy_now') }}
+          </button>
         </form>
       @else
         <button class="btn" style="background:#9CA3AF;color:#fff;padding:16px;width:100%;border-radius:12px;cursor:not-allowed;">نفد المخزون</button>

@@ -22,6 +22,7 @@ class CheckMaintenanceMode
             $request->is('admin-tools*') ||
             $request->is('admin-api*') ||
             $request->is('maintenance-preview*') ||
+            $request->is('coming-soon') ||
             $request->is('livewire*') ||
             $request->is('lang/*') ||
             $request->is('up') ||

@@ -14,6 +14,16 @@ use App\Http\Controllers\PageController;
 // ── Language Switch ──
 Route::get('lang/{locale}', [LanguageController::class, 'switch'])->name('lang.switch');
 
+// ── Coming Soon standalone page ──
+Route::get('/coming-soon', function () {
+    $title   = \App\Models\Setting::get('maintenance_title', 'قريباً');
+    $message = \App\Models\Setting::get('maintenance_message', 'نعمل على إطلاق متجرنا قريباً — ترقبونا!');
+    $launch  = \App\Models\Setting::get('maintenance_launch_date', '');
+    $wa      = \App\Models\Setting::get('maintenance_whatsapp', '+970598191312');
+    $type    = 'coming_soon';
+    return view('maintenance', compact('type', 'title', 'message', 'launch', 'wa'));
+})->name('coming-soon');
+
 // ── Maintenance Preview (admin only, bypasses middleware) ──
 Route::get('/maintenance-preview', function () {
     $type    = \App\Models\Setting::get('maintenance_type', 'maintenance');
