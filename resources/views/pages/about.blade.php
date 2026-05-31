@@ -12,12 +12,7 @@
   position: relative;
   overflow: hidden;
 }
-.about-hero-bg {
-  position:absolute;inset:0;
-  background-image: url('{{ asset("images/banner.jpeg") }}');
-  background-size:cover;background-position:center;
-  opacity:0.18;
-}
+.about-hero-bg { display:none; }
 .about-hero::before {
   content:'';position:absolute;width:380px;height:380px;border-radius:50%;
   background:rgba(232,113,26,0.10);top:-140px;right:-100px;z-index:1;
@@ -228,9 +223,7 @@
           مع توصيل سريع وخدمة عملاء تضع رضاك فوق كل اعتبار.
         </p>
       </div>
-      <div class="story-img">
-        <img src="{{ asset('images/banner.jpeg') }}" alt="شركة ابناء الفريد التجارية" loading="lazy"/>
-      </div>
+      <div class="story-img">🏢</div>
     </div>
   </div>
 
