@@ -14,7 +14,7 @@
 }
 .about-hero-bg {
   position:absolute;inset:0;
-  background-image: url('{{ asset("images/banner.jpg") }}');
+  background-image: url('{{ asset("images/banner.jpeg") }}');
   background-size:cover;background-position:center;
   opacity:0.18;
 }
@@ -229,7 +229,7 @@
         </p>
       </div>
       <div class="story-img">
-        <img src="{{ asset('images/banner.jpg') }}" alt="شركة ابناء الفريد التجارية" loading="lazy"/>
+        <img src="{{ asset('images/banner.jpeg') }}" alt="شركة ابناء الفريد التجارية" loading="lazy"/>
       </div>
     </div>
   </div>
