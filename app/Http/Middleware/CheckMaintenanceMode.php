@@ -11,21 +11,22 @@ class CheckMaintenanceMode
 {
     public function handle(Request $request, Closure $next): Response
     {
+        // Always allow authenticated (admin) users through
+        if (auth()->check()) {
+            return $next($request);
+        }
+
         // Always allow these paths through
         if (
             $request->is('admin*') ||
             $request->is('admin-tools*') ||
             $request->is('admin-api*') ||
             $request->is('maintenance-preview*') ||
+            $request->is('livewire*') ||
             $request->is('lang/*') ||
             $request->is('up') ||
             $request->is('api*')
         ) {
-            return $next($request);
-        }
-
-        // Always allow authenticated (admin) users through
-        if (auth()->check()) {
             return $next($request);
         }
 
