@@ -110,11 +110,12 @@
     <div class="categories-grid">
       @forelse($categories as $cat)
         <a href="{{ route('products.category', $cat->slug) }}" class="cat-card">
-          @if($cat->image)
-            <img src="{{ asset('storage/'.$cat->image) }}" alt="{{ $cat->name }}" loading="lazy"/>
-          @else
-            <img src="{{ $catFallbackImages[$cat->slug] ?? $defaultCatImage }}" alt="{{ $cat->name }}" loading="lazy"/>
-          @endif
+          @php
+            $catImg = $cat->image
+              ? (str_starts_with($cat->image, 'http') ? $cat->image : asset('storage/'.$cat->image))
+              : ($catFallbackImages[$cat->slug] ?? $defaultCatImage);
+          @endphp
+          <img src="{{ $catImg }}" alt="{{ $cat->name }}" loading="lazy"/>
           <div class="cat-overlay"></div>
           <div class="cat-info">
             <h3>{{ $cat->name }}</h3>

@@ -12,8 +12,13 @@
   {{-- IMAGE AREA --}}
   <div class="product-img">
     <a href="{{ route('products.show', $product->slug) }}" class="product-img-link">
+      @php
+        $imgSrc = $product->main_image
+          ? (str_starts_with($product->main_image, 'http') ? $product->main_image : asset('storage/'.$product->main_image))
+          : asset('images/placeholder.svg');
+      @endphp
       <img
-        src="{{ $product->main_image ? asset('storage/'.$product->main_image) : asset('images/placeholder.svg') }}"
+        src="{{ $imgSrc }}"
         alt="{{ $product->name }}"
         loading="lazy"
       />
