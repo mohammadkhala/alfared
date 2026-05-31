@@ -14,6 +14,16 @@ use App\Http\Controllers\PageController;
 // ── Language Switch ──
 Route::get('lang/{locale}', [LanguageController::class, 'switch'])->name('lang.switch');
 
+// ── Maintenance Preview (admin only, bypasses middleware) ──
+Route::get('/maintenance-preview', function () {
+    $type    = \App\Models\Setting::get('maintenance_type', 'maintenance');
+    $title   = \App\Models\Setting::get('maintenance_title', '');
+    $message = \App\Models\Setting::get('maintenance_message', '');
+    $launch  = \App\Models\Setting::get('maintenance_launch_date', '');
+    $wa      = \App\Models\Setting::get('maintenance_whatsapp', '');
+    return view('maintenance', compact('type','title','message','launch','wa'));
+})->middleware('auth')->name('maintenance.preview');
+
 // ── Admin Invoices & Export ──
 Route::middleware('auth')->prefix('admin-tools')->group(function () {
     Route::get('invoice/{order}',  [InvoiceController::class, 'single'])->name('orders.invoice');
