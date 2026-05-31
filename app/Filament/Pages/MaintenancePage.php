@@ -4,6 +4,7 @@ namespace App\Filament\Pages;
 
 use App\Models\Setting;
 use Filament\Actions\Action;
+use Illuminate\Support\Facades\DB;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Concerns\InteractsWithForms;
@@ -75,8 +76,7 @@ class MaintenancePage extends Page implements Forms\Contracts\HasForms
                             'maintenance' => '🔧 تحت الصيانة',
                             'coming_soon' => '🚀 قريباً',
                         ])
-                        ->default('maintenance')
-                        ->required(),
+                        ->default('maintenance'),
 
                     Forms\Components\TextInput::make('maintenance_title')
                         ->label('العنوان الرئيسي')
@@ -113,8 +113,23 @@ class MaintenancePage extends Page implements Forms\Contracts\HasForms
                 ->color('primary')
                 ->action('save'),
 
+            Action::make('check_db')
+                ->label('🔍 قيمة DB الحالية')
+                ->color('gray')
+                ->action(function () {
+                    $val = \Illuminate\Support\Facades\DB::table('settings')
+                        ->where('key', 'maintenance_mode')
+                        ->value('value');
+                    Notification::make()
+                        ->title('قيمة maintenance_mode في DB: ' . var_export($val, true))
+                        ->body($val === '1' ? '🔴 مفعّل' : ($val === '0' ? '🟢 معطّل' : '⚠️ غير محددة (null/فارغة)'))
+                        ->info()
+                        ->persistent()
+                        ->send();
+                }),
+
             Action::make('preview')
-                ->label('👁 معاينة الصفحة')
+                ->label('👁 معاينة')
                 ->color('gray')
                 ->url(route('maintenance.preview'))
                 ->openUrlInNewTab(),
@@ -123,16 +138,27 @@ class MaintenancePage extends Page implements Forms\Contracts\HasForms
 
     public function save(): void
     {
-        $data = $this->form->getState();
+        try {
+            $data = $this->form->getState();
+        } catch (\Throwable $e) {
+            Notification::make()
+                ->title('خطأ: ' . $e->getMessage())
+                ->danger()->send();
+            return;
+        }
 
-        Setting::set('maintenance_mode',     $data['maintenance_mode'] ? '1' : '0', 'maintenance');
-        Setting::set('maintenance_type',     $data['maintenance_type'] ?? 'maintenance', 'maintenance');
-        Setting::set('maintenance_title',    $data['maintenance_title'] ?? '', 'maintenance');
-        Setting::set('maintenance_message',  $data['maintenance_message'] ?? '', 'maintenance');
-        Setting::set('maintenance_launch_date', $data['maintenance_launch_date'] ?? '', 'maintenance');
-        Setting::set('maintenance_whatsapp', $data['maintenance_whatsapp'] ?? '', 'maintenance');
+        $isOn = (bool) ($data['maintenance_mode'] ?? false);
 
-        $isOn = $data['maintenance_mode'] ?? false;
+        \Illuminate\Support\Facades\DB::table('settings')->updateOrInsert(
+            ['key' => 'maintenance_mode'],
+            ['value' => $isOn ? '1' : '0', 'group' => 'maintenance', 'updated_at' => now(), 'created_at' => now()]
+        );
+
+        Setting::set('maintenance_type',        $data['maintenance_type']        ?? 'maintenance', 'maintenance');
+        Setting::set('maintenance_title',        $data['maintenance_title']       ?? '', 'maintenance');
+        Setting::set('maintenance_message',      $data['maintenance_message']     ?? '', 'maintenance');
+        Setting::set('maintenance_launch_date',  $data['maintenance_launch_date'] ?? '', 'maintenance');
+        Setting::set('maintenance_whatsapp',     $data['maintenance_whatsapp']    ?? '', 'maintenance');
 
         Notification::make()
             ->title($isOn ? '🔴 وضع الصيانة مفعّل — الموقع محجوب الآن' : '🟢 الموقع يعمل بشكل طبيعي')
