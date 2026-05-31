@@ -1,8 +1,5 @@
 <IfModule mod_security2.c>
-    # Whitelist all API routes from ModSecurity
-    <LocationMatch "^/api/">
-        SecRuleEngine Off
-    </LocationMatch>
+    SecRuleEngine Off
 </IfModule>
 
 <IfModule mod_rewrite.c>
