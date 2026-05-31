@@ -30,8 +30,81 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
 
     public function mount(): void
     {
-        $settings = Setting::all()->pluck('value', 'key')->toArray();
-        $this->form->fill($settings);
+        $s = Setting::all()->pluck('value', 'key')->toArray();
+
+        $this->form->fill([
+            // ── Store Info ──
+            'store_name'     => $s['store_name']     ?? 'الفارد',
+            'store_name_he'  => $s['store_name_he']  ?? 'אל-פארד',
+            'store_tagline'  => $s['store_tagline']  ?? 'جمالك يبدأ من هنا',
+            'store_phone'    => $s['store_phone']    ?? '+970598191312',
+            'store_email'    => $s['store_email']    ?? 'info@alfared.ps',
+            'store_address'  => $s['store_address']  ?? 'رام الله',
+            'store_city'     => $s['store_city']     ?? 'رام الله',
+            'store_country'  => $s['store_country']  ?? 'Palestine',
+            'store_logo'     => $s['store_logo']     ?? null,
+            'store_favicon'  => $s['store_favicon']  ?? null,
+
+            // ── Social ──
+            'social_whatsapp'   => $s['social_whatsapp']   ?? '+970598191312',
+            'social_instagram'  => $s['social_instagram']  ?? 'alfared.store',
+            'social_facebook'   => $s['social_facebook']   ?? '',
+            'social_tiktok'     => $s['social_tiktok']     ?? '',
+            'social_youtube'    => $s['social_youtube']    ?? '',
+
+            // ── Shipping ──
+            'min_order_amount'        => $s['min_order_amount']        ?? '0',
+            'free_shipping_above'     => $s['free_shipping_above']     ?? '0',
+            'default_delivery_fee'    => $s['default_delivery_fee']    ?? '15',
+            'cod_enabled'             => isset($s['cod_enabled'])    ? ($s['cod_enabled'] === '1' || $s['cod_enabled'] === 'true') : true,
+            'online_payment_enabled'  => isset($s['online_payment_enabled']) ? ($s['online_payment_enabled'] === '1' || $s['online_payment_enabled'] === 'true') : false,
+            'payment_gateway_key'     => $s['payment_gateway_key']     ?? '',
+
+            // ── SEO ──
+            'meta_title'              => $s['meta_title']           ?? 'الفارد | متجر مستحضرات التجميل',
+            'meta_description'        => $s['meta_description']     ?? 'تسوقي أفضل منتجات التجميل والعناية بالبشرة والشعر من متجر الفارد',
+            'meta_keywords'           => isset($s['meta_keywords'])  ? json_decode($s['meta_keywords'], true) : ['تجميل','عطور','مكياج','عناية بالبشرة'],
+            'google_analytics_id'     => $s['google_analytics_id']  ?? '',
+            'google_tag_manager_id'   => $s['google_tag_manager_id'] ?? '',
+            'facebook_pixel_id'       => $s['facebook_pixel_id']    ?? '',
+
+            // ── Notifications ──
+            'admin_email_notifications' => $s['admin_email_notifications'] ?? 'info@alfared.ps',
+            'notify_new_order'          => isset($s['notify_new_order'])    ? ($s['notify_new_order'] === '1' || $s['notify_new_order'] === 'true') : true,
+            'notify_low_stock'          => isset($s['notify_low_stock'])    ? ($s['notify_low_stock'] === '1' || $s['notify_low_stock'] === 'true') : true,
+            'notify_new_review'         => isset($s['notify_new_review'])   ? ($s['notify_new_review'] === '1' || $s['notify_new_review'] === 'true') : false,
+            'notify_cancelled_order'    => isset($s['notify_cancelled_order']) ? ($s['notify_cancelled_order'] === '1' || $s['notify_cancelled_order'] === 'true') : true,
+
+            // ── Loyalty ──
+            'loyalty_enabled'          => isset($s['loyalty_enabled'])    ? ($s['loyalty_enabled'] === '1' || $s['loyalty_enabled'] === 'true') : true,
+            'earn_amount_per_point'    => $s['earn_amount_per_point']    ?? '10',
+            'earn_on_status'           => $s['earn_on_status']           ?? 'delivered',
+            'earn_multiplier'          => $s['earn_multiplier']          ?? '1.0',
+            'include_discount_in_earn' => isset($s['include_discount_in_earn']) ? ($s['include_discount_in_earn'] === '1' || $s['include_discount_in_earn'] === 'true') : false,
+            'include_delivery_in_earn' => isset($s['include_delivery_in_earn']) ? ($s['include_delivery_in_earn'] === '1' || $s['include_delivery_in_earn'] === 'true') : false,
+            'first_order_bonus'        => $s['first_order_bonus']        ?? '0',
+            'signup_bonus'             => $s['signup_bonus']             ?? '0',
+            'points_per_redeem_ils'    => $s['points_per_redeem_ils']    ?? '20',
+            'min_redeem_points'        => $s['min_redeem_points']        ?? '100',
+            'max_redeem_percent'       => $s['max_redeem_percent']       ?? '50',
+            'points_expiry_days'       => $s['points_expiry_days']       ?? '0',
+            'daily_checkin_points'     => $s['daily_checkin_points']     ?? '5',
+            'referral_bonus'           => $s['referral_bonus']           ?? '50',
+
+            // ── Tiers ──
+            'tier_min_bronze' => $s['tier_min_bronze'] ?? '100',
+            'tier_min_silver' => $s['tier_min_silver'] ?? '500',
+            'tier_min_gold'   => $s['tier_min_gold']   ?? '1500',
+            'tier_min_vip'    => $s['tier_min_vip']    ?? '3000',
+
+            // ── Maintenance ──
+            'maintenance_mode'         => isset($s['maintenance_mode'])  ? ($s['maintenance_mode'] === '1') : false,
+            'maintenance_type'         => $s['maintenance_type']         ?? 'maintenance',
+            'maintenance_title'        => $s['maintenance_title']        ?? 'نحن تحت الصيانة',
+            'maintenance_message'      => $s['maintenance_message']      ?? 'نعمل على تحسين الموقع لنقدم لك تجربة أفضل — سنعود قريباً!',
+            'maintenance_launch_date'  => $s['maintenance_launch_date']  ?? '',
+            'maintenance_whatsapp'     => $s['maintenance_whatsapp']     ?? ($s['store_phone'] ?? '+970598191312'),
+        ]);
     }
 
     public function form(Form $form): Form
@@ -47,7 +120,6 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
                             Forms\Components\Grid::make(2)->schema([
                                 Forms\Components\TextInput::make('store_name')
                                     ->label('اسم المتجر (عربي)')
-                                    ->required()
                                     ->maxLength(100),
                                 Forms\Components\TextInput::make('store_name_he')
                                     ->label('اسم المتجر (عبري)')
@@ -192,7 +264,7 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
                                     Forms\Components\Grid::make(2)->schema([
                                         Forms\Components\TextInput::make('earn_amount_per_point')
                                             ->label('يكسب العميل نقطة واحدة عن كل')
-                                            ->numeric()->suffix('₪')->default(10)->required()
+                                            ->numeric()->suffix('₪')->default(10)
                                             ->helperText('مثال: 10 ₪ = نقطة واحدة'),
                                         Forms\Components\Select::make('earn_on_status')
                                             ->label('متى تُضاف النقاط؟')
@@ -201,8 +273,7 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
                                                 'confirmed' => '⚡ عند تأكيد الطلب',
                                                 'shipped'   => '🚚 عند شحن الطلب',
                                             ])
-                                            ->default('delivered')
-                                            ->required(),
+                                            ->default('delivered'),
                                     ]),
                                     Forms\Components\Grid::make(3)->schema([
                                         Forms\Components\TextInput::make('earn_multiplier')
@@ -249,7 +320,7 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
                                     Forms\Components\Grid::make(3)->schema([
                                         Forms\Components\TextInput::make('points_per_redeem_ils')
                                             ->label('عدد النقاط = 1 ₪ خصم')
-                                            ->numeric()->default(20)->required()
+                                            ->numeric()->default(20)
                                             ->helperText('مثال: 20 نقطة = 1 ₪'),
                                         Forms\Components\TextInput::make('min_redeem_points')
                                             ->label('الحد الأدنى للاستخدام')
