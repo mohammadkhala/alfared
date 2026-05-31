@@ -63,11 +63,11 @@
 
       {{-- Nav Links --}}
       <ul class="nav-links">
-        <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">الرئيسية</a></li>
-        <li><a href="{{ route('products.index') }}" class="{{ request()->routeIs('products.*') ? 'active' : '' }}">المتجر</a></li>
-        <li><a href="{{ route('products.index') }}?on_sale=1" class="{{ request()->is('*/products*') && request('on_sale') ? 'active' : '' }}">العروض</a></li>
-        <li><a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">من نحن</a></li>
-        <li><a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'active' : '' }}">اتصل بنا</a></li>
+        <li><a href="{{ route('home') }}" class="{{ request()->routeIs('home') ? 'active' : '' }}">{{ __('nav_home') }}</a></li>
+        <li><a href="{{ route('products.index') }}" class="{{ request()->routeIs('products.*') ? 'active' : '' }}">{{ __('nav_store') }}</a></li>
+        <li><a href="{{ route('products.index') }}?on_sale=1" class="{{ request()->is('*/products*') && request('on_sale') ? 'active' : '' }}">{{ __('nav_offers') }}</a></li>
+        <li><a href="{{ route('about') }}" class="{{ request()->routeIs('about') ? 'active' : '' }}">{{ __('nav_about') }}</a></li>
+        <li><a href="{{ route('contact') }}" class="{{ request()->routeIs('contact') ? 'active' : '' }}">{{ __('nav_contact') }}</a></li>
       </ul>
 
       {{-- Actions --}}
