@@ -40,13 +40,15 @@ class MaintenancePage extends Page implements Forms\Contracts\HasForms
 
     public function mount(): void
     {
+        $phone = Setting::get('store_phone') ?: Setting::get('social_whatsapp') ?: '+970598191312';
+
         $this->form->fill([
-            'maintenance_mode'     => Setting::get('maintenance_mode', '0') === '1',
-            'maintenance_type'     => Setting::get('maintenance_type', 'maintenance'),
-            'maintenance_title'    => Setting::get('maintenance_title', ''),
-            'maintenance_message'  => Setting::get('maintenance_message', ''),
+            'maintenance_mode'        => Setting::get('maintenance_mode', '0') === '1',
+            'maintenance_type'        => Setting::get('maintenance_type', 'maintenance'),
+            'maintenance_title'       => Setting::get('maintenance_title')    ?: 'نحن تحت الصيانة',
+            'maintenance_message'     => Setting::get('maintenance_message')  ?: 'نعمل على تحسين الموقع لنقدم لك تجربة أفضل — سنعود قريباً بكل جديد!',
             'maintenance_launch_date' => Setting::get('maintenance_launch_date', ''),
-            'maintenance_whatsapp' => Setting::get('maintenance_whatsapp', '+970598191312'),
+            'maintenance_whatsapp'    => Setting::get('maintenance_whatsapp') ?: $phone,
         ]);
     }
 
@@ -79,21 +81,24 @@ class MaintenancePage extends Page implements Forms\Contracts\HasForms
                     Forms\Components\TextInput::make('maintenance_title')
                         ->label('العنوان الرئيسي')
                         ->placeholder('نحن تحت الصيانة')
-                        ->maxLength(100),
+                        ->maxLength(100)
+                        ->helperText('يظهر بخط كبير في منتصف الصفحة'),
 
                     Forms\Components\Textarea::make('maintenance_message')
                         ->label('رسالة الزوار')
-                        ->placeholder('نعمل على تحسين الموقع وسنعود قريباً...')
-                        ->rows(3),
+                        ->placeholder('نعمل على تحسين الموقع لنقدم لك تجربة أفضل — سنعود قريباً!')
+                        ->rows(3)
+                        ->helperText('وصف مختصر يظهر تحت العنوان'),
 
                     Forms\Components\TextInput::make('maintenance_launch_date')
                         ->label('تاريخ الإطلاق (اختياري)')
-                        ->placeholder('2026-06-20')
+                        ->type('date')
                         ->helperText('يظهر عداد تنازلي في صفحة "قريباً" — اتركه فارغاً إن لم تحتج'),
 
                     Forms\Components\TextInput::make('maintenance_whatsapp')
                         ->label('رقم واتساب للتواصل')
-                        ->placeholder('+970598191312'),
+                        ->placeholder('+970598191312')
+                        ->helperText('يظهر زر واتساب في الصفحة للزوار'),
                 ]),
 
             ])
