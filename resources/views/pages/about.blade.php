@@ -223,7 +223,9 @@
           مع توصيل سريع وخدمة عملاء تضع رضاك فوق كل اعتبار.
         </p>
       </div>
-      <div class="story-img">🏢</div>
+      <div class="story-img">
+        <img src="{{ asset('images/banner.jpeg') }}" alt="شركة ابناء الفريد التجارية" loading="lazy"/>
+      </div>
     </div>
   </div>
 
@@ -264,13 +266,6 @@
     </div>
   </div>
 
-</div>
-
-{{-- Feature banner --}}
-<div class="container">
-  <div class="feature-banner">
-    <img src="{{ asset('images/store-assets/feature-graphic-1024x500.png') }}" alt="ابناء الفريد — أضخم معرض منتجات" loading="lazy"/>
-  </div>
 </div>
 
 {{-- Why us ── full width --}}
