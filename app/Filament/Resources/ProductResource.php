@@ -39,16 +39,29 @@ class ProductResource extends Resource
                             ->label('اسم المنتج (عربي)')
                             ->required()->maxLength(255)
                             ->live(onBlur: true)
-                            ->afterStateUpdated(fn($state, Forms\Set $set) =>
-                                $set('slug', \Illuminate\Support\Str::slug($state))),
+                            ->afterStateUpdated(function ($state, Forms\Set $set, $record) {
+                                // Only auto-set slug when creating (no existing record)
+                                if (!$record) {
+                                    $base = \Illuminate\Support\Str::slug($state);
+                                    $slug = $base . '-' . rand(100, 999);
+                                    // Ensure uniqueness
+                                    while (\App\Models\Product::where('slug', $slug)->exists()) {
+                                        $slug = $base . '-' . rand(100, 999);
+                                    }
+                                    $set('slug', $slug);
+                                }
+                            }),
 
                         Forms\Components\TextInput::make('name_he')
                             ->label('اسم المنتج (عبري)')->maxLength(255),
                     ]),
 
                     Forms\Components\TextInput::make('slug')
-                        ->label('الرابط (Slug)')->required()
-                        ->unique(ignoreRecord: true)->maxLength(255),
+                        ->label('الرابط (Slug)')
+                        ->unique(ignoreRecord: true)->maxLength(255)
+                        ->disabled()
+                        ->dehydrated()
+                        ->helperText('يتولّد تلقائياً من اسم المنتج'),
 
                     Forms\Components\Grid::make(2)->schema([
                         Forms\Components\Select::make('category_id')
