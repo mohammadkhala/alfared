@@ -5,6 +5,10 @@
 
     RewriteEngine On
 
+    # ── Redirect old domain to new domain (permanent 301) ──
+    RewriteCond %{HTTP_HOST} ^(www\.)?alfared\.online$ [NC]
+    RewriteRule ^(.*)$ https://alfared.ps/$1 [R=301,L]
+
     # Handle Authorization Header
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]

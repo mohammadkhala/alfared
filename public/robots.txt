@@ -1,2 +1,14 @@
 User-agent: *
-Disallow:
+Disallow: /admin
+Disallow: /admin-tools/
+Disallow: /admin-api/
+Disallow: /maintenance-preview
+Disallow: /checkout/
+Disallow: /account/
+Disallow: /cart
+Disallow: /livewire/
+Disallow: /lang/
+
+Allow: /
+
+Sitemap: https://alfared.ps/sitemap.xml

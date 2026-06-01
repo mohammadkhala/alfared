@@ -14,6 +14,27 @@ use App\Http\Controllers\PageController;
 // ── Language Switch ──
 Route::get('lang/{locale}', [LanguageController::class, 'switch'])->name('lang.switch');
 
+// ── Sitemap ──
+Route::get('/sitemap.xml', function () {
+    $products   = \App\Models\Product::where('is_active', true)->get(['slug', 'updated_at']);
+    $categories = \App\Models\Category::all(['slug', 'updated_at']);
+
+    $staticPages = [
+        ['url' => url('/'),               'priority' => '1.0', 'changefreq' => 'daily'],
+        ['url' => url('/products'),       'priority' => '0.9', 'changefreq' => 'daily'],
+        ['url' => url('/about'),          'priority' => '0.5', 'changefreq' => 'monthly'],
+        ['url' => url('/contact'),        'priority' => '0.5', 'changefreq' => 'monthly'],
+        ['url' => url('/privacy-policy'), 'priority' => '0.3', 'changefreq' => 'yearly'],
+        ['url' => url('/terms'),          'priority' => '0.3', 'changefreq' => 'yearly'],
+        ['url' => url('/shipping'),       'priority' => '0.4', 'changefreq' => 'monthly'],
+        ['url' => url('/returns'),        'priority' => '0.4', 'changefreq' => 'monthly'],
+        ['url' => url('/faq'),            'priority' => '0.5', 'changefreq' => 'monthly'],
+    ];
+
+    $content = view('sitemap', compact('products', 'categories', 'staticPages'))->render();
+    return response($content, 200)->header('Content-Type', 'application/xml');
+})->name('sitemap');
+
 // ── Coming Soon standalone page ──
 Route::get('/coming-soon', function () {
     $title   = \App\Models\Setting::get('maintenance_title', 'قريباً');

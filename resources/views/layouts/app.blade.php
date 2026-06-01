@@ -7,8 +7,31 @@
   <meta name="csrf-token" content="{{ csrf_token() }}"/>
   <title>@yield('title', __('company_name'))</title>
   <meta name="description" content="@yield('description', __('tagline'))"/>
+
+  {{-- SEO: Canonical URL — tells Google the authoritative domain is alfared.ps --}}
+  <link rel="canonical" href="{{ url()->current() }}"/>
+
+  {{-- Open Graph --}}
+  <meta property="og:type"        content="website"/>
+  <meta property="og:url"         content="{{ url()->current() }}"/>
+  <meta property="og:title"       content="@yield('title', __('company_name'))"/>
+  <meta property="og:description" content="@yield('description', __('tagline'))"/>
+  <meta property="og:image"       content="{{ asset('images/logo.png') }}"/>
+  <meta property="og:locale"      content="ar_PS"/>
+  <meta property="og:site_name"   content="شركة أبناء الفريد"/>
+
+  {{-- Twitter Card --}}
+  <meta name="twitter:card"        content="summary"/>
+  <meta name="twitter:title"       content="@yield('title', __('company_name'))"/>
+  <meta name="twitter:description" content="@yield('description', __('tagline'))"/>
+  <meta name="twitter:image"       content="{{ asset('images/logo.png') }}"/>
+
+  {{-- Robots --}}
+  <meta name="robots" content="index, follow"/>
+
   <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}"/>
   <link rel="shortcut icon" href="{{ asset('images/logo.png') }}"/>
+  <link rel="sitemap" type="application/xml" href="{{ url('/sitemap.xml') }}"/>
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="{{ asset('css/store.css') }}"/>
