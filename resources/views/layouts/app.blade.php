@@ -328,6 +328,7 @@ document.addEventListener('DOMContentLoaded', function() {
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.add-to-cart-form').forEach(form => {
     form.addEventListener('submit', async (e) => {
+      if (e.submitter && e.submitter.name === 'buy_now') return;
       e.preventDefault();
       const btn = form.querySelector('.quick-add, .add-btn');
       if (!btn) return;
@@ -405,6 +406,10 @@ document.addEventListener('DOMContentLoaded', function() {
   document.addEventListener('submit', async function(e){
     const form = e.target.closest('.add-to-cart-form');
     if (!form) return;
+
+    // Buy Now: let the form submit normally so the server can redirect to checkout
+    if (e.submitter && e.submitter.name === 'buy_now') return;
+
     e.preventDefault();
 
     const btn = form.querySelector('button[type="submit"]');
