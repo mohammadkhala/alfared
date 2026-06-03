@@ -37,11 +37,7 @@ class LahzaService
             'currency'     => $this->currency,
             'ref'          => $order->order_number,
             'callback_url' => $callbackUrl,
-            'metadata'     => [
-                'order_id'     => $order->id,
-                'order_number' => $order->order_number,
-                'customer'     => $order->customer_name,
-            ],
+            // metadata (nested object) not supported by Lahza API — omitted
         ];
 
         $response = Http::withHeaders([
