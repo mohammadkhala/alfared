@@ -6,10 +6,16 @@
   <div style="text-align:center;max-width:480px;width:100%;">
     <div style="font-size:72px;margin-bottom:20px;animation:shake .5s ease;">❌</div>
     <h1 style="font-size:1.8rem;font-weight:900;color:#DC2626;margin-bottom:12px;">فشل عملية الدفع</h1>
-    <p style="color:#6B7280;line-height:1.8;margin-bottom:32px;">
+    <p style="color:#6B7280;line-height:1.8;margin-bottom:{{ session('init_error') ? '16px' : '32px' }};">
       لم يتم إتمام الدفع للطلب <strong>{{ $order->order_number }}</strong>.<br/>
       يمكنك المحاولة مجدداً أو اختيار الدفع عند الاستلام.
     </p>
+
+    @if(session('init_error'))
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:12px 16px;margin-bottom:24px;font-size:13px;color:#B91C1C;text-align:right;direction:rtl;">
+        ⚠️ {{ session('init_error') }}
+      </div>
+    @endif
 
     <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;">
       <a href="{{ route('checkout.index') }}"

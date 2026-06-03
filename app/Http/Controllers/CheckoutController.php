@@ -173,9 +173,10 @@ class CheckoutController extends Controller
 
                 return redirect($result['authorization_url']);
             } catch (\Throwable $e) {
-                // Fallback: cancel the Lahza order, let user retry
+                // Fallback: mark failed, send to payment-failed page (cart is already cleared)
                 $order->update(['payment_status' => 'failed', 'status' => 'cancelled']);
-                return back()->with('error', 'فشل تهيئة الدفع الإلكتروني: ' . $e->getMessage());
+                return redirect()->route('checkout.failed', $order->order_number)
+                                 ->with('init_error', $e->getMessage());
             }
         }
 
