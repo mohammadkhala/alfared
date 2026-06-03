@@ -151,13 +151,17 @@
             </div>
           </label>
 
-          {{-- Lahza Online Payment --}}
+          {{-- Online Card Payment --}}
           <label for="lahza" style="display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:12px;border:2px solid #E5E7EB;cursor:pointer;transition:border-color .2s,background .2s;" id="lbl-lahza">
             <input type="radio" name="payment_method" value="lahza" id="lahza" onchange="switchPayment(this.value)" style="width:18px;height:18px;accent-color:#1B3B8C;"/>
             <div style="font-size:28px;">💳</div>
             <div>
-              <div style="font-size:15px;font-weight:700;color:#1B3B8C;">دفع إلكتروني — لحظة</div>
-              <div style="font-size:12px;color:#6B7280;margin-top:2px;">ادفع الآن بالبطاقة البنكية بأمان عبر بوابة لحظة</div>
+              <div style="font-size:15px;font-weight:700;color:#1B3B8C;">دفع إلكتروني بالبطاقة</div>
+              <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+                <span style="background:#1A1F71;color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px;">VISA</span>
+                <span style="background:#EB001B;color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px;">MC</span>
+                <span style="font-size:11px;color:#6B7280;">ادفع الآن ببطاقتك بأمان تام</span>
+              </div>
             </div>
             <div style="margin-right:auto;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#16A34A;white-space:nowrap;">🔒 آمن 100%</div>
           </label>

@@ -6,7 +6,7 @@ class ApiConfig {
   ///   - Real device      → use your computer's LAN IP, e.g. http://192.168.1.X:8001
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://192.168.1.6:8001',
+    defaultValue: 'http://localhost:8001',  // adb reverse tcp:8001 tcp:8001
   );
 
   static const String apiPrefix = '/api/v1';

@@ -128,7 +128,7 @@ class OrderResource extends Resource
                         Forms\Components\Select::make('payment_method')->label('طريقة الدفع')
                             ->options([
                                 'cod'      => '💵 دفع عند الاستلام',
-                                'lahza'    => '💳 لحظة (بطاقة إلكترونية)',
+                                'lahza'    => '💳 دفع إلكتروني بالبطاقة',
                                 'card'     => '💳 بطاقة ائتمان',
                                 'transfer' => '🏦 تحويل بنكي',
                             ])
@@ -260,7 +260,7 @@ class OrderResource extends Resource
                     Infolists\Components\TextEntry::make('payment_method')->label('طريقة الدفع')
                         ->badge()
                         ->formatStateUsing(fn($state) => match($state) {
-                            'lahza'    => '💳 لحظة',
+                            'lahza'    => '💳 بطاقة',
                             'cod'      => '💵 دفع عند الاستلام',
                             'card'     => '💳 بطاقة ائتمان',
                             'transfer' => '🏦 تحويل بنكي',
@@ -391,7 +391,7 @@ class OrderResource extends Resource
                 Tables\Columns\TextColumn::make('payment_method')->label('الدفع')
                     ->badge()
                     ->formatStateUsing(fn($state) => match($state) {
-                        'lahza'    => '💳 لحظة',
+                        'lahza'    => '💳 بطاقة',
                         'cod'      => '💵 كاش',
                         'card'     => '💳 بطاقة',
                         'transfer' => '🏦 تحويل',
