@@ -67,7 +67,7 @@ class CartController extends Controller
             ]);
         }
 
-        if ($request->boolean('buy_now')) {
+        if ($request->input('buy_now') == '1') {
             return redirect()->route('checkout.index');
         }
 
