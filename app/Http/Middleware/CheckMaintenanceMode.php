@@ -26,7 +26,9 @@ class CheckMaintenanceMode
             $request->is('livewire*') ||
             $request->is('lang/*') ||
             $request->is('up') ||
-            $request->is('api*')
+            $request->is('api*') ||
+            $request->is('webhooks*') ||
+            $request->is('checkout/lahza/*')
         ) {
             return $next($request);
         }

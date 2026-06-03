@@ -10,6 +10,7 @@ use App\Http\Controllers\WishlistController;
 use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PageController;
+use App\Http\Controllers\LahzaWebhookController;
 
 // ── Language Switch ──
 Route::get('lang/{locale}', [LanguageController::class, 'switch'])->name('lang.switch');
@@ -105,8 +106,14 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::post('/place', [CheckoutController::class, 'placeOrder'])->name('place');
     Route::get('/delivery-fee', [CheckoutController::class, 'getDeliveryFee'])->name('delivery-fee');
     Route::get('/success/{orderNumber}', [CheckoutController::class, 'success'])->name('success');
+    Route::get('/failed/{orderNumber}', [CheckoutController::class, 'paymentFailed'])->name('failed');
     Route::get('/tracking/{orderNumber}', [CheckoutController::class, 'tracking'])->name('tracking');
+    // Lahza callback (redirect after payment)
+    Route::get('/lahza/callback/{orderNumber}', [CheckoutController::class, 'lahzaCallback'])->name('lahza.callback');
 });
+
+// ── Lahza Webhook (skip CSRF + maintenance) ──
+Route::post('/webhooks/lahza', [LahzaWebhookController::class, 'handle'])->name('webhook.lahza');
 
 // ── Account (Auth required) ──
 Route::prefix('account')->name('account.')->middleware('auth')->group(function () {

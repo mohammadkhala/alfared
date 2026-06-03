@@ -8,6 +8,7 @@ import '../../providers/locale_provider.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
 import '../account/addresses_screen.dart';
+import 'lahza_webview_screen.dart';
 import 'success_screen.dart';
 
 class CheckoutScreen extends StatefulWidget {
@@ -101,9 +102,29 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'loyalty_points':   int.tryParse(_loyalty.text) ?? 0,
         'payment_method':   _payment,
       });
+
       await context.read<CartProvider>().load();
       if (!mounted) return;
-      final orderNumber = (res as Map)['order_number'] as String;
+
+      final orderNumber      = (res as Map)['order_number'] as String;
+      final paymentMethod    = (res['payment_method'] as String?) ?? 'cod';
+      final authorizationUrl = res['authorization_url'] as String?;
+
+      // ── Lahza: open WebView for payment ──
+      if (paymentMethod == 'lahza' && authorizationUrl != null) {
+        await Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => LahzaWebViewScreen(
+              authorizationUrl: authorizationUrl,
+              orderNumber: orderNumber,
+              callbackBaseUrl: 'https://alfared.ps',
+            ),
+          ),
+        );
+        return; // WebView handles navigation to SuccessScreen
+      }
+
+      // ── COD: go directly to success ──
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(builder: (_) => SuccessScreen(orderNumber: orderNumber)));
     } catch (e) {
@@ -291,11 +312,51 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
           // ── Payment method ─────────────────────────────────────
           _section(s.paymentMethod, [
+            // COD
             RadioListTile<String>(
               value: 'cod',
               groupValue: _payment,
               onChanged: (v) => setState(() => _payment = v!),
-              title: Text(s.cod, style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+              title: Row(children: [
+                const Text('💵 ', style: TextStyle(fontSize: 18)),
+                Text(s.cod,
+                    style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+              ]),
+              subtitle: const Text('ادفع عند استلام الطلب',
+                  style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: Colors.grey)),
+              activeColor: AppColors.orange,
+              dense: true,
+            ),
+
+            const Divider(height: 1),
+
+            // Lahza
+            RadioListTile<String>(
+              value: 'lahza',
+              groupValue: _payment,
+              onChanged: (v) => setState(() => _payment = v!),
+              title: Row(children: [
+                const Text('💳 ', style: TextStyle(fontSize: 18)),
+                const Text('دفع إلكتروني — لحظة',
+                    style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                const SizedBox(width: 8),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDCFCE7),
+                    borderRadius: BorderRadius.circular(6),
+                    border: Border.all(color: const Color(0xFF86EFAC)),
+                  ),
+                  child: const Text('🔒 آمن',
+                      style: TextStyle(
+                          fontFamily: 'Cairo',
+                          fontSize: 10,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF16A34A))),
+                ),
+              ]),
+              subtitle: const Text('ادفع بالبطاقة البنكية عبر بوابة لحظة',
+                  style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: Colors.grey)),
               activeColor: AppColors.orange,
               dense: true,
             ),

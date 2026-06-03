@@ -45,4 +45,10 @@ return [
         'api_key' => env('WASENDER_API_KEY'),
     ],
 
+    'lahza' => [
+        'public_key' => env('LAHZA_PUBLIC_KEY'),
+        'secret_key' => env('LAHZA_SECRET_KEY'),
+        'currency'   => env('LAHZA_CURRENCY', 'ILS'),
+    ],
+
 ];

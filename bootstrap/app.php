@@ -23,6 +23,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\CloudflareRealIp::class,
         ]);
 
+        // Exclude Lahza webhook from CSRF verification
+        $middleware->validateCsrfTokens(except: [
+            'webhooks/lahza',
+        ]);
+
         // ── Trust Cloudflare proxies so $request->ip() returns real client IP ──
         // Cloudflare sends real IP via CF-Connecting-IP header.
         $middleware->trustProxies(

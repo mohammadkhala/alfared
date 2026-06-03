@@ -10,6 +10,7 @@ use App\Models\Order;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\LoyaltyService;
+use App\Services\LahzaService;
 use Filament\Notifications\Actions\Action as NotificationAction;
 use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Http\JsonResponse;
@@ -235,7 +236,7 @@ class CartController extends Controller
             'delivery_zone_id' => 'required|exists:delivery_zones,id',
             'coupon_code'      => 'nullable|string',
             'loyalty_points'   => 'nullable|integer|min:0',
-            'payment_method'   => 'nullable|in:cod,card,transfer',
+            'payment_method'   => 'nullable|in:cod,lahza,card,transfer',
         ]);
 
         $user = $request->user();
@@ -360,11 +361,35 @@ class CartController extends Controller
             }
         }
 
+        // ── Lahza online payment ──
+        if (($data['payment_method'] ?? 'cod') === 'lahza') {
+            try {
+                $lahza       = app(LahzaService::class);
+                $callbackUrl = route('checkout.lahza.callback', ['orderNumber' => $order->order_number]);
+                $result      = $lahza->initialize($order, $callbackUrl);
+                $order->update(['payment_ref' => $result['reference']]);
+
+                return response()->json([
+                    'order_number'      => $order->order_number,
+                    'order_id'          => $order->id,
+                    'total'             => (float) $order->total,
+                    'payment_method'    => 'lahza',
+                    'authorization_url' => $result['authorization_url'],
+                    'message'           => 'أكمل الدفع عبر بوابة لحظة',
+                ], 201);
+            } catch (\Throwable $e) {
+                // Cancel the order
+                $order->update(['payment_status' => 'failed', 'status' => 'cancelled']);
+                return response()->json(['error' => 'فشل تهيئة الدفع: ' . $e->getMessage()], 422);
+            }
+        }
+
         return response()->json([
-            'order_number' => $order->order_number,
-            'order_id'     => $order->id,
-            'total'        => (float) $order->total,
-            'message'      => 'تم استلام طلبك بنجاح!',
+            'order_number'   => $order->order_number,
+            'order_id'       => $order->id,
+            'total'          => (float) $order->total,
+            'payment_method' => $data['payment_method'] ?? 'cod',
+            'message'        => 'تم استلام طلبك بنجاح!',
         ], 201);
     }
 }
