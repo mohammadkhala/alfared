@@ -146,8 +146,10 @@
             </form>
           </div>
 
-          {{-- Buy Now --}}
-          <button type="submit" name="buy_now" value="1"
+          {{-- Buy Now: type=button + direct form.submit() bypasses AJAX interceptor --}}
+          <input type="hidden" name="buy_now" value="0" id="buyNowFlag"/>
+          <button type="button"
+            onclick="document.getElementById('buyNowFlag').value='1'; document.getElementById('addToCartForm').submit();"
             style="width:100%;padding:15px;font-size:16px;font-weight:700;background:#1B3B8C;color:#fff;border:none;border-radius:12px;cursor:pointer;letter-spacing:0.3px;">
             ⚡ {{ __('buy_now') }}
           </button>
