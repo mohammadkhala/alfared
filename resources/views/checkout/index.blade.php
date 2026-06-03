@@ -134,49 +134,6 @@
           @endif
         @endauth
 
-        {{-- Step 3: Payment --}}
-        <div class="checkout-section" style="background:#fff;border-radius:16px;padding:28px;box-shadow:0 4px 20px rgba(27,59,140,.08);">
-          <h3 style="font-size:1.1rem;font-weight:700;color:#1B3B8C;margin:0 0 20px;display:flex;align-items:center;gap:10px;">
-            <span style="width:32px;height:32px;background:#1B3B8C;color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:14px;">3</span>
-            {{ __('checkout_step_payment') }}
-          </h3>
-
-          {{-- COD --}}
-          <label for="cod" style="display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:12px;border:2px solid #E5E7EB;cursor:pointer;margin-bottom:12px;transition:border-color .2s,background .2s;" id="lbl-cod">
-            <input type="radio" name="payment_method" value="cod" id="cod" checked onchange="switchPayment(this.value)" style="width:18px;height:18px;accent-color:#1B3B8C;"/>
-            <div style="font-size:28px;">💵</div>
-            <div>
-              <div style="font-size:15px;font-weight:700;color:#1B3B8C;">{{ __('checkout_cod_label') }}</div>
-              <div style="font-size:12px;color:#6B7280;margin-top:2px;">{{ __('checkout_cod_desc') }}</div>
-            </div>
-          </label>
-
-          {{-- Online Card Payment --}}
-          <label for="lahza" style="display:flex;align-items:center;gap:14px;padding:16px 20px;border-radius:12px;border:2px solid #E5E7EB;cursor:pointer;transition:border-color .2s,background .2s;" id="lbl-lahza">
-            <input type="radio" name="payment_method" value="lahza" id="lahza" onchange="switchPayment(this.value)" style="width:18px;height:18px;accent-color:#1B3B8C;"/>
-            <div style="font-size:28px;">💳</div>
-            <div>
-              <div style="font-size:15px;font-weight:700;color:#1B3B8C;">دفع إلكتروني بالبطاقة</div>
-              <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-                <span style="background:#1A1F71;color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px;">VISA</span>
-                <span style="background:#EB001B;color:#fff;font-size:10px;font-weight:900;padding:2px 7px;border-radius:4px;">MC</span>
-                <span style="font-size:11px;color:#6B7280;">ادفع الآن ببطاقتك بأمان تام</span>
-              </div>
-            </div>
-            <div style="margin-right:auto;background:#F0FDF4;border:1px solid #86EFAC;border-radius:8px;padding:4px 10px;font-size:11px;font-weight:700;color:#16A34A;white-space:nowrap;">🔒 آمن 100%</div>
-          </label>
-
-          <script>
-            function switchPayment(val) {
-              document.getElementById('lbl-cod').style.borderColor   = val === 'cod'   ? '#1B3B8C' : '#E5E7EB';
-              document.getElementById('lbl-cod').style.background    = val === 'cod'   ? '#F0F4FF' : '';
-              document.getElementById('lbl-lahza').style.borderColor = val === 'lahza' ? '#1B3B8C' : '#E5E7EB';
-              document.getElementById('lbl-lahza').style.background  = val === 'lahza' ? '#F0F4FF' : '';
-            }
-            // Init
-            switchPayment('cod');
-          </script>
-        </div>
       </div>
 
       {{-- Right: Order summary --}}
@@ -225,6 +182,48 @@
               <span id="totalDisplay" style="color:#E8711A;">{{ number_format($subtotal - $discount, 2) }} ₪</span>
             </div>
           </div>
+
+          {{-- Payment method --}}
+          <div style="margin-bottom:20px;">
+            <div style="font-size:13px;font-weight:700;color:#1B3B8C;margin-bottom:10px;display:flex;align-items:center;gap:7px;">
+              <span style="width:24px;height:24px;background:#1B3B8C;color:#fff;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:12px;">3</span>
+              {{ __('checkout_step_payment') }}
+            </div>
+
+            {{-- COD --}}
+            <label for="cod" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:2px solid #E5E7EB;cursor:pointer;margin-bottom:8px;transition:border-color .2s,background .2s;" id="lbl-cod">
+              <input type="radio" name="payment_method" value="cod" id="cod" checked onchange="switchPayment(this.value)" style="width:16px;height:16px;accent-color:#1B3B8C;flex-shrink:0;"/>
+              <div style="font-size:22px;flex-shrink:0;">💵</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#1B3B8C;">{{ __('checkout_cod_label') }}</div>
+                <div style="font-size:11px;color:#6B7280;margin-top:1px;">{{ __('checkout_cod_desc') }}</div>
+              </div>
+            </label>
+
+            {{-- Online Card --}}
+            <label for="lahza" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:2px solid #E5E7EB;cursor:pointer;transition:border-color .2s,background .2s;" id="lbl-lahza">
+              <input type="radio" name="payment_method" value="lahza" id="lahza" onchange="switchPayment(this.value)" style="width:16px;height:16px;accent-color:#1B3B8C;flex-shrink:0;"/>
+              <div style="font-size:22px;flex-shrink:0;">💳</div>
+              <div style="flex:1;min-width:0;">
+                <div style="font-size:13px;font-weight:700;color:#1B3B8C;">دفع إلكتروني بالبطاقة</div>
+                <div style="display:flex;align-items:center;gap:5px;margin-top:3px;flex-wrap:wrap;">
+                  <span style="background:#1A1F71;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px;">VISA</span>
+                  <span style="background:#EB001B;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px;">MC</span>
+                  <span style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700;color:#16A34A;">🔒 آمن</span>
+                </div>
+              </div>
+            </label>
+          </div>
+
+          <script>
+            function switchPayment(val) {
+              document.getElementById('lbl-cod').style.borderColor   = val === 'cod'   ? '#1B3B8C' : '#E5E7EB';
+              document.getElementById('lbl-cod').style.background    = val === 'cod'   ? '#F0F4FF' : '';
+              document.getElementById('lbl-lahza').style.borderColor = val === 'lahza' ? '#1B3B8C' : '#E5E7EB';
+              document.getElementById('lbl-lahza').style.background  = val === 'lahza' ? '#F0F4FF' : '';
+            }
+            switchPayment('cod');
+          </script>
 
           <button type="submit" class="btn btn-orange"
             style="width:100%;padding:16px;font-size:16px;font-weight:700;background:linear-gradient(135deg,#E8711A,#d4610e);border-radius:12px;box-shadow:0 4px 15px rgba(232,113,26,.3);">
