@@ -142,9 +142,52 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     final maxPoints = (_totals['max_loyalty_points'] as num?)?.toInt() ?? 0;
 
+    // Light input theme: white background, black text, clear labels
+    final inputTheme = Theme.of(context).inputDecorationTheme.copyWith(
+      filled: true,
+      fillColor: Colors.white,
+      labelStyle: const TextStyle(
+        color: Color(0xFF374151), fontFamily: 'Cairo',
+        fontSize: 13, fontWeight: FontWeight.w600,
+      ),
+      floatingLabelStyle: const TextStyle(
+        color: Color(0xFF1B3B8C), fontFamily: 'Cairo',
+        fontSize: 13, fontWeight: FontWeight.w700,
+      ),
+      floatingLabelBehavior: FloatingLabelBehavior.always,
+      contentPadding: const EdgeInsets.fromLTRB(16, 22, 16, 14),
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.4),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFFD1D5DB), width: 1.4),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: AppColors.orange, width: 2),
+      ),
+    );
+
     return Scaffold(
-      appBar: AppBar(title: Text(s.checkout)),
-      body: Form(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        title: Text(s.checkout),
+        backgroundColor: Colors.white,
+        foregroundColor: const Color(0xFF1B3B8C),
+        elevation: 0,
+        surfaceTintColor: Colors.transparent,
+      ),
+      body: Theme(
+        data: Theme.of(context).copyWith(
+          inputDecorationTheme: inputTheme,
+          textTheme: Theme.of(context).textTheme.apply(
+            bodyColor: Colors.black87,
+            displayColor: Colors.black87,
+          ),
+        ),
+        child: Form(
         key: _form,
         child: ListView(padding: const EdgeInsets.all(16), children: [
 
@@ -337,9 +380,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               onChanged: (v) => setState(() => _payment = v!),
               title: Row(children: [
                 const Text('💳 ', style: TextStyle(fontSize: 18)),
-                const Text('دفع إلكتروني — لحظة',
-                    style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
-                const SizedBox(width: 8),
+                const Text('بطاقة بنكية',
+                    style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, color: Color(0xFF1B3B8C))),
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: BoxDecoration(color: const Color(0xFF1A1F71), borderRadius: BorderRadius.circular(3)),
+                  child: const Text('VISA', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w900)),
+                ),
+                const SizedBox(width: 3),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
+                  decoration: BoxDecoration(color: const Color(0xFFEB001B), borderRadius: BorderRadius.circular(3)),
+                  child: const Text('MC', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w900)),
+                ),
+                const SizedBox(width: 6),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                   decoration: BoxDecoration(
@@ -355,7 +410,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                           color: Color(0xFF16A34A))),
                 ),
               ]),
-              subtitle: const Text('ادفع بالبطاقة البنكية عبر بوابة لحظة',
+              subtitle: const Text('ادفع الآن ببطاقتك بأمان تام',
                   style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: Colors.grey)),
               activeColor: AppColors.orange,
               dense: true,
@@ -401,23 +456,25 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           const SizedBox(height: 24),
         ]),
       ),
+      ),
     );
   }
 
   Widget _section(String title, List<Widget> children) => Container(
     margin: const EdgeInsets.only(bottom: 14),
-    padding: const EdgeInsets.all(14),
+    padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
     decoration: BoxDecoration(
       color: Colors.white,
-      borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: AppColors.border),
+      borderRadius: BorderRadius.circular(16),
+      boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 3))],
     ),
     child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
       Text(title, style: const TextStyle(
-        fontSize: 14, fontWeight: FontWeight.w900,
-        color: AppColors.blue, fontFamily: 'Cairo',
+        fontSize: 13, fontWeight: FontWeight.w900,
+        color: Color(0xFF1B3B8C), fontFamily: 'Cairo', letterSpacing: 0.2,
       )),
-      const SizedBox(height: 12),
+      const SizedBox(height: 4),
+      const Divider(height: 16, color: Color(0xFFF3F4F6)),
       ...children,
     ]),
   );

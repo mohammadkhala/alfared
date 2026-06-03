@@ -11,7 +11,7 @@
 </div>
 
 <div class="container" style="padding:40px 0;">
-  <form action="{{ route('checkout.place') }}" method="POST" id="checkoutForm">
+  <form action="{{ route('checkout.place') }}" method="POST" id="checkoutForm" novalidate>
     @csrf
     <div class="checkout-layout">
 
