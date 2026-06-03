@@ -12,7 +12,7 @@ class Order extends Model
         'order_number', 'user_id', 'customer_name', 'customer_phone', 'customer_email',
         'city', 'area', 'address_line', 'building', 'delivery_notes', 'delivery_zone_id',
         'subtotal', 'delivery_fee', 'discount_amount', 'total',
-        'coupon_code', 'coupon_id', 'status', 'payment_method', 'payment_status',
+        'coupon_code', 'coupon_id', 'status', 'payment_method', 'payment_status', 'payment_ref',
         'admin_notes', 'confirmed_at', 'shipped_at', 'delivered_at',
         'last_edited_by', 'last_edited_at',
         'loyalty_points_redeemed', 'loyalty_discount',

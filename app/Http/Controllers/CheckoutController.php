@@ -9,6 +9,7 @@ use App\Models\DeliveryZone;
 use App\Models\Coupon;
 use App\Models\User;
 use App\Services\LoyaltyService;
+use App\Services\LahzaService;
 use Filament\Notifications\Actions\Action as NotificationAction;
 use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Http\Request;
@@ -55,6 +56,7 @@ class CheckoutController extends Controller
             'city'             => 'required|string|max:100',
             'address_line'     => 'required|string|max:500',
             'delivery_zone_id' => 'required|exists:delivery_zones,id',
+            'payment_method'   => 'nullable|in:cod,lahza',
         ], [
             'phone.regex' => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972 ويتبعه 8 إلى 10 أرقام.',
         ]);
@@ -80,7 +82,9 @@ class CheckoutController extends Controller
         $delivery = $zone->calculateFee($subtotal - $discount - $loyaltyDiscount);
         $total    = max(0, $subtotal - $discount - $loyaltyDiscount + $delivery);
 
-        DB::transaction(function () use ($request, $cart, $zone, $coupon, $subtotal, $discount, $delivery, $total, $pointsToRedeem, $loyaltyDiscount) {
+        $paymentMethod = $request->input('payment_method', 'cod');
+
+        DB::transaction(function () use ($request, $cart, $zone, $coupon, $subtotal, $discount, $delivery, $total, $pointsToRedeem, $loyaltyDiscount, $paymentMethod) {
             $order = Order::create([
                 'customer_name'    => $request->first_name . ' ' . $request->last_name,
                 'customer_phone'   => $request->phone,
@@ -101,7 +105,8 @@ class CheckoutController extends Controller
                 'coupon_id'        => $coupon['id'] ?? null,
                 'user_id'          => auth()->id(),
                 'status'           => 'pending',
-                'payment_method'   => 'cod',
+                'payment_method'   => $paymentMethod,
+                'payment_status'   => 'pending',
             ]);
 
             // ── Deduct points used as redemption ──
@@ -155,7 +160,96 @@ class CheckoutController extends Controller
         });
 
         $order = Order::find(session('last_order'));
+
+        // ── Lahza online payment ──
+        if ($paymentMethod === 'lahza') {
+            try {
+                $lahza       = app(LahzaService::class);
+                $callbackUrl = route('checkout.lahza.callback', ['orderNumber' => $order->order_number]);
+                $result      = $lahza->initialize($order, $callbackUrl);
+
+                // Save reference
+                $order->update(['payment_ref' => $result['reference']]);
+
+                return redirect($result['authorization_url']);
+            } catch (\Throwable $e) {
+                // Fallback: cancel the Lahza order, let user retry
+                $order->update(['payment_status' => 'failed', 'status' => 'cancelled']);
+                return back()->with('error', 'فشل تهيئة الدفع الإلكتروني: ' . $e->getMessage());
+            }
+        }
+
         return redirect()->route('checkout.success', $order->order_number);
+    }
+
+    /**
+     * Lahza redirects here after payment (success or failure).
+     */
+    public function lahzaCallback(Request $request, string $orderNumber)
+    {
+        $order = Order::where('order_number', $orderNumber)->firstOrFail();
+
+        // Already processed (webhook may have fired first)
+        if ($order->payment_status === 'paid') {
+            return redirect()->route('checkout.success', $orderNumber);
+        }
+
+        $reference = $request->query('reference') ?? $order->payment_ref;
+
+        if (! $reference) {
+            return redirect()->route('checkout.failed', $orderNumber);
+        }
+
+        try {
+            $lahza = app(LahzaService::class);
+            $data  = $lahza->verify($reference);
+
+            if (($data['status'] ?? '') === 'success') {
+                $order->update([
+                    'payment_status' => 'paid',
+                    'payment_ref'    => $reference,
+                    'status'         => 'confirmed',
+                    'confirmed_at'   => now(),
+                ]);
+
+                // Notify admins
+                $recipients = User::whereIn('role', [User::ROLE_ADMIN, User::ROLE_STAFF])->get()
+                    ->filter(fn ($u) => $u->hasPermission('manage_orders'));
+
+                if ($recipients->isNotEmpty()) {
+                    FilamentNotification::make()
+                        ->title('💳 دفع مكتمل — ' . $order->order_number)
+                        ->body($order->customer_name . ' • ' . number_format($order->total, 2) . ' ₪ — تم الدفع عبر لحظة')
+                        ->icon('heroicon-o-credit-card')
+                        ->iconColor('success')
+                        ->actions([
+                            NotificationAction::make('view')
+                                ->label('عرض الطلب')
+                                ->url(url('/admin/orders/' . $order->id))
+                                ->markAsRead(),
+                        ])
+                        ->sendToDatabase($recipients);
+                }
+
+                return redirect()->route('checkout.success', $orderNumber);
+            } else {
+                $order->update(['payment_status' => 'failed']);
+                return redirect()->route('checkout.failed', $orderNumber);
+            }
+        } catch (\Throwable $e) {
+            $order->update(['payment_status' => 'failed']);
+            return redirect()->route('checkout.failed', $orderNumber)
+                             ->with('error', $e->getMessage());
+        }
+    }
+
+    /**
+     * Payment failed page.
+     */
+    public function paymentFailed(string $orderNumber)
+    {
+        $order = Order::where('order_number', $orderNumber)->with('items')->firstOrFail();
+        return view('checkout.payment-failed', compact('order'));
     }
 
     public function success(string $orderNumber)

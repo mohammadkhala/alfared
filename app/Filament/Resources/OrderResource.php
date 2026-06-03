@@ -128,6 +128,7 @@ class OrderResource extends Resource
                         Forms\Components\Select::make('payment_method')->label('طريقة الدفع')
                             ->options([
                                 'cod'      => '💵 دفع عند الاستلام',
+                                'lahza'    => '💳 لحظة (بطاقة إلكترونية)',
                                 'card'     => '💳 بطاقة ائتمان',
                                 'transfer' => '🏦 تحويل بنكي',
                             ])
@@ -254,6 +255,44 @@ class OrderResource extends Resource
                 ]),
             ]),
 
+            Infolists\Components\Section::make('💳 الدفع')->schema([
+                Infolists\Components\Grid::make(3)->schema([
+                    Infolists\Components\TextEntry::make('payment_method')->label('طريقة الدفع')
+                        ->badge()
+                        ->formatStateUsing(fn($state) => match($state) {
+                            'lahza'    => '💳 لحظة',
+                            'cod'      => '💵 دفع عند الاستلام',
+                            'card'     => '💳 بطاقة ائتمان',
+                            'transfer' => '🏦 تحويل بنكي',
+                            default    => $state,
+                        })
+                        ->color(fn($state) => match($state) {
+                            'lahza'    => 'success',
+                            'cod'      => 'warning',
+                            default    => 'primary',
+                        }),
+                    Infolists\Components\TextEntry::make('payment_status')->label('حالة الدفع')
+                        ->badge()
+                        ->formatStateUsing(fn($state) => match($state) {
+                            'paid'    => '✅ مدفوع',
+                            'pending' => '⏳ في الانتظار',
+                            'failed'  => '❌ فشل الدفع',
+                            default   => $state,
+                        })
+                        ->color(fn($state) => match($state) {
+                            'paid'    => 'success',
+                            'pending' => 'warning',
+                            'failed'  => 'danger',
+                            default   => 'gray',
+                        }),
+                    Infolists\Components\TextEntry::make('payment_ref')
+                        ->label('رقم مرجع لحظة')
+                        ->placeholder('—')
+                        ->copyable()
+                        ->visible(fn($record) => $record->payment_method === 'lahza'),
+                ]),
+            ]),
+
             // ─── سجل التعديلات ───
             Infolists\Components\Section::make('📜 سجل التعديلات')
                 ->description(fn($record) => $record->lastEditor
@@ -348,6 +387,38 @@ class OrderResource extends Resource
 
                 Tables\Columns\TextColumn::make('total')->label('الإجمالي')
                     ->money('ILS')->sortable()->weight('bold'),
+
+                Tables\Columns\TextColumn::make('payment_method')->label('الدفع')
+                    ->badge()
+                    ->formatStateUsing(fn($state) => match($state) {
+                        'lahza'    => '💳 لحظة',
+                        'cod'      => '💵 كاش',
+                        'card'     => '💳 بطاقة',
+                        'transfer' => '🏦 تحويل',
+                        default    => $state,
+                    })
+                    ->color(fn($state) => match($state) {
+                        'lahza'    => 'success',
+                        'cod'      => 'warning',
+                        'card'     => 'info',
+                        'transfer' => 'primary',
+                        default    => 'gray',
+                    }),
+
+                Tables\Columns\TextColumn::make('payment_status')->label('حالة الدفع')
+                    ->badge()
+                    ->formatStateUsing(fn($state) => match($state) {
+                        'paid'    => '✅ مدفوع',
+                        'pending' => '⏳ بانتظار',
+                        'failed'  => '❌ فشل',
+                        default   => $state,
+                    })
+                    ->color(fn($state) => match($state) {
+                        'paid'    => 'success',
+                        'pending' => 'warning',
+                        'failed'  => 'danger',
+                        default   => 'gray',
+                    }),
 
                 Tables\Columns\TextColumn::make('city')->label('المنطقة')->sortable(),
 
