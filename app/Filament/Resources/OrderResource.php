@@ -390,7 +390,7 @@ class OrderResource extends Resource
                             $html .= '<div style="width:26px;height:26px;border-radius:7px;background:'.$bgs[$i % 2].';display:flex;align-items:center;justify-content:center;font-size:13px;">🛍️</div>';
                         }
                         if ($count > 2) {
-                            $html .= '<div style="width:26px;height:26px;border-radius:7px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#64748B;">+'..($count-2).'</div>';
+                            $html .= '<div style="width:26px;height:26px;border-radius:7px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#64748B;">+'.($count-2).'</div>';
                         }
                         $html .= '</div>';
                         return new HtmlString($html);
