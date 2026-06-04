@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Order;
+use App\Models\Setting;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Log;
 
@@ -15,8 +16,11 @@ class LahzaService
 
     public function __construct()
     {
+        // Admin panel key takes priority over .env
+        $dbKey = Setting::get('payment_gateway_key', '');
+
+        $this->secretKey = $dbKey ?: (config('services.lahza.secret_key') ?? '');
         $this->publicKey = config('services.lahza.public_key') ?? '';
-        $this->secretKey = config('services.lahza.secret_key') ?? '';
         $this->currency  = config('services.lahza.currency', 'ILS');
     }
 
