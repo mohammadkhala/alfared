@@ -371,50 +371,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               dense: true,
             ),
 
-            const Divider(height: 1),
-
-            // Lahza
-            RadioListTile<String>(
-              value: 'lahza',
-              groupValue: _payment,
-              onChanged: (v) => setState(() => _payment = v!),
-              title: Row(children: [
-                const Text('💳 ', style: TextStyle(fontSize: 18)),
-                const Text('بطاقة بنكية',
-                    style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700, color: Color(0xFF1B3B8C))),
-                const SizedBox(width: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                  decoration: BoxDecoration(color: const Color(0xFF1A1F71), borderRadius: BorderRadius.circular(3)),
-                  child: const Text('VISA', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w900)),
-                ),
-                const SizedBox(width: 3),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
-                  decoration: BoxDecoration(color: const Color(0xFFEB001B), borderRadius: BorderRadius.circular(3)),
-                  child: const Text('MC', style: TextStyle(color: Colors.white, fontSize: 8, fontWeight: FontWeight.w900)),
-                ),
-                const SizedBox(width: 6),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFFDCFCE7),
-                    borderRadius: BorderRadius.circular(6),
-                    border: Border.all(color: const Color(0xFF86EFAC)),
-                  ),
-                  child: const Text('🔒 آمن',
-                      style: TextStyle(
-                          fontFamily: 'Cairo',
-                          fontSize: 10,
-                          fontWeight: FontWeight.w700,
-                          color: Color(0xFF16A34A))),
-                ),
-              ]),
-              subtitle: const Text('ادفع الآن ببطاقتك بأمان تام',
-                  style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: Colors.grey)),
-              activeColor: AppColors.orange,
-              dense: true,
-            ),
+            // Lahza card payment — temporarily hidden until server API issue is resolved
           ]),
 
           // ── Totals ─────────────────────────────────────────────
