@@ -39,8 +39,13 @@ class BrandResource extends Resource
                         ->unique(ignoreRecord: true)->maxLength(255),
                 ]),
                 Forms\Components\Grid::make(2)->schema([
-                    Forms\Components\FileUpload::make('logo')->label('الشعار')
-                        ->image()->directory('brands'),
+                    Forms\Components\FileUpload::make('logo')
+                        ->label('الشعار')
+                        ->image()
+                        ->directory('brands')
+                        ->maxSize(1024)
+                        ->acceptedFileTypes(['image/jpeg','image/png','image/webp'])
+                        ->helperText('📐 400 × 400 بكسل (مربع) · 💡 PNG بخلفية شفافة مثالي · 📁 أقل من 1 MB'),
                     Forms\Components\TextInput::make('website')->label('الموقع الإلكتروني')
                         ->url()->maxLength(255),
                 ]),

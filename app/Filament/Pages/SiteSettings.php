@@ -151,11 +151,17 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
                                     ->label('شعار المتجر (Logo)')
                                     ->image()
                                     ->directory('settings')
-                                    ->imageEditor(),
+                                    ->imageEditor()
+                                    ->maxSize(1024)
+                                    ->acceptedFileTypes(['image/jpeg','image/png','image/webp','image/svg+xml'])
+                                    ->helperText('📐 400 × 120 بكسل (عرضي) · 💡 PNG بخلفية شفافة · 📁 أقل من 1 MB'),
                                 Forms\Components\FileUpload::make('store_favicon')
                                     ->label('Favicon (16×16 أو 32×32)')
                                     ->image()
-                                    ->directory('settings'),
+                                    ->directory('settings')
+                                    ->maxSize(256)
+                                    ->acceptedFileTypes(['image/png','image/x-icon','image/vnd.microsoft.icon'])
+                                    ->helperText('📐 32 × 32 بكسل · 📁 PNG أو ICO'),
                             ]),
                         ]),
 

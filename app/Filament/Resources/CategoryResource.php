@@ -45,8 +45,13 @@ class CategoryResource extends Resource
 
             Forms\Components\Section::make('الشكل والترتيب')->schema([
                 Forms\Components\Grid::make(3)->schema([
-                    Forms\Components\FileUpload::make('image')->label('الصورة')
-                        ->image()->directory('categories'),
+                    Forms\Components\FileUpload::make('image')
+                        ->label('الصورة')
+                        ->image()
+                        ->directory('categories')
+                        ->maxSize(1024)
+                        ->acceptedFileTypes(['image/jpeg','image/png','image/webp'])
+                        ->helperText('📐 400 × 400 بكسل (مربع) · 📁 أقل من 1 MB'),
                     Forms\Components\TextInput::make('icon')->label('أيقونة (emoji أو اسم)')->maxLength(50),
                     Forms\Components\ColorPicker::make('color')->label('لون الخلفية'),
                 ]),

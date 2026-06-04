@@ -38,8 +38,15 @@ class BannerResource extends Resource
                     Forms\Components\TextInput::make('button_text_ar')->label('نص الزر')->maxLength(100),
                 ]),
                 Forms\Components\TextInput::make('link')->label('الرابط عند النقر')->url()->maxLength(255),
-                Forms\Components\FileUpload::make('image')->label('صورة البانر')
-                    ->image()->directory('banners')->required()->columnSpanFull(),
+                Forms\Components\FileUpload::make('image')
+                    ->label('صورة البانر')
+                    ->image()
+                    ->directory('banners')
+                    ->required()
+                    ->maxSize(3072)
+                    ->acceptedFileTypes(['image/jpeg','image/png','image/webp'])
+                    ->helperText('📐 الأبعاد المثالية: 1200 × 500 بكسل · 📱 تأكد أن المحتوى في المنتصف (الأطراف قد تُقطع على الموبايل) · 📁 الحجم الأقصى: 3 MB · ✅ الصيغ: JPG، PNG، WebP')
+                    ->columnSpanFull(),
             ]),
 
             Forms\Components\Section::make('الإعدادات')->schema([
