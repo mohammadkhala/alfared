@@ -52,36 +52,45 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
   Future<void> _bootstrap() async {
     setState(() => _loading = true);
-    try {
-      // Load app config + delivery zones in parallel
-      final results = await Future.wait([
-        ApiService.instance.get('/app-config'),
-        ApiService.instance.get('/delivery-zones'),
-      ]);
 
-      final config = (results[0] as Map)['data'] as Map? ?? {};
+    // ── 1. Auto-fill name/email/phone from logged-in user immediately ──
+    final user = context.read<AuthProvider>().user;
+    if (user != null) {
+      final nameParts = (user.name).trim().split(RegExp(r'\s+'));
+      _firstName.text = nameParts.isNotEmpty ? nameParts.first : '';
+      _lastName.text  = nameParts.length > 1  ? nameParts.sublist(1).join(' ') : '';
+      _email.text     = user.email;
+      if (user.phone != null) {
+        final p = user.phone!;
+        if      (p.startsWith('+972')) { _phonePrefix = '+972'; _phone.text = p.substring(4); }
+        else if (p.startsWith('+970')) { _phonePrefix = '+970'; _phone.text = p.substring(4); }
+      }
+    }
+
+    // ── 2. Load app-config & delivery zones independently ──
+    try {
+      final configRes = await ApiService.instance.get('/app-config');
+      final config = (configRes as Map)['data'] as Map? ?? {};
       _codEnabled           = config['cod_enabled']            as bool? ?? true;
       _onlinePaymentEnabled = config['online_payment_enabled'] as bool? ?? false;
-
-      // Default payment method based on what's enabled
       if (!_codEnabled && _onlinePaymentEnabled) _payment = 'lahza';
       if (_codEnabled)                           _payment = 'cod';
+    } catch (_) {}
 
-      final zonesRes = results[1];
-      _zones = ((zonesRes as Map)['zones'] as List).cast<Map<String, dynamic>>();
-      final user = context.read<AuthProvider>().user;
-      if (user != null) {
-        final nameParts = (user.name ?? '').trim().split(' ');
-        _firstName.text = nameParts.isNotEmpty ? nameParts.first : '';
-        _lastName.text  = nameParts.length > 1 ? nameParts.sublist(1).join(' ') : '';
-        _email.text     = user.email;
-        if (user.phone != null) {
-          final p = user.phone!;
-          if (p.startsWith('+972'))      { _phonePrefix = '+972'; _phone.text = p.substring(4); }
-          else if (p.startsWith('+970')) { _phonePrefix = '+970'; _phone.text = p.substring(4); }
-        }
-      }
-    } catch (e) { Fluttertoast.showToast(msg: e.toString()); }
+    try {
+      final zonesRes = await ApiService.instance.get('/delivery-zones');
+      final list = ((zonesRes as Map)['zones'] as List?) ?? [];
+      _zones = list.map((z) {
+        final m = z as Map<String, dynamic>;
+        return {
+          ...m,
+          'id': m['id'] is int ? m['id'] : int.tryParse(m['id'].toString()) ?? 0,
+        };
+      }).where((z) => (z['id'] as int) > 0).toList();
+    } catch (e) {
+      Fluttertoast.showToast(msg: 'تعذر تحميل مناطق التوصيل');
+    }
+
     if (mounted) setState(() => _loading = false);
     _preview();
   }
