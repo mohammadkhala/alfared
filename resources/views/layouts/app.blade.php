@@ -222,6 +222,8 @@
           <li><a href="{{ route('returns') }}">{{ __('footer_return_policy') }}</a></li>
           <li><a href="{{ route('shipping') }}">{{ __('footer_shipping') }}</a></li>
           <li><a href="{{ route('faq') }}">{{ __('footer_faq') }}</a></li>
+          <li><a href="{{ route('privacy-policy') }}">🔒 {{ __('privacy_policy') }}</a></li>
+          <li><a href="{{ route('terms') }}">📜 {{ __('terms_of_use') }}</a></li>
         </ul>
       </div>
     </div>

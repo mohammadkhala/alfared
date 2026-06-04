@@ -16,7 +16,7 @@
       <div class="legal-header-icon">@yield('icon', '📄')</div>
       <div>
         <h1>@yield('title')</h1>
-        <p class="legal-date">آخر تحديث: يناير 2025 &nbsp;·&nbsp; شركة أبناء الفريد — فلسطين</p>
+        <p class="legal-date">آخر تحديث: يونيو 2026 &nbsp;·&nbsp; شركة أبناء الفريد — فلسطين</p>
       </div>
     </div>
 
