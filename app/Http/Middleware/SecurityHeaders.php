@@ -56,7 +56,7 @@ class SecurityHeaders
                 "frame-src 'self' https://www.google.com https://maps.google.com",
                 "frame-ancestors 'self'",
                 "base-uri 'self'",
-                "form-action 'self' https://wa.me",
+                "form-action 'self' https://alfared.ps https://alfared.online https://checkout.lahza.io https://wa.me",
                 "object-src 'none'",
             ];
             $response->headers->set('Content-Security-Policy', implode('; ', $csp));
