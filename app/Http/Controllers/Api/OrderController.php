@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\LoyaltyTransaction;
 use App\Models\Order;
 use App\Models\Wishlist;
+use App\Services\LahzaService;
 use App\Services\LoyaltyService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -35,6 +36,47 @@ class OrderController extends Controller
         // Public tracking by order number (no auth) - useful for guests too
         $order = Order::where('order_number', $orderNumber)->with('items')->firstOrFail();
         return response()->json(['order' => $this->formatOrder($order, true)]);
+    }
+
+    /**
+     * POST /api/v1/orders/{orderNumber}/verify-payment
+     * Called by the Flutter WebView when user closes Lahza page.
+     * Actively queries Lahza to confirm payment and updates our order.
+     */
+    public function verifyPayment(string $orderNumber): JsonResponse
+    {
+        $order = Order::where('order_number', $orderNumber)->firstOrFail();
+
+        // Already confirmed — just return current status
+        if ($order->payment_status === 'paid') {
+            return response()->json(['payment_status' => 'paid']);
+        }
+
+        $ref = $order->payment_ref;
+        if (! $ref) {
+            return response()->json(['payment_status' => $order->payment_status]);
+        }
+
+        try {
+            $lahza = app(LahzaService::class);
+            $data  = $lahza->verify($ref);
+
+            if (($data['status'] ?? '') === 'success') {
+                $order->update([
+                    'payment_status' => 'paid',
+                    'status'         => 'confirmed',
+                    'confirmed_at'   => now(),
+                ]);
+                return response()->json(['payment_status' => 'paid']);
+            }
+
+            $order->update(['payment_status' => 'failed']);
+            return response()->json(['payment_status' => 'failed']);
+
+        } catch (\Throwable $e) {
+            // Lahza API error — return current status without changing it
+            return response()->json(['payment_status' => $order->payment_status]);
+        }
     }
 
     /** ── Return request ───────────────────────────────────── */

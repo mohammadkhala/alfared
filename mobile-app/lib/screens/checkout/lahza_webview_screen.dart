@@ -97,12 +97,14 @@ class _LahzaWebViewScreenState extends State<LahzaWebViewScreen> {
     });
   }
 
-  /// Called when user taps X — check backend FIRST before showing cancel dialog.
+  /// Called when user taps X — actively verify with Lahza before showing cancel.
   Future<void> _handleClosePressed() async {
     if (_handled) return;
     setState(() => _checking = true);
     try {
-      final res    = await ApiService.instance.get('/orders/${widget.orderNumber}/track');
+      // Call verify-payment which queries Lahza API directly and updates our DB
+      final res    = await ApiService.instance
+          .post('/orders/${widget.orderNumber}/verify-payment');
       final status = (res as Map)['payment_status'] as String? ?? '';
       if (status == 'paid') {
         _handled = true;
