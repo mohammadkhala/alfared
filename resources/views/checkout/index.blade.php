@@ -201,7 +201,7 @@
             @if($codEnabled)
             <label for="cod" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:2px solid #E5E7EB;cursor:pointer;margin-bottom:8px;transition:border-color .2s,background .2s;" id="lbl-cod">
               <input type="radio" name="payment_method" value="cod" id="cod"
-                {{ !$onlinePaymentEnabled ? 'checked' : '' }}
+                {{ $codEnabled ? 'checked' : '' }}
                 onchange="switchPayment(this.value)" style="width:16px;height:16px;accent-color:#1B3B8C;flex-shrink:0;"/>
               <div style="font-size:22px;flex-shrink:0;">💵</div>
               <div>
@@ -215,7 +215,7 @@
             @if($onlinePaymentEnabled)
             <label for="lahza" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:2px solid #E5E7EB;cursor:pointer;margin-bottom:8px;transition:border-color .2s,background .2s;" id="lbl-lahza">
               <input type="radio" name="payment_method" value="lahza" id="lahza"
-                {{ !$codEnabled ? 'checked' : '' }}
+                {{ (!$codEnabled && $onlinePaymentEnabled) ? 'checked' : '' }}
                 onchange="switchPayment(this.value)" style="width:16px;height:16px;accent-color:#1B3B8C;flex-shrink:0;"/>
               <div style="font-size:22px;flex-shrink:0;">💳</div>
               <div>
