@@ -8,6 +8,7 @@ use App\Models\Banner;
 use App\Models\Brand;
 use App\Models\Category;
 use App\Models\Product;
+use App\Models\Setting;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
@@ -293,5 +294,29 @@ class CatalogController extends Controller
             'stock_quantity'    => (int) $p->stock_quantity,
             'low_stock'         => $p->is_low_stock,
         ];
+    }
+
+    /**
+     * GET /api/v1/app-config
+     * Returns store-level feature flags and settings for the mobile app.
+     * Cached for 60 s — cleared automatically when settings are saved.
+     */
+    public function appConfig(): JsonResponse
+    {
+        $data = Cache::remember('api:app_config', 60, function () {
+            $s = Setting::all()->pluck('value', 'key');
+
+            return [
+                'cod_enabled'           => ($s->get('cod_enabled', '1') === '1'),
+                'online_payment_enabled'=> ($s->get('online_payment_enabled', '0') === '1'),
+                'loyalty_enabled'       => ($s->get('loyalty_enabled', '1') === '1'),
+                'min_order_amount'      => (float) ($s->get('min_order_amount', '0')),
+                'free_shipping_above'   => (float) ($s->get('free_shipping_above', '0')),
+                'store_phone'           => $s->get('store_phone', ''),
+                'social_whatsapp'       => $s->get('social_whatsapp', ''),
+            ];
+        });
+
+        return response()->json(['data' => $data]);
     }
 }

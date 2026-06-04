@@ -191,23 +191,42 @@
             </div>
 
             {{-- COD --}}
+            @if($codEnabled)
             <label for="cod" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:2px solid #E5E7EB;cursor:pointer;margin-bottom:8px;transition:border-color .2s,background .2s;" id="lbl-cod">
-              <input type="radio" name="payment_method" value="cod" id="cod" checked onchange="switchPayment(this.value)" style="width:16px;height:16px;accent-color:#1B3B8C;flex-shrink:0;"/>
+              <input type="radio" name="payment_method" value="cod" id="cod"
+                {{ !$onlinePaymentEnabled ? 'checked' : '' }}
+                onchange="switchPayment(this.value)" style="width:16px;height:16px;accent-color:#1B3B8C;flex-shrink:0;"/>
               <div style="font-size:22px;flex-shrink:0;">💵</div>
               <div>
                 <div style="font-size:13px;font-weight:700;color:#1B3B8C;">{{ __('checkout_cod_label') }}</div>
                 <div style="font-size:11px;color:#6B7280;margin-top:1px;">{{ __('checkout_cod_desc') }}</div>
               </div>
             </label>
+            @endif
 
-            {{-- Online Card — temporarily hidden until outbound API issue is resolved --}}
+            {{-- Online Card (Lahza) — controlled from admin settings --}}
+            @if($onlinePaymentEnabled)
+            <label for="lahza" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:2px solid #E5E7EB;cursor:pointer;margin-bottom:8px;transition:border-color .2s,background .2s;" id="lbl-lahza">
+              <input type="radio" name="payment_method" value="lahza" id="lahza"
+                {{ !$codEnabled ? 'checked' : '' }}
+                onchange="switchPayment(this.value)" style="width:16px;height:16px;accent-color:#1B3B8C;flex-shrink:0;"/>
+              <div style="font-size:22px;flex-shrink:0;">💳</div>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#1B3B8C;">{{ __('checkout_card_label') }}</div>
+                <div style="font-size:11px;color:#6B7280;margin-top:1px;">{{ __('checkout_card_desc') }}</div>
+              </div>
+            </label>
+            @endif
           </div>
 
           <script>
-            // COD is the only option — highlight it by default
             document.addEventListener('DOMContentLoaded', function() {
-              var lbl = document.getElementById('lbl-cod');
-              if (lbl) { lbl.style.borderColor = '#1B3B8C'; lbl.style.background = '#F0F4FF'; }
+              // Highlight the checked payment option on load
+              const checked = document.querySelector('input[name="payment_method"]:checked');
+              if (checked) {
+                const lbl = document.getElementById('lbl-' + checked.value);
+                if (lbl) { lbl.style.borderColor = '#1B3B8C'; lbl.style.background = '#F0F4FF'; }
+              }
             });
           </script>
 

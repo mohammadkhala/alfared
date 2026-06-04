@@ -25,6 +25,7 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/send-otp',           [AuthController::class, 'sendOtp'])->middleware('throttle:3,1');
     Route::post('auth/verify-otp',         [AuthController::class, 'verifyOtp'])->middleware('throttle:5,1');
 
+    Route::get('app-config',      [CatalogController::class, 'appConfig']);
     Route::get('home',            [CatalogController::class, 'home']);
     Route::get('categories',      [CatalogController::class, 'categories']);
     Route::get('banners',         [CatalogController::class, 'banners']);

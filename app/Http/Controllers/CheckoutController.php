@@ -7,6 +7,7 @@ use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\DeliveryZone;
 use App\Models\Coupon;
+use App\Models\Setting;
 use App\Models\User;
 use App\Services\LoyaltyService;
 use App\Services\LahzaService;
@@ -32,9 +33,14 @@ class CheckoutController extends Controller
         $loyaltyBalance = (int) (auth()->user()->loyalty_points ?? 0);
         $loyaltyMax     = auth()->check() ? LoyaltyService::maxRedeemablePoints(auth()->user(), $subtotal - $discount) : 0;
 
+        // ── Payment methods from admin settings ──
+        $codEnabled            = Setting::get('cod_enabled', '1') === '1';
+        $onlinePaymentEnabled  = Setting::get('online_payment_enabled', '0') === '1';
+
         return view('checkout.index', compact(
             'cart', 'zones', 'coupon', 'subtotal', 'discount',
-            'loyaltyCfg', 'loyaltyBalance', 'loyaltyMax'
+            'loyaltyCfg', 'loyaltyBalance', 'loyaltyMax',
+            'codEnabled', 'onlinePaymentEnabled'
         ));
     }
 

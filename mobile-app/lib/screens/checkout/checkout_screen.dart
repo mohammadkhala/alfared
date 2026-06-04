@@ -40,6 +40,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   bool _loading = false;
   bool _placing = false;
 
+  // Payment feature flags from admin settings
+  bool _codEnabled           = true;
+  bool _onlinePaymentEnabled = false;
+
   @override
   void initState() {
     super.initState();
@@ -49,7 +53,21 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   Future<void> _bootstrap() async {
     setState(() => _loading = true);
     try {
-      final zonesRes = await ApiService.instance.get('/delivery-zones');
+      // Load app config + delivery zones in parallel
+      final results = await Future.wait([
+        ApiService.instance.get('/app-config'),
+        ApiService.instance.get('/delivery-zones'),
+      ]);
+
+      final config = (results[0] as Map)['data'] as Map? ?? {};
+      _codEnabled           = config['cod_enabled']            as bool? ?? true;
+      _onlinePaymentEnabled = config['online_payment_enabled'] as bool? ?? false;
+
+      // Default payment method based on what's enabled
+      if (!_codEnabled && _onlinePaymentEnabled) _payment = 'lahza';
+      if (_codEnabled)                           _payment = 'cod';
+
+      final zonesRes = results[1];
       _zones = ((zonesRes as Map)['zones'] as List).cast<Map<String, dynamic>>();
       final user = context.read<AuthProvider>().user;
       if (user != null) {
@@ -355,23 +373,39 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
           // ── Payment method ─────────────────────────────────────
           _section(s.paymentMethod, [
-            // COD
-            RadioListTile<String>(
-              value: 'cod',
-              groupValue: _payment,
-              onChanged: (v) => setState(() => _payment = v!),
-              title: Row(children: [
-                const Text('💵 ', style: TextStyle(fontSize: 18)),
-                Text(s.cod,
-                    style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
-              ]),
-              subtitle: const Text('ادفع عند استلام الطلب',
-                  style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: Colors.grey)),
-              activeColor: AppColors.orange,
-              dense: true,
-            ),
+            // COD — shown only when enabled from admin
+            if (_codEnabled)
+              RadioListTile<String>(
+                value: 'cod',
+                groupValue: _payment,
+                onChanged: (v) => setState(() => _payment = v!),
+                title: Row(children: [
+                  const Text('💵 ', style: TextStyle(fontSize: 18)),
+                  Text(s.cod,
+                      style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                ]),
+                subtitle: const Text('ادفع عند استلام الطلب',
+                    style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: Colors.grey)),
+                activeColor: AppColors.orange,
+                dense: true,
+              ),
 
-            // Lahza card payment — temporarily hidden until server API issue is resolved
+            // Online card payment (Lahza) — shown only when enabled from admin
+            if (_onlinePaymentEnabled)
+              RadioListTile<String>(
+                value: 'lahza',
+                groupValue: _payment,
+                onChanged: (v) => setState(() => _payment = v!),
+                title: Row(children: [
+                  const Text('💳 ', style: TextStyle(fontSize: 18)),
+                  const Text('بطاقة بنكية (Visa / Mastercard)',
+                      style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+                ]),
+                subtitle: const Text('دفع آمن عبر بوابة لحظة',
+                    style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: Colors.grey)),
+                activeColor: AppColors.orange,
+                dense: true,
+              ),
           ]),
 
           // ── Totals ─────────────────────────────────────────────
