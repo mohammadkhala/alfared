@@ -67,7 +67,9 @@
           <div class="form-grid">
             <div class="form-group">
               <label>{{ __('checkout_delivery_zone') }} <span style="color:red;">{{ __('checkout_required') }}</span></label>
-              <select name="delivery_zone_id" id="deliveryZone" required onchange="updateDeliveryFee()">
+              {{-- Hidden input carries the actual value on submit --}}
+              <input type="hidden" name="delivery_zone_id" id="deliveryZoneHidden" value="{{ old('delivery_zone_id', '') }}">
+              <select id="deliveryZone" onchange="syncZone(this.value); updateDeliveryFee();">
                 <option value="">{{ __('checkout_choose_zone') }}</option>
                 @foreach($zones as $zone)
                   <option value="{{ $zone->id }}" {{ old('delivery_zone_id') == $zone->id ? 'selected' : '' }}>
@@ -259,6 +261,27 @@ const ZONE_LABEL  = @json(__('checkout_choose_zone_short'));
 
 let deliveryFee   = 0;
 let loyaltyDiscount = 0;
+
+// Sync select UI value → hidden input (called on change + on submit)
+function syncZone(val) {
+  document.getElementById('deliveryZoneHidden').value = val || '';
+}
+
+// On page load: sync hidden input if old() value pre-selected the select
+document.addEventListener('DOMContentLoaded', function () {
+  const sel = document.getElementById('deliveryZone');
+  if (sel && sel.value) syncZone(sel.value);
+
+  // Submit guard: validate zone selected
+  document.getElementById('checkoutForm').addEventListener('submit', function (e) {
+    syncZone(document.getElementById('deliveryZone').value);
+    if (!document.getElementById('deliveryZoneHidden').value) {
+      e.preventDefault();
+      alert(@json(__('checkout_choose_zone')));
+      document.getElementById('deliveryZone').focus();
+    }
+  });
+});
 
 function recalcTotal() {
   const total = Math.max(0, subtotal - discount - loyaltyDiscount + deliveryFee);
