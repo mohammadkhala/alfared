@@ -111,14 +111,26 @@ class ProductResource extends Resource
 
                 Forms\Components\Tabs\Tab::make('الصور')->schema([
                     Forms\Components\FileUpload::make('main_image')
-                        ->label('الصورة الرئيسية')->image()
-                        ->directory('products')->imageEditor()->columnSpanFull(),
+                        ->label('الصورة الرئيسية')
+                        ->image()
+                        ->directory('products')
+                        ->imageEditor()
+                        ->maxSize(2048)
+                        ->acceptedFileTypes(['image/jpeg','image/png','image/webp'])
+                        ->helperText('📐 الأبعاد المثالية: 800 × 800 بكسل (مربع 1:1) · 📁 الحجم الأقصى: 2 MB · ✅ الصيغ المقبولة: JPG، PNG، WebP · 💡 استخدم خلفية بيضاء أو شفافة للحصول على أفضل نتيجة')
+                        ->columnSpanFull(),
 
                     Forms\Components\Repeater::make('images')
                         ->label('صور إضافية')->relationship('images')
                         ->schema([
                             Forms\Components\FileUpload::make('image')
-                                ->label('الصورة')->image()->directory('products')->required(),
+                                ->label('الصورة')
+                                ->image()
+                                ->directory('products')
+                                ->maxSize(2048)
+                                ->acceptedFileTypes(['image/jpeg','image/png','image/webp'])
+                                ->helperText('800 × 800 بكسل · أقل من 2 MB')
+                                ->required(),
                             Forms\Components\TextInput::make('alt_text')->label('النص البديل'),
                             Forms\Components\TextInput::make('sort_order')->label('الترتيب')->numeric()->default(0),
                         ])->columns(3)->columnSpanFull(),
