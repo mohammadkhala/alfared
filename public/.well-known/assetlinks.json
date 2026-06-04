@@ -1,0 +1,12 @@
+[
+  {
+    "relation": ["delegate_permission/common.handle_all_urls"],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "pss.alfared.shop",
+      "sha256_cert_fingerprints": [
+        "0A:D9:E4:EF:CD:A8:59:CE:21:8A:EE:9F:E3:2E:98:51:37:E2:69:73:AD:CA:58:9B:37:C7:C6:53:70:F9:59:E1"
+      ]
+    }
+  }
+]
