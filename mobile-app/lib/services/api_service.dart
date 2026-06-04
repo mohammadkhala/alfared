@@ -9,8 +9,8 @@ class ApiService {
   ApiService._() {
     _dio = Dio(BaseOptions(
       baseUrl: ApiConfig.api,
-      connectTimeout: ApiConfig.timeout,
-      receiveTimeout: ApiConfig.timeout,
+      connectTimeout: ApiConfig.connectTimeout,
+      receiveTimeout: ApiConfig.receiveTimeout,
       headers: {
         'Accept': 'application/json',
         'X-App-Source': 'app',
@@ -59,25 +59,37 @@ class ApiService {
     String path, {
     Map<String, dynamic>? data,
     Map<String, dynamic>? queryParameters,
+    int maxRetries = 2,
   }) async {
-    try {
-      final resp = await _dio.request(
-        path,
-        data: data,
-        queryParameters: queryParameters,
-        options: Options(method: method),
-      );
-      if (resp.statusCode != null && resp.statusCode! >= 200 && resp.statusCode! < 300) {
-        return resp.data;
+    int attempt = 0;
+    while (true) {
+      attempt++;
+      try {
+        final resp = await _dio.request(
+          path,
+          data: data,
+          queryParameters: queryParameters,
+          options: Options(method: method),
+        );
+        if (resp.statusCode != null && resp.statusCode! >= 200 && resp.statusCode! < 300) {
+          return resp.data;
+        }
+        final msg = _extractErrorMessage(resp.data);
+        throw ApiException(msg, statusCode: resp.statusCode, raw: resp.data);
+      } on DioException catch (e) {
+        final isTimeout = e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.receiveTimeout ||
+            e.type == DioExceptionType.connectionError;
+        if (isTimeout && attempt <= maxRetries && method.toUpperCase() == 'GET') {
+          await Future.delayed(Duration(seconds: attempt * 2));
+          continue;
+        }
+        final msg = _extractErrorMessage(e.response?.data) ??
+            (isTimeout
+                ? 'انتهت مهلة الاتصال. تحقّق من الإنترنت.'
+                : 'تعذّر الاتصال بالخادم.');
+        throw ApiException(msg, statusCode: e.response?.statusCode, raw: e.response?.data);
       }
-      final msg = _extractErrorMessage(resp.data);
-      throw ApiException(msg, statusCode: resp.statusCode, raw: resp.data);
-    } on DioException catch (e) {
-      final msg = _extractErrorMessage(e.response?.data) ??
-          (e.type == DioExceptionType.connectionTimeout
-              ? 'انتهت مهلة الاتصال. تحقّق من الإنترنت.'
-              : 'تعذّر الاتصال بالخادم.');
-      throw ApiException(msg, statusCode: e.response?.statusCode, raw: e.response?.data);
     }
   }
 

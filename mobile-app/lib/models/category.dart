@@ -1,3 +1,5 @@
+import '../utils/image_helper.dart';
+
 class Category {
   final int    id;
   final String name;
@@ -29,7 +31,7 @@ class Category {
     nameEn: j['name_en'] as String?,
     nameHe: j['name_he'] as String?,
     slug:   j['slug']    as String? ?? '',
-    image:  j['image']   as String?,
+    image:  ImageHelper.cleanUrl(j['image'] as String?),
     icon:   j['icon']    as String?,
   );
 }
@@ -57,7 +59,7 @@ class AppBanner {
     id:       j['id'] as int,
     title:    j['title']    as String?,
     subtitle: j['subtitle'] as String?,
-    image:    j['image']    as String?,
+    image:    ImageHelper.cleanUrl(j['image'] as String?),
     link:     j['link']     as String?,
     badge:    j['badge']    as String?,
     button:   j['button']   as String?,

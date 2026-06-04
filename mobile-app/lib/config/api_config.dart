@@ -6,7 +6,7 @@ class ApiConfig {
   ///   - Real device      → use your computer's LAN IP, e.g. http://192.168.1.X:8001
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://localhost:8001',  // adb reverse tcp:8001 tcp:8001
+    defaultValue: 'https://alfared.ps',
   );
 
   static const String apiPrefix = '/api/v1';
@@ -15,5 +15,6 @@ class ApiConfig {
   /// Custom UA header so the backend tracker can classify visits as the app.
   static const String appUaToken = 'AlfaredApp/1.0';
 
-  static const Duration timeout = Duration(seconds: 30);
+  static const Duration connectTimeout = Duration(seconds: 60);
+  static const Duration receiveTimeout = Duration(seconds: 60);
 }
