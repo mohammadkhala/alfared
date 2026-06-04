@@ -90,7 +90,8 @@ class ProductController extends Controller
             ->where('category_id', $category->id)
             ->with(['brand'])
             ->latest()
-            ->paginate(24);
+            ->paginate(24)
+            ->withQueryString();
 
         $categories = Category::where('is_active', true)->whereNull('parent_id')->withCount('products')->get();
         $brands     = Brand::where('is_active', true)->get();
