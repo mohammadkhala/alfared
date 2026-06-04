@@ -11,6 +11,13 @@
 </div>
 
 <div class="container" style="padding:40px 0;">
+
+  @if(session('error'))
+  <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:12px;padding:14px 20px;margin-bottom:20px;color:#B91C1C;font-weight:600;display:flex;align-items:center;gap:10px;">
+    ⚠️ {{ session('error') }}
+  </div>
+  @endif
+
   <form action="{{ route('checkout.place') }}" method="POST" id="checkoutForm" novalidate>
     @csrf
     <div class="checkout-layout">
