@@ -340,6 +340,34 @@ class _AccountScreenState extends State<AccountScreen> {
             ]),
           ),
 
+          // ── Legal ──
+          const SizedBox(height: 12),
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 14),
+            decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(AppRadius.xl), boxShadow: AppShadows.card),
+            child: Column(children: [
+              _MenuItem(
+                icon: '🔒',
+                iconBg: const Color(0xFFE8F0FF),
+                label: 'سياسة الخصوصية',
+                onTap: () async {
+                  final url = Uri.parse('https://alfared.ps/privacy-policy');
+                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                },
+              ),
+              _MenuDivider(),
+              _MenuItem(
+                icon: '📜',
+                iconBg: const Color(0xFFE8F0FF),
+                label: 'شروط الاستخدام',
+                onTap: () async {
+                  final url = Uri.parse('https://alfared.ps/terms');
+                  await launchUrl(url, mode: LaunchMode.externalApplication);
+                },
+              ),
+            ]),
+          ),
+
           // ── Support / Logout ──
           const SizedBox(height: 12),
           Container(
