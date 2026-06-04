@@ -71,10 +71,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     try {
       final configRes = await ApiService.instance.get('/app-config');
       final config = (configRes as Map)['data'] as Map? ?? {};
-      _codEnabled           = config['cod_enabled']            as bool? ?? true;
-      _onlinePaymentEnabled = config['online_payment_enabled'] as bool? ?? false;
-      if (!_codEnabled && _onlinePaymentEnabled) _payment = 'lahza';
-      if (_codEnabled)                           _payment = 'cod';
+      _codEnabled           = _asBool(config['cod_enabled'],            fallback: true);
+      _onlinePaymentEnabled = _asBool(config['online_payment_enabled'], fallback: false);
+      // Default selection: prefer COD when available, otherwise Lahza
+      if (_codEnabled)                            _payment = 'cod';
+      else if (_onlinePaymentEnabled)             _payment = 'lahza';
     } catch (_) {}
 
     try {
@@ -478,6 +479,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ...children,
     ]),
   );
+
+  /// Safely parse a value that may come as bool, int (0/1) or String ("0"/"1"/"true")
+  bool _asBool(dynamic v, {required bool fallback}) {
+    if (v == null)    return fallback;
+    if (v is bool)    return v;
+    if (v is int)     return v != 0;
+    if (v is String)  return v == '1' || v.toLowerCase() == 'true';
+    return fallback;
+  }
 
   Widget _totalsRow(String label, dynamic value,
       {required S s, Color? color, String prefix = '', bool grand = false}) {
