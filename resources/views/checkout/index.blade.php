@@ -229,13 +229,22 @@
           </div>
 
           <script>
+            function switchPayment(value) {
+              ['cod','lahza'].forEach(function(v) {
+                const lbl = document.getElementById('lbl-' + v);
+                if (!lbl) return;
+                if (v === value) {
+                  lbl.style.borderColor = '#1B3B8C';
+                  lbl.style.background  = '#F0F4FF';
+                } else {
+                  lbl.style.borderColor = '#E5E7EB';
+                  lbl.style.background  = '';
+                }
+              });
+            }
             document.addEventListener('DOMContentLoaded', function() {
-              // Highlight the checked payment option on load
               const checked = document.querySelector('input[name="payment_method"]:checked');
-              if (checked) {
-                const lbl = document.getElementById('lbl-' + checked.value);
-                if (lbl) { lbl.style.borderColor = '#1B3B8C'; lbl.style.background = '#F0F4FF'; }
-              }
+              if (checked) switchPayment(checked.value);
             });
           </script>
 
