@@ -142,7 +142,10 @@ class CheckoutController extends Controller
                 Coupon::where('id', $coupon['id'])->increment('used_count');
             }
 
-            session()->forget(['cart', 'coupon', 'delivery_fee']);
+            // For COD: clear cart immediately. For Lahza: clear only after successful redirect.
+            if ($paymentMethod !== 'lahza') {
+                session()->forget(['cart', 'coupon', 'delivery_fee']);
+            }
             session(['last_order' => $order->id]);
 
             // ─── Notify all admin/staff with manage_orders permission ───
@@ -174,15 +177,17 @@ class CheckoutController extends Controller
                 $callbackUrl = route('checkout.lahza.callback', ['orderNumber' => $order->order_number]);
                 $result      = $lahza->initialize($order, $callbackUrl);
 
-                // Save reference
+                // Save reference then clear cart (payment page is opening)
                 $order->update(['payment_ref' => $result['reference']]);
+                session()->forget(['cart', 'coupon', 'delivery_fee']);
 
                 return redirect($result['authorization_url']);
             } catch (\Throwable $e) {
-                // Fallback: mark failed, send to payment-failed page (cart is already cleared)
+                // Initialization failed — cancel order, keep cart intact so user can retry
                 $order->update(['payment_status' => 'failed', 'status' => 'cancelled']);
-                return redirect()->route('checkout.failed', $order->order_number)
-                                 ->with('init_error', $e->getMessage());
+                session()->forget('last_order');
+                return redirect()->route('checkout.index')
+                                 ->with('error', 'تعذّر الاتصال ببوابة الدفع. يرجى المحاولة مجدداً أو اختيار الدفع عند الاستلام.');
             }
         }
 
