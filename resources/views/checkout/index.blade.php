@@ -200,29 +200,15 @@
               </div>
             </label>
 
-            {{-- Online Card --}}
-            <label for="lahza" style="display:flex;align-items:center;gap:12px;padding:12px 14px;border-radius:10px;border:2px solid #E5E7EB;cursor:pointer;transition:border-color .2s,background .2s;" id="lbl-lahza">
-              <input type="radio" name="payment_method" value="lahza" id="lahza" onchange="switchPayment(this.value)" style="width:16px;height:16px;accent-color:#1B3B8C;flex-shrink:0;"/>
-              <div style="font-size:22px;flex-shrink:0;">💳</div>
-              <div style="flex:1;min-width:0;">
-                <div style="font-size:13px;font-weight:700;color:#1B3B8C;">دفع إلكتروني بالبطاقة</div>
-                <div style="display:flex;align-items:center;gap:5px;margin-top:3px;flex-wrap:wrap;">
-                  <span style="background:#1A1F71;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px;">VISA</span>
-                  <span style="background:#EB001B;color:#fff;font-size:9px;font-weight:900;padding:2px 6px;border-radius:3px;">MC</span>
-                  <span style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:6px;padding:2px 7px;font-size:10px;font-weight:700;color:#16A34A;">🔒 آمن</span>
-                </div>
-              </div>
-            </label>
+            {{-- Online Card — temporarily hidden until outbound API issue is resolved --}}
           </div>
 
           <script>
-            function switchPayment(val) {
-              document.getElementById('lbl-cod').style.borderColor   = val === 'cod'   ? '#1B3B8C' : '#E5E7EB';
-              document.getElementById('lbl-cod').style.background    = val === 'cod'   ? '#F0F4FF' : '';
-              document.getElementById('lbl-lahza').style.borderColor = val === 'lahza' ? '#1B3B8C' : '#E5E7EB';
-              document.getElementById('lbl-lahza').style.background  = val === 'lahza' ? '#F0F4FF' : '';
-            }
-            switchPayment('cod');
+            // COD is the only option — highlight it by default
+            document.addEventListener('DOMContentLoaded', function() {
+              var lbl = document.getElementById('lbl-cod');
+              if (lbl) { lbl.style.borderColor = '#1B3B8C'; lbl.style.background = '#F0F4FF'; }
+            });
           </script>
 
           <button type="submit" class="btn btn-orange"
