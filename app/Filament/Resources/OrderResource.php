@@ -345,89 +345,97 @@ class OrderResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('order_number')->label('رقم الطلب')
+                // ── رقم الطلب + التاريخ ──────────────────────────────
+                Tables\Columns\TextColumn::make('order_number')
+                    ->label('الطلب')
                     ->searchable()->sortable()
-                    ->formatStateUsing(fn($state) => new HtmlString(
-                        '<strong style="color:#122870;">#'.e($state).'</strong>'
-                    )),
+                    ->formatStateUsing(function ($record) {
+                        $num  = e($record->order_number);
+                        $date = $record->created_at?->format('d/m H:i') ?? '';
+                        return new HtmlString(
+                            '<div style="line-height:1.5;">'
+                            . '<strong style="color:#122870;font-size:13px;">#'.$num.'</strong>'
+                            . '<div style="font-size:11px;color:#94A3B8;margin-top:1px;">'.$date.'</div>'
+                            . '</div>'
+                        );
+                    }),
 
-                Tables\Columns\TextColumn::make('customer_name')->label('العميل')
+                // ── العميل (اسم + هاتف) ──────────────────────────────
+                Tables\Columns\TextColumn::make('customer_name')
+                    ->label('العميل')
                     ->searchable()->sortable()
                     ->formatStateUsing(function ($record) {
                         $initial = mb_strtoupper(mb_substr($record->customer_name ?? '؟', 0, 1));
                         $name    = e($record->customer_name);
                         $phone   = e($record->customer_phone);
-                        return new HtmlString(<<<HTML
-                            <div style="display:flex;align-items:center;gap:10px;">
-                              <div style="width:34px;height:34px;border-radius:50%;background:#E8F0FF;color:#122870;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:13px;flex-shrink:0;">{$initial}</div>
-                              <div>
-                                <div style="font-weight:700;font-size:13px;">{$name}</div>
-                                <div style="font-size:11px;color:#64748B;">{$phone}</div>
-                              </div>
-                            </div>
-                            HTML);
+                        return new HtmlString(
+                            '<div style="display:flex;align-items:center;gap:8px;">'
+                            . '<div style="width:30px;height:30px;border-radius:50%;background:#E8F0FF;color:#122870;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0;">'.$initial.'</div>'
+                            . '<div style="min-width:0;">'
+                            . '<div style="font-weight:700;font-size:13px;white-space:nowrap;">'.$name.'</div>'
+                            . '<div style="font-size:11px;color:#64748B;">'.$phone.'</div>'
+                            . '</div></div>'
+                        );
                     }),
 
-                Tables\Columns\TextColumn::make('products_preview')->label('المنتجات')
+                // ── المنتجات (أيقونات مضغوطة) ──────────────────────
+                Tables\Columns\TextColumn::make('products_preview')
+                    ->label('المنتجات')
                     ->state(function ($record) {
-                        $items = $record->items()->limit(3)->get();
-                        $extra = max(0, $record->items()->count() - 3);
-                        $bgs = ['linear-gradient(135deg,#FFF0E8,#FFE0CC)','linear-gradient(135deg,#E8F0FF,#D0DFFF)','linear-gradient(135deg,#F0FFE8,#D0FFCC)'];
-                        $html = '<div style="display:flex;gap:4px;">';
+                        $count = $record->items()->count();
+                        $items = $record->items()->limit(2)->get();
+                        $bgs   = ['linear-gradient(135deg,#FFF0E8,#FFE0CC)','linear-gradient(135deg,#E8F0FF,#D0DFFF)'];
+                        $html  = '<div style="display:flex;gap:3px;align-items:center;">';
                         foreach ($items as $i => $it) {
-                            $bg = $bgs[$i % 3];
-                            $html .= '<div style="width:28px;height:28px;border-radius:8px;background:'.$bg.';display:flex;align-items:center;justify-content:center;font-size:14px;">🛍️</div>';
+                            $html .= '<div style="width:26px;height:26px;border-radius:7px;background:'.$bgs[$i % 2].';display:flex;align-items:center;justify-content:center;font-size:13px;">🛍️</div>';
                         }
-                        if ($extra > 0) {
-                            $html .= '<div style="width:28px;height:28px;border-radius:8px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#64748B;">+'.$extra.'</div>';
+                        if ($count > 2) {
+                            $html .= '<div style="width:26px;height:26px;border-radius:7px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#64748B;">+'..($count-2).'</div>';
                         }
                         $html .= '</div>';
                         return new HtmlString($html);
-                    }),
+                    })
+                    ->toggleable(isToggledHiddenByDefault: false),
 
-                Tables\Columns\TextColumn::make('total')->label('الإجمالي')
+                // ── الإجمالي ─────────────────────────────────────────
+                Tables\Columns\TextColumn::make('total')
+                    ->label('الإجمالي')
                     ->money('ILS')->sortable()->weight('bold'),
 
-                Tables\Columns\TextColumn::make('payment_method')->label('الدفع')
-                    ->badge()
-                    ->formatStateUsing(fn($state) => match($state) {
-                        'lahza'    => '💳 بطاقة',
-                        'cod'      => '💵 كاش',
-                        'card'     => '💳 بطاقة',
-                        'transfer' => '🏦 تحويل',
-                        default    => $state,
-                    })
-                    ->color(fn($state) => match($state) {
-                        'lahza'    => 'success',
-                        'cod'      => 'warning',
-                        'card'     => 'info',
-                        'transfer' => 'primary',
-                        default    => 'gray',
+                // ── الدفع: طريقة + حالة مدمجتان ─────────────────────
+                Tables\Columns\TextColumn::make('payment_method')
+                    ->label('الدفع')
+                    ->formatStateUsing(function ($record) {
+                        $method = match($record->payment_method) {
+                            'lahza','card' => ['💳 بطاقة', '#D1FAE5', '#065F46'],
+                            'cod'          => ['💵 كاش',   '#FEF3C7', '#92400E'],
+                            'transfer'     => ['🏦 تحويل', '#DBEAFE', '#1E40AF'],
+                            default        => [$record->payment_method, '#F3F4F6', '#374151'],
+                        };
+                        $status = match($record->payment_status) {
+                            'paid'    => ['✅ مدفوع',   '#D1FAE5', '#065F46'],
+                            'pending' => ['⏳ بانتظار', '#FEF3C7', '#92400E'],
+                            'failed'  => ['❌ فشل',     '#FEE2E2', '#991B1B'],
+                            default   => [$record->payment_status, '#F3F4F6', '#374151'],
+                        };
+                        return new HtmlString(
+                            '<div style="display:flex;flex-direction:column;gap:3px;">'
+                            . '<span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;background:'.$method[1].';color:'.$method[2].'">'.$method[0].'</span>'
+                            . '<span style="display:inline-block;padding:2px 8px;border-radius:20px;font-size:11px;font-weight:600;background:'.$status[1].';color:'.$status[2].'">'.$status[0].'</span>'
+                            . '</div>'
+                        );
                     }),
 
-                Tables\Columns\TextColumn::make('payment_status')->label('حالة الدفع')
-                    ->badge()
-                    ->formatStateUsing(fn($state) => match($state) {
-                        'paid'    => '✅ مدفوع',
-                        'pending' => '⏳ بانتظار',
-                        'failed'  => '❌ فشل',
-                        default   => $state,
-                    })
-                    ->color(fn($state) => match($state) {
-                        'paid'    => 'success',
-                        'pending' => 'warning',
-                        'failed'  => 'danger',
-                        default   => 'gray',
-                    }),
+                // ── المنطقة (مخفية افتراضياً) ────────────────────────
+                Tables\Columns\TextColumn::make('city')
+                    ->label('المنطقة')
+                    ->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
-                Tables\Columns\TextColumn::make('city')->label('المنطقة')->sortable(),
-
+                // ── الحالة (select مباشر) ─────────────────────────────
                 Tables\Columns\SelectColumn::make('status')
                     ->label('الحالة')
                     ->options(Order::$statusLabels),
-
-                Tables\Columns\TextColumn::make('created_at')->label('التاريخ')
-                    ->dateTime('d/m h:i')->sortable(),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('city')->label('المنطقة')
