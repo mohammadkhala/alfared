@@ -139,7 +139,7 @@
           @endforeach
         </div>
         <div class="pagination-wrap" style="margin-top:32px;">
-          {{ $products->withQueryString()->links() }}
+          {{ $products->links() }}
         </div>
       @else
         <div class="empty-state" style="text-align:center;padding:80px 20px;">

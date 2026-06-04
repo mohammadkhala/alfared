@@ -8,6 +8,7 @@ use App\Models\Category;
 use App\Models\Product;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -18,6 +19,9 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot(): void
     {
+        // ── Use custom Arabic pagination view ──
+        Paginator::defaultView('vendor.pagination.tailwind');
+
         // ── Force HTTPS in production ──
         if (app()->environment('production')) {
             \Illuminate\Support\Facades\URL::forceScheme('https');
