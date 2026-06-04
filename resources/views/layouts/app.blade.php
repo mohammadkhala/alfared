@@ -276,7 +276,7 @@
   </button>
   <div class="float-app-panel">
     <p class="float-app-title">{{ __('float_app_title') }}</p>
-    <a href="#" class="float-app-btn android" target="_blank">
+    <a href="https://play.google.com/store/apps/details?id=pss.alfared.shop&pcampaignid=web_share" class="float-app-btn android" target="_blank" rel="noopener">
       <svg viewBox="0 0 24 24" fill="currentColor" width="16" height="16"><path d="M3.18 23.75c.3.17.65.18.96.04l12.47-7.21-2.79-2.79-10.64 9.96zm-1.43-20.5C1.44 3.58 1.25 4 1.25 4.5v15c0 .5.19.92.5 1.25l.07.07 8.4-8.4v-.2L1.75 3.25zm14.63 8.56l-2.49-2.49-2.49 2.49 2.49 2.49 2.49-2.49zm1.24-.71l-2.12 2.12 2.12 2.12 3.26-1.88c.93-.54.93-1.41 0-1.95l-3.26-1.88 0 1.47z"/></svg>
       Google Play
     </a>
