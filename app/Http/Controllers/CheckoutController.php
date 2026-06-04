@@ -55,6 +55,12 @@ class CheckoutController extends Controller
 
     public function placeOrder(Request $request)
     {
+        \Log::info('CHECKOUT_DEBUG', [
+            'payment_method'  => $request->input('payment_method'),
+            'all_inputs'      => $request->except(['_token']),
+            'cart_count'      => count(session('cart', [])),
+        ]);
+
         $request->validate([
             'first_name'       => 'required|string|max:100',
             'last_name'        => 'required|string|max:100',
@@ -175,7 +181,9 @@ class CheckoutController extends Controller
             try {
                 $lahza       = app(LahzaService::class);
                 $callbackUrl = route('checkout.lahza.callback', ['orderNumber' => $order->order_number]);
+                \Log::info('LAHZA_INIT_ATTEMPT', ['order' => $order->order_number, 'key_len' => strlen($lahza->getPublicKey()), 'callback' => $callbackUrl]);
                 $result      = $lahza->initialize($order, $callbackUrl);
+                \Log::info('LAHZA_INIT_SUCCESS', ['ref' => $result['reference'], 'url' => $result['authorization_url']]);
 
                 // Save reference then clear cart (payment page is opening)
                 $order->update(['payment_ref' => $result['reference']]);
@@ -183,11 +191,12 @@ class CheckoutController extends Controller
 
                 return redirect($result['authorization_url']);
             } catch (\Throwable $e) {
+                \Log::error('LAHZA_INIT_FAILED', ['msg' => $e->getMessage(), 'order' => $order->order_number ?? 'N/A']);
                 // Initialization failed — cancel order, keep cart intact so user can retry
                 $order->update(['payment_status' => 'failed', 'status' => 'cancelled']);
                 session()->forget('last_order');
                 return redirect()->route('checkout.index')
-                                 ->with('error', 'تعذّر الاتصال ببوابة الدفع. يرجى المحاولة مجدداً أو اختيار الدفع عند الاستلام.');
+                                 ->with('error', 'تعذّر الاتصال ببوابة الدفع: ' . $e->getMessage());
             }
         }
 
