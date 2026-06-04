@@ -1,4 +1,4 @@
-package ps.alfared.shop
+package pss.alfared.shop
 
 import io.flutter.embedding.android.FlutterActivity
 
