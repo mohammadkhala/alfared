@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
@@ -42,11 +43,29 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() { super.initState(); _load(); }
 
+  void _debugWrite(String msg, Map<String, dynamic> data, String hyp) {
+    // #region agent log
+    print('[DEBUG-f6fb39] ${jsonEncode({'msg': msg, 'data': data, 'hyp': hyp})}');
+    // #endregion
+  }
+
   Future<void> _load() async {
     setState(() => _loading = true);
     try {
       final res  = await ApiService.instance.get('/home');
       final data = res as Map;
+
+      // #region agent log
+      final rawImages = ((data['featured'] as List?) ?? []).take(3).map((e) => e['image']).toList();
+      final rawBannerImages = ((data['banners'] as List?) ?? []).take(3).map((e) => e['image']).toList();
+      final rawCatImages = ((data['categories'] as List?) ?? []).take(3).map((e) => e['image']).toList();
+      _debugWrite('api_raw_response', {
+        'featured_images': rawImages,
+        'banner_images': rawBannerImages,
+        'category_images': rawCatImages,
+      }, 'B');
+      // #endregion
+
       _banners      = ((data['banners']      as List?) ?? []).map((e) => AppBanner.fromJson(e as Map<String, dynamic>)).toList();
       _categories   = ((data['categories']   as List?) ?? []).map((e) => Category.fromJson(e as Map<String, dynamic>)).toList();
       _featured     = ((data['featured']     as List?) ?? []).map((e) => Product.fromJson(e as Map<String, dynamic>)).toList();
@@ -54,7 +73,19 @@ class _HomeScreenState extends State<HomeScreen> {
       _offers       = ((data['offers']       as List?) ?? []).map((e) => Product.fromJson(e as Map<String, dynamic>)).toList();
       _offerBanners = ((data['offerBanners'] as List?) ?? []).map((e) => AppBanner.fromJson(e as Map<String, dynamic>)).toList();
       _recent       = await RecentlyViewedService.list();
-    } catch (_) {}
+
+      // #region agent log
+      _debugWrite('parsed_products', {
+        'featured_parsed_images': _featured.take(3).map((p) => p.image).toList(),
+        'banners_parsed_images': _banners.take(3).map((b) => b.image).toList(),
+        'categories_parsed_images': _categories.take(3).map((c) => c.image).toList(),
+      }, 'A');
+      // #endregion
+    } catch (e) {
+      // #region agent log
+      _debugWrite('load_error', {'error': e.toString()}, 'E');
+      // #endregion
+    }
     if (mounted) setState(() => _loading = false);
   }
 

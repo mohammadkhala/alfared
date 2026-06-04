@@ -1,3 +1,5 @@
+import '../utils/image_helper.dart';
+
 class AppOrder {
   final String orderNumber;
   final String status;
@@ -97,7 +99,7 @@ class OrderItem {
     id:           _toInt(j['id']),
     productId:    _toInt(j['product_id']),
     productName:  j['product_name'] as String? ?? '',
-    productImage: j['product_image']as String?,
+    productImage: ImageHelper.cleanUrl(j['product_image'] as String?),
     price:       (j['price']        as num?)?.toDouble() ?? (double.tryParse(j['price'].toString()) ?? 0),
     quantity:    (j['quantity']     as num?)?.toInt() ?? 1,
     total:       (j['total']        as num?)?.toDouble() ?? (double.tryParse(j['total'].toString()) ?? 0),

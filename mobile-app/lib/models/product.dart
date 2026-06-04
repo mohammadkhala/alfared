@@ -1,3 +1,5 @@
+import '../utils/image_helper.dart';
+
 class VariantValue {
   final int id;
   final String value;
@@ -112,7 +114,7 @@ class Product {
     nameEn:          j['name_en']        as String?,
     nameHe:          j['name_he']        as String?,
     slug:            j['slug']           as String? ?? '',
-    image:           j['image']          as String?,
+    image:           ImageHelper.cleanUrl(j['image'] as String?),
     price:          (j['price']          as num?)?.toDouble() ?? 0,
     comparePrice:   (j['compare_price']  as num?)?.toDouble(),
     discountPercent: j['discount_percent'] is int ? j['discount_percent'] : null,
@@ -125,7 +127,7 @@ class Product {
     shortDescription: j['short_description'] as String?,
     stockQuantity:   (j['stock_quantity'] as num?)?.toInt(),
     description:     j['description'] as String?,
-    images:          (j['images'] as List?)?.cast<String>() ?? const [],
+    images:          (j['images'] as List?)?.cast<String>().map(ImageHelper.cleanUrl).whereType<String>().toList() ?? const [],
     variantGroups:   (j['variants'] as List?)
         ?.map((v) => VariantGroup.fromJson(v as Map<String, dynamic>))
         .toList() ?? const [],

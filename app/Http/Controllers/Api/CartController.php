@@ -113,7 +113,7 @@ class CartController extends Controller
                 'product_id' => $product->id,
                 'variant_id' => $variantId,
                 'name'       => $product->name_ar,
-                'image'      => $product->main_image ? url('storage/' . $product->main_image) : null,
+                'image'      => $product->main_image ? (str_starts_with($product->main_image, 'http') ? $product->main_image : url('storage/' . $product->main_image)) : null,
                 'price'      => (float) $price,
                 'qty'        => (int) $data['qty'],
             ];

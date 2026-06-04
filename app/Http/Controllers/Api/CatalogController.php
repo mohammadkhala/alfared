@@ -30,7 +30,7 @@ class CatalogController extends Controller
                     'id'       => $b->id,
                     'title'    => $b->title_ar,
                     'subtitle' => $b->subtitle_ar,
-                    'image'    => $b->image ? url('storage/' . $b->image) : null,
+                    'image'    => $b->image ? (str_starts_with($b->image, 'http') ? $b->image : url('storage/' . $b->image)) : null,
                     'link'     => $b->link,
                     'badge'    => $b->badge_text,
                     'button'   => $b->button_text_ar,
@@ -76,7 +76,7 @@ class CatalogController extends Controller
                     'id'       => $b->id,
                     'title'    => $b->title_ar,
                     'subtitle' => $b->subtitle_ar,
-                    'image'    => $b->image ? url('storage/' . $b->image) : null,
+                    'image'    => $b->image ? (str_starts_with($b->image, 'http') ? $b->image : url('storage/' . $b->image)) : null,
                     'link'     => $b->link,
                     'badge'    => $b->badge_text,
                     'button'   => $b->button_text_ar,
@@ -114,7 +114,7 @@ class CatalogController extends Controller
                     'id'        => $b->id,
                     'title'     => $b->title_ar,
                     'subtitle'  => $b->subtitle_ar,
-                    'image'     => $b->image ? url('storage/' . $b->image) : null,
+                    'image'     => $b->image ? (str_starts_with($b->image, 'http') ? $b->image : url('storage/' . $b->image)) : null,
                     'link'      => $b->link,
                     'badge'     => $b->badge_text,
                     'button'    => $b->button_text_ar,
@@ -191,7 +191,7 @@ class CatalogController extends Controller
                     'id'        => $b->id,
                     'title'     => $b->title_ar,
                     'subtitle'  => $b->subtitle_ar,
-                    'image'     => $b->image ? url('storage/' . $b->image) : null,
+                    'image'     => $b->image ? (str_starts_with($b->image, 'http') ? $b->image : url('storage/' . $b->image)) : null,
                     'link'      => $b->link,
                     'badge'     => $b->badge_text,
                     'button'    => $b->button_text_ar,
@@ -217,7 +217,7 @@ class CatalogController extends Controller
                 $this->formatProduct($product),
                 [
                     'description'  => $product->description_ar,
-                    'images'       => $product->images->map(fn($i) => url('storage/' . $i->image_url))->all(),
+                    'images'       => $product->images->map(fn($i) => (str_starts_with($i->image_url, 'http') ? $i->image_url : url('storage/' . $i->image_url)))->all(),
                     'variants'     => $product->variants
                         ->where('is_active', true)
                         ->groupBy('type')
@@ -268,7 +268,7 @@ class CatalogController extends Controller
             'name_he'  => $c->name_he,
             'slug'     => $c->slug,
             'icon'     => $c->icon ?? null,
-            'image'    => $c->image ? url('storage/' . $c->image) : null,
+            'image'    => $c->image ? (str_starts_with($c->image, 'http') ? $c->image : url('storage/' . $c->image)) : null,
         ];
     }
 
@@ -280,7 +280,7 @@ class CatalogController extends Controller
             'name_en'         => $p->name_en,
             'name_he'         => $p->name_he,
             'slug'            => $p->slug,
-            'image'           => $p->main_image ? url('storage/' . $p->main_image) : null,
+            'image'           => $p->main_image ? (str_starts_with($p->main_image, 'http') ? $p->main_image : url('storage/' . $p->main_image)) : null,
             'price'           => (float) $p->price,
             'compare_price'   => $p->compare_price ? (float) $p->compare_price : null,
             'discount_percent'=> $p->discount_percent,

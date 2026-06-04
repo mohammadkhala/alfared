@@ -9,6 +9,8 @@ import '../../theme/app_theme.dart';
 import '../../widgets/guest_wall.dart';
 import '../products/product_detail_screen.dart';
 
+import '../../utils/image_helper.dart';
+
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
 
@@ -90,8 +92,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         borderRadius: BorderRadius.circular(10),
                         child: SizedBox(
                           width: 74, height: 74,
-                          child: p['image'] != null
-                            ? CachedNetworkImage(imageUrl: p['image'], fit: BoxFit.cover)
+                          child: ImageHelper.cleanUrl(p['image']) != null
+                            ? CachedNetworkImage(imageUrl: ImageHelper.cleanUrl(p['image'])!, fit: BoxFit.cover)
                             : Container(
                                 color: AppColors.grayBg,
                                 child: const Icon(Icons.image_not_supported, color: AppColors.border)),

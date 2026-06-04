@@ -13,6 +13,8 @@ import '../../widgets/guest_wall.dart';
 import '../checkout/checkout_screen.dart';
 import '../products/products_screen.dart';
 
+import '../../utils/image_helper.dart';
+
 class CartScreen extends StatefulWidget {
   const CartScreen({super.key});
 
@@ -269,8 +271,8 @@ class _CartItemCard extends StatelessWidget {
             borderRadius: BorderRadius.circular(12),
             child: SizedBox(
               width: 76, height: 76,
-              child: item['image'] != null
-                ? CachedNetworkImage(imageUrl: item['image'], fit: BoxFit.cover)
+              child: ImageHelper.cleanUrl(item['image']) != null
+                ? CachedNetworkImage(imageUrl: ImageHelper.cleanUrl(item['image'])!, fit: BoxFit.cover)
                 : Container(
                     color: AppColors.grayBg,
                     child: const Icon(Icons.image_not_supported, color: AppColors.gray),
