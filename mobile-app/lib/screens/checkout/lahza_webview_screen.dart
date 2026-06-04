@@ -23,8 +23,9 @@ class LahzaWebViewScreen extends StatefulWidget {
 
 class _LahzaWebViewScreenState extends State<LahzaWebViewScreen> {
   late final WebViewController _controller;
-  bool _loading = true;
-  bool _handled = false;
+  bool _loading  = true;
+  bool _handled  = false;
+  bool _checking = false;
   Timer? _pollTimer;
 
   @override
@@ -42,77 +43,46 @@ class _LahzaWebViewScreenState extends State<LahzaWebViewScreen> {
         },
         onNavigationRequest: (request) {
           _checkUrl(request.url);
-
-          // Prevent loading our callback URL inside the WebView
-          // (server handles it, then redirects to success/failed)
-          if (request.url.contains('checkout/lahza/callback')) {
-            return NavigationDecision.prevent;
-          }
-          if (request.url.contains('checkout/failed') ||
+          if (request.url.contains('checkout/lahza/callback') ||
+              request.url.contains('checkout/failed') ||
               request.url.contains('checkout/payment-failed')) {
             return NavigationDecision.prevent;
           }
-
           return NavigationDecision.navigate;
         },
-        onWebResourceError: (error) {
-          debugPrint('WebView error: ${error.description}');
-        },
+        onWebResourceError: (e) => debugPrint('WebView error: ${e.description}'),
       ))
       ..loadRequest(Uri.parse(widget.authorizationUrl));
+
+    // Start polling immediately — Lahza may never redirect the browser.
+    // Poll every 3 s for up to 2 min, starting after 4 s.
+    Future.delayed(const Duration(seconds: 4), _startPolling);
   }
 
-  /// Called on every URL change — covers both navigation requests and page finishes.
   void _checkUrl(String url) {
     if (_handled) return;
-
-    // Success paths
     if (url.contains('checkout/lahza/callback') ||
         url.contains('checkout/success')) {
       _handled = true;
       _pollTimer?.cancel();
       _navigateToSuccess();
-      return;
-    }
-
-    // Failure paths
-    if (url.contains('checkout/failed') ||
-        url.contains('checkout/payment-failed')) {
+    } else if (url.contains('checkout/failed') ||
+               url.contains('checkout/payment-failed')) {
       _handled = true;
       _pollTimer?.cancel();
       _onPaymentFailed();
-      return;
     }
-
-    // Lahza shows "Please close this web page to continue" when done.
-    // At this point the browser won't redirect — poll backend for order status.
-    if (!url.contains('lahza.io') && !url.contains('alfared')) {
-      // Still on Lahza's domain — do nothing yet
-      return;
-    }
-
-    // We're on some unknown URL after payment — start polling if not already
-    _startPolling();
   }
 
-  /// After Lahza finishes, it sometimes shows a completion page without redirect.
-  /// Poll our order-track API for up to 30 s to detect payment_status = paid/failed.
   void _startPolling() {
     if (_pollTimer != null || _handled) return;
     int attempts = 0;
     _pollTimer = Timer.periodic(const Duration(seconds: 3), (t) async {
       attempts++;
       if (_handled || !mounted) { t.cancel(); return; }
-      if (attempts > 10) {
-        t.cancel();
-        // Timed out — assume success and let user verify on success screen
-        _handled = true;
-        _navigateToSuccess();
-        return;
-      }
+      if (attempts > 40) { t.cancel(); return; } // stop after 2 min
       try {
-        final res = await ApiService.instance
-            .get('/orders/${widget.orderNumber}/track');
+        final res    = await ApiService.instance.get('/orders/${widget.orderNumber}/track');
         final status = (res as Map)['payment_status'] as String? ?? '';
         if (status == 'paid') {
           t.cancel();
@@ -127,12 +97,55 @@ class _LahzaWebViewScreenState extends State<LahzaWebViewScreen> {
     });
   }
 
+  /// Called when user taps X — check backend FIRST before showing cancel dialog.
+  Future<void> _handleClosePressed() async {
+    if (_handled) return;
+    setState(() => _checking = true);
+    try {
+      final res    = await ApiService.instance.get('/orders/${widget.orderNumber}/track');
+      final status = (res as Map)['payment_status'] as String? ?? '';
+      if (status == 'paid') {
+        _handled = true;
+        _pollTimer?.cancel();
+        _navigateToSuccess();
+        return;
+      }
+    } catch (_) {}
+    if (!mounted) return;
+    setState(() => _checking = false);
+
+    // Payment not confirmed yet — ask if they really want to cancel
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('إلغاء الدفع؟',
+            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+        content: const Text(
+            'إذا أتممت الدفع بالفعل فالطلب سيُسجَّل تلقائياً. هل تريد العودة؟',
+            style: TextStyle(fontFamily: 'Cairo')),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text('لا، انتظر', style: TextStyle(fontFamily: 'Cairo')),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              Navigator.pop(context, {'success': false});
+            },
+            child: const Text('نعم، ارجع',
+                style: TextStyle(fontFamily: 'Cairo', color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
   void _navigateToSuccess() {
     if (!mounted) return;
     Navigator.of(context).pushReplacement(
       MaterialPageRoute(
-        builder: (_) => SuccessScreen(orderNumber: widget.orderNumber),
-      ),
+          builder: (_) => SuccessScreen(orderNumber: widget.orderNumber)),
     );
   }
 
@@ -161,38 +174,21 @@ class _LahzaWebViewScreenState extends State<LahzaWebViewScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0B1A3B),
         foregroundColor: Colors.white,
-        title: const Text(
-          '💳 الدفع عبر لحظة',
-          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700),
-        ),
-        leading: IconButton(
-          icon: const Icon(Icons.close),
-          onPressed: () {
-            showDialog(
-              context: context,
-              builder: (ctx) => AlertDialog(
-                title: const Text('إلغاء الدفع؟',
-                    style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
-                content: const Text('هل تريد إلغاء عملية الدفع والعودة؟',
-                    style: TextStyle(fontFamily: 'Cairo')),
-                actions: [
-                  TextButton(
-                    onPressed: () => Navigator.pop(ctx),
-                    child: const Text('لا', style: TextStyle(fontFamily: 'Cairo')),
-                  ),
-                  TextButton(
-                    onPressed: () {
-                      Navigator.pop(ctx);
-                      Navigator.pop(context, {'success': false});
-                    },
-                    child: const Text('نعم، إلغاء',
-                        style: TextStyle(fontFamily: 'Cairo', color: Colors.red)),
-                  ),
-                ],
+        title: const Text('💳 الدفع عبر لحظة',
+            style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
+        leading: _checking
+            ? const Padding(
+                padding: EdgeInsets.all(14),
+                child: SizedBox(
+                  width: 20, height: 20,
+                  child: CircularProgressIndicator(
+                      strokeWidth: 2, color: Colors.white),
+                ),
+              )
+            : IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: _handleClosePressed,
               ),
-            );
-          },
-        ),
       ),
       body: Stack(
         children: [
@@ -206,14 +202,11 @@ class _LahzaWebViewScreenState extends State<LahzaWebViewScreen> {
                   children: [
                     CircularProgressIndicator(color: AppColors.orange),
                     SizedBox(height: 16),
-                    Text(
-                      'جاري تحميل بوابة الدفع...',
-                      style: TextStyle(
-                        fontFamily: 'Cairo',
-                        color: Colors.white70,
-                        fontSize: 14,
-                      ),
-                    ),
+                    Text('جاري تحميل بوابة الدفع...',
+                        style: TextStyle(
+                            fontFamily: 'Cairo',
+                            color: Colors.white70,
+                            fontSize: 14)),
                   ],
                 ),
               ),
