@@ -202,6 +202,8 @@
   "checkout_step_payment": "אמצעי תשלום",
   "checkout_cod_label": "💵 תשלום במזומן בקבלה (COD)",
   "checkout_cod_desc": "שלם במזומן בעת קבלת ההזמנה — ללא עמלות נוספות",
+  "checkout_card_label": "💳 כרטיס אשראי (Visa / Mastercard)",
+  "checkout_card_desc": "תשלום מאובטח דרך שער Lahza",
   "checkout_order_summary": "סיכום הזמנה",
   "checkout_choose_zone_short": "בחר אזור",
   "checkout_confirm": "✓ אשר הזמנה",

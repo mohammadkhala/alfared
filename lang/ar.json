@@ -202,6 +202,8 @@
   "checkout_step_payment": "طريقة الدفع",
   "checkout_cod_label": "💵 الدفع عند الاستلام (Cash on Delivery)",
   "checkout_cod_desc": "ادفع نقداً عند استلام طلبك — لا توجد رسوم إضافية",
+  "checkout_card_label": "💳 بطاقة بنكية (Visa / Mastercard)",
+  "checkout_card_desc": "دفع آمن ومباشر عبر بوابة لحظة",
   "checkout_order_summary": "ملخص طلبك",
   "checkout_choose_zone_short": "اختر المنطقة",
   "checkout_confirm": "✓ تأكيد الطلب",

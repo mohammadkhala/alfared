@@ -202,6 +202,8 @@
   "checkout_step_payment": "Payment Method",
   "checkout_cod_label": "💵 Cash on Delivery (COD)",
   "checkout_cod_desc": "Pay cash when you receive your order — no extra fees",
+  "checkout_card_label": "💳 Credit / Debit Card (Visa / Mastercard)",
+  "checkout_card_desc": "Secure online payment via Lahza gateway",
   "checkout_order_summary": "Order Summary",
   "checkout_choose_zone_short": "Choose zone",
   "checkout_confirm": "✓ Confirm Order",
