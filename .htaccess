@@ -2,14 +2,16 @@
     RewriteEngine On
     RewriteBase /
 
-    # Serve existing files/folders directly (assets, etc.)
+    # ── Redirect /public/* to clean URLs (301 permanent) ─────────
+    RewriteCond %{THE_REQUEST} \s/+public(/[^\s]*)? [NC]
+    RewriteRule ^public(/.*)?$ /$1 [R=301,L]
+
+    # ── Serve existing files/folders directly (storage, assets) ──
     RewriteCond %{REQUEST_FILENAME} -f [OR]
     RewriteCond %{REQUEST_FILENAME} -d
     RewriteRule ^ - [L]
 
-    # If not already pointing at public/, rewrite internally
-    RewriteCond %{REQUEST_URI} !^/public/
+    # ── Route everything through public/index.php ─────────────────
     RewriteRule ^$ public/index.php [L]
-    RewriteCond %{REQUEST_URI} !^/public/
     RewriteRule ^(.*) public/$1 [L,QSA]
 </IfModule>
