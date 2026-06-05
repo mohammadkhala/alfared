@@ -89,7 +89,7 @@ class AdminPanelProvider extends PanelProvider
                 fn(): string =>
                     '<div style="display:flex;align-items:center;gap:12px;margin-inline-end:8px;">'
                     . '<span style="background:#F1F5F9;border-radius:8px;padding:6px 12px;font-size:12px;color:#64748B;font-weight:600;">📅 ' . now()->translatedFormat('d F Y') . '</span>'
-                    . '<a href="' . url('/') . '" target="_blank" style="font-size:13px;color:#1B3B8C;text-decoration:none;font-weight:700;">🌐 عرض الموقع</a>'
+                    . '<a href="https://alfared.ps" target="_blank" style="font-size:13px;color:#1B3B8C;text-decoration:none;font-weight:700;">🌐 عرض الموقع</a>'
                     . '</div>'
             )
 
