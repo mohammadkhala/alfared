@@ -4,17 +4,58 @@
   $statusLabels = ['pending'=>'بانتظار التأكيد','confirmed'=>'تم التأكيد','processing'=>'قيد التجهيز','shipped'=>'في الطريق','delivered'=>'تم التوصيل','cancelled'=>'ملغي','returned'=>'مُرجَّع'];
 @endphp
 
+<style>
+/* ── Dashboard Responsive Grid ────────────────────────────── */
+.dash-kpi-row    { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-bottom:20px; }
+.dash-charts-row { display:grid; grid-template-columns:2fr 1fr;       gap:16px; margin-bottom:20px; }
+.dash-tables-row { display:grid; grid-template-columns:1fr 1fr;       gap:16px; }
+.dash-table-wrap { overflow-x:auto; -webkit-overflow-scrolling:touch; }
+
+/* KPI value numbers shrink gracefully */
+.dash-kpi-val { font-size:28px; font-weight:900; line-height:1; margin-bottom:6px; }
+.dash-kpi-lbl { font-size:11px; color:#6B7280; font-weight:700; margin-bottom:8px; }
+
+/* ── Tablet (≤ 900px) ──────────────────────────────────────── */
+@media (max-width: 900px) {
+  .dash-kpi-row    { grid-template-columns: repeat(2,1fr); }
+  .dash-charts-row { grid-template-columns: 1fr; }
+  .dash-tables-row { grid-template-columns: 1fr; }
+  .dash-kpi-val    { font-size: 22px; }
+  .dash-bar-wrap   { height: 120px !important; }
+}
+
+/* ── Mobile (≤ 600px) ──────────────────────────────────────── */
+@media (max-width: 600px) {
+  .dash-kpi-row    { grid-template-columns: repeat(2,1fr); gap:10px; margin-bottom:14px; }
+  .dash-charts-row { gap:10px; margin-bottom:14px; }
+  .dash-tables-row { gap:10px; }
+  .dash-kpi-val    { font-size: 20px; }
+  .dash-kpi-lbl    { font-size: 10px; }
+  .dash-card       { padding: 14px !important; }
+  .dash-bar-wrap   { height: 100px !important; }
+  .dash-card h3    { font-size: 13px !important; }
+  .dash-table-wrap table { min-width: 420px; }
+}
+
+/* ── Small Mobile (≤ 400px) ───────────────────────────────── */
+@media (max-width: 400px) {
+  .dash-kpi-row    { grid-template-columns: 1fr 1fr; gap:8px; }
+  .dash-kpi-val    { font-size: 18px; }
+  .dash-card       { padding: 12px !important; }
+}
+</style>
+
 <div style="direction:rtl;font-family:'Cairo',sans-serif;">
 
   {{-- ══════════ KPI ROW ══════════ --}}
-  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:20px;">
+  <div class="dash-kpi-row">
 
     {{-- Revenue --}}
-    <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;overflow:hidden;">
+    <div class="dash-card" style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;right:0;width:4px;height:100%;background:#1B3B8C;"></div>
       <div style="position:absolute;top:14px;left:14px;font-size:30px;opacity:.1;line-height:1;">💰</div>
-      <div style="font-size:11px;color:#6B7280;font-weight:700;margin-bottom:8px;">إجمالي المبيعات (هذا الشهر)</div>
-      <div style="font-size:28px;font-weight:900;color:#1B3B8C;line-height:1;margin-bottom:6px;">{{ number_format($monthRevenue, 0) }} ₪</div>
+      <div class="dash-kpi-lbl">إجمالي المبيعات (هذا الشهر)</div>
+      <div class="dash-kpi-val" style="color:#1B3B8C;">{{ number_format($monthRevenue, 0) }} ₪</div>
       @if($revenueChange != 0)
         <div style="font-size:11px;color:{{ $revenueChange >= 0 ? '#10B981' : '#EF4444' }};">{{ $revenueChange >= 0 ? '↑' : '↓' }} +{{ abs($revenueChange) }}% مقارنة بالشهر الماضي</div>
       @else
@@ -23,11 +64,11 @@
     </div>
 
     {{-- Today Orders --}}
-    <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;overflow:hidden;">
+    <div class="dash-card" style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;right:0;width:4px;height:100%;background:#E8711A;"></div>
       <div style="position:absolute;top:14px;left:14px;font-size:30px;opacity:.1;line-height:1;">🛒</div>
-      <div style="font-size:11px;color:#6B7280;font-weight:700;margin-bottom:8px;">الطلبات الجديدة (اليوم)</div>
-      <div style="font-size:28px;font-weight:900;color:#E8711A;line-height:1;margin-bottom:6px;">{{ $todayOrders }}</div>
+      <div class="dash-kpi-lbl">الطلبات الجديدة (اليوم)</div>
+      <div class="dash-kpi-val" style="color:#E8711A;">{{ $todayOrders }}</div>
       @if($ordersChange != 0)
         <div style="font-size:11px;color:{{ $ordersChange >= 0 ? '#10B981' : '#EF4444' }};">{{ $ordersChange >= 0 ? '↑' : '↓' }} {{ abs($ordersChange) }}% مقارنة بالأمس</div>
       @else
@@ -36,11 +77,11 @@
     </div>
 
     {{-- New Customers --}}
-    <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;overflow:hidden;">
+    <div class="dash-card" style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;right:0;width:4px;height:100%;background:#10B981;"></div>
       <div style="position:absolute;top:14px;left:14px;font-size:30px;opacity:.1;line-height:1;">👥</div>
-      <div style="font-size:11px;color:#6B7280;font-weight:700;margin-bottom:8px;">العملاء الجدد (هذا الأسبوع)</div>
-      <div style="font-size:28px;font-weight:900;color:#10B981;line-height:1;margin-bottom:6px;">{{ $weekCustomers }}</div>
+      <div class="dash-kpi-lbl">العملاء الجدد (هذا الأسبوع)</div>
+      <div class="dash-kpi-val" style="color:#10B981;">{{ $weekCustomers }}</div>
       @if($customersChange != 0)
         <div style="font-size:11px;color:{{ $customersChange >= 0 ? '#10B981' : '#EF4444' }};">{{ $customersChange >= 0 ? '↑' : '↓' }} {{ abs($customersChange) }}% مقارنة بالأسبوع الماضي</div>
       @else
@@ -49,23 +90,23 @@
     </div>
 
     {{-- Low Stock --}}
-    <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;overflow:hidden;">
+    <div class="dash-card" style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);position:relative;overflow:hidden;">
       <div style="position:absolute;top:0;right:0;width:4px;height:100%;background:#8B5CF6;"></div>
       <div style="position:absolute;top:14px;left:14px;font-size:30px;opacity:.1;line-height:1;">📦</div>
-      <div style="font-size:11px;color:#6B7280;font-weight:700;margin-bottom:8px;">منتجات مخزون منخفض</div>
-      <div style="font-size:28px;font-weight:900;color:#8B5CF6;line-height:1;margin-bottom:6px;">{{ $lowStock }}</div>
+      <div class="dash-kpi-lbl">منتجات مخزون منخفض</div>
+      <div class="dash-kpi-val" style="color:#8B5CF6;">{{ $lowStock }}</div>
       <div style="font-size:11px;color:{{ $lowStock > 0 ? '#EF4444' : '#10B981' }};">{{ $lowStock > 0 ? '⚠️ تحتاج إعادة طلب' : '✓ المخزون كافٍ' }}</div>
     </div>
 
   </div>
 
   {{-- ══════════ CHARTS ROW ══════════ --}}
-  <div style="display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:20px;">
+  <div class="dash-charts-row">
 
     {{-- Bar Chart --}}
-    <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+    <div class="dash-card" style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
       <h3 style="font-size:14px;font-weight:900;color:#1B3B8C;margin:0 0 16px;">📈 المبيعات اليومية (آخر 7 أيام)</h3>
-      <div style="display:flex;align-items:flex-end;gap:8px;height:160px;">
+      <div class="dash-bar-wrap" style="display:flex;align-items:flex-end;gap:8px;height:160px;">
         @php $barColors = ['#1B3B8C','rgba(27,59,140,.65)','#E8711A','rgba(27,59,140,.8)','#10B981','rgba(27,59,140,.6)','rgba(232,113,26,.75)']; @endphp
         @foreach($daily as $i => $day)
           <div style="flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end;">
@@ -78,7 +119,7 @@
     </div>
 
     {{-- Donut Chart --}}
-    <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+    <div class="dash-card" style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
       <h3 style="font-size:14px;font-weight:900;color:#1B3B8C;margin:0 0 16px;">🏷️ المبيعات حسب القسم</h3>
       <div style="display:flex;flex-direction:column;align-items:center;">
         <div style="width:120px;height:120px;border-radius:50%;background:conic-gradient({{ $donutGradient }});position:relative;margin-bottom:14px;flex-shrink:0;">
@@ -101,14 +142,15 @@
   </div>
 
   {{-- ══════════ TABLES ROW ══════════ --}}
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+  <div class="dash-tables-row">
 
     {{-- Recent Orders --}}
-    <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+    <div class="dash-card" style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <h3 style="font-size:14px;font-weight:900;color:#1B3B8C;margin:0;">آخر الطلبات</h3>
         <a href="{{ route('filament.admin.resources.orders.index') }}" style="font-size:12px;color:#E8711A;text-decoration:none;font-weight:700;">عرض الكل ←</a>
       </div>
+      <div class="dash-table-wrap">
       <table style="width:100%;border-collapse:collapse;">
         <thead>
           <tr style="background:#F9FAFB;">
@@ -136,14 +178,16 @@
           @endforelse
         </tbody>
       </table>
+      </div>{{-- /.dash-table-wrap --}}
     </div>
 
     {{-- Top Products --}}
-    <div style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
+    <div class="dash-card" style="background:white;border-radius:14px;padding:20px;box-shadow:0 2px 10px rgba(0,0,0,.06);">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
         <h3 style="font-size:14px;font-weight:900;color:#1B3B8C;margin:0;">أكثر المنتجات مبيعاً</h3>
         <a href="{{ route('filament.admin.resources.products.index') }}" style="font-size:12px;color:#E8711A;text-decoration:none;font-weight:700;">عرض الكل ←</a>
       </div>
+      <div class="dash-table-wrap">
       <table style="width:100%;border-collapse:collapse;">
         <thead>
           <tr style="background:#F9FAFB;">
@@ -176,6 +220,7 @@
           @endforelse
         </tbody>
       </table>
+      </div>{{-- /.dash-table-wrap --}}
     </div>
 
   </div>
