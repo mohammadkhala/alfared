@@ -598,3 +598,145 @@ html.dark .fi-simple-main {
 html.dark .fi-simple-page .fi-header-heading {
     color: #93C5FD !important;
 }
+
+/* ============================================================
+   MOBILE RESPONSIVE — max-width: 768px
+   ============================================================ */
+@media (max-width: 768px) {
+
+    /* ── Topbar: hide date chip, keep site-link small ── */
+    .fi-topbar > nav {
+        padding: 0 8px !important;
+    }
+    .fi-topbar > nav span[style*="background:#F1F5F9"] {
+        display: none !important;
+    }
+    .fi-topbar > nav a[href="https://alfared.ps"] {
+        font-size: 11px !important;
+    }
+
+    /* ── Page header ── */
+    .fi-header-heading {
+        font-size: 15px !important;
+    }
+    .fi-page-header {
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+    .fi-page-header .fi-btn {
+        font-size: 12px !important;
+        padding: 7px 12px !important;
+    }
+
+    /* ── Tables: horizontal scroll ── */
+    .fi-ta-ctn {
+        border-radius: 10px !important;
+        overflow-x: auto !important;
+    }
+    .fi-ta-table {
+        min-width: 600px !important;
+    }
+    .fi-ta-cell,
+    .fi-ta-col-header-cell {
+        padding: 10px 10px !important;
+        font-size: 12px !important;
+        white-space: nowrap !important;
+    }
+    .fi-ta-header-toolbar {
+        padding: 10px 12px !important;
+        flex-wrap: wrap !important;
+        gap: 8px !important;
+    }
+
+    /* ── Form sections: single column ── */
+    .fi-fo-grid,
+    .fi-fo-component-ctn > .grid {
+        grid-template-columns: 1fr !important;
+    }
+    .fi-section-content {
+        padding: 14px !important;
+    }
+    .fi-section-header {
+        padding: 12px 14px !important;
+    }
+
+    /* ── Widgets / stats cards: 2 cols on mobile ── */
+    .fi-wi-stats-overview-stats-ctn {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 10px !important;
+    }
+    .fi-wi-stats-overview-stat {
+        padding: 12px !important;
+    }
+    .fi-wi-stats-overview-stat-value {
+        font-size: 20px !important;
+    }
+
+    /* ── Filters bar ── */
+    .fi-ta-filters-form {
+        flex-direction: column !important;
+    }
+
+    /* ── Pagination ── */
+    .fi-pagination {
+        flex-wrap: wrap !important;
+        gap: 6px !important;
+        justify-content: center !important;
+        padding: 10px !important;
+    }
+    .fi-pagination-records-per-page-select-ctn {
+        display: none !important;
+    }
+
+    /* ── Modals full-screen on mobile ── */
+    .fi-modal-window {
+        border-radius: 14px 14px 0 0 !important;
+        margin: 0 !important;
+        max-height: 90vh !important;
+        overflow-y: auto !important;
+    }
+
+    /* ── Tabs: scrollable ── */
+    .fi-tabs {
+        overflow-x: auto !important;
+        flex-wrap: nowrap !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+    .fi-tabs-tab {
+        white-space: nowrap !important;
+        padding: 8px 12px !important;
+        font-size: 12px !important;
+    }
+
+    /* ── Infolist: single column ── */
+    .fi-in-entries {
+        grid-template-columns: 1fr !important;
+    }
+
+    /* ── Action buttons in table row ── */
+    .fi-ta-row-actions {
+        flex-direction: column !important;
+        gap: 4px !important;
+    }
+
+    /* ── Topbar right actions ── */
+    .fi-topbar-end {
+        gap: 4px !important;
+    }
+}
+
+/* ── Extra small phones ── */
+@media (max-width: 480px) {
+    .fi-wi-stats-overview-stats-ctn {
+        grid-template-columns: 1fr 1fr !important;
+    }
+    .fi-wi-stats-overview-stat-value {
+        font-size: 18px !important;
+    }
+    .fi-header-heading {
+        font-size: 14px !important;
+    }
+    .fi-ta-table {
+        min-width: 500px !important;
+    }
+}
