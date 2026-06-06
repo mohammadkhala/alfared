@@ -1,22 +1,22 @@
 @extends('layouts.app')
 
-@section('title', $product->name_ar . ' — أبناء الفريد')
-@section('description', $product->description_ar ?? $product->name_ar)
+@section('title', $product->name . ' — ' . __('company_name'))
+@section('description', strip_tags($product->{'description_'.app()->getLocale()} ?? $product->description_ar ?? $product->name))
 
 @section('content')
 <div class="container" style="padding:32px 0;">
 
   {{-- Breadcrumb --}}
   <nav class="breadcrumb" style="margin-bottom:24px;font-size:14px;color:#6B7280;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
-    <a href="{{ route('home') }}" style="color:#1B3B8C;">الرئيسية</a>
+    <a href="{{ route('home') }}" style="color:#1B3B8C;">{{ __('home') }}</a>
     <span>›</span>
-    <a href="{{ route('products.index') }}" style="color:#1B3B8C;">المتجر</a>
+    <a href="{{ route('products.index') }}" style="color:#1B3B8C;">{{ __('store') }}</a>
     @if($product->category)
       <span>›</span>
-      <a href="{{ route('products.category', $product->category->slug) }}" style="color:#1B3B8C;">{{ $product->category->name_ar }}</a>
+      <a href="{{ route('products.category', $product->category->slug) }}" style="color:#1B3B8C;">{{ $product->category->name }}</a>
     @endif
     <span>›</span>
-    <span>{{ $product->name_ar }}</span>
+    <span>{{ $product->name }}</span>
   </nav>
 
   {{-- Product main section --}}
@@ -50,7 +50,7 @@
         <div class="product-brand" style="font-size:13px;color:#E8711A;font-weight:600;margin-bottom:8px;">{{ $product->brand->name }}</div>
       @endif
 
-      <h1 style="font-size:1.8rem;font-weight:700;color:#1B3B8C;line-height:1.3;margin-bottom:12px;">{{ $product->name_ar }}</h1>
+      <h1 style="font-size:1.8rem;font-weight:700;color:#1B3B8C;line-height:1.3;margin-bottom:12px;">{{ $product->name }}</h1>
 
       {{-- Rating --}}
       <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
@@ -59,8 +59,8 @@
             <span style="color:{{ $i<=round($product->rating_avg??0) ? '#F59E0B' : '#D1D5DB' }};font-size:18px;">★</span>
           @endfor
         </div>
-        <span style="color:#6B7280;font-size:14px;">{{ number_format($product->rating_avg??0,1) }} ({{ $product->reviews_count??0 }} تقييم)</span>
-        <span style="color:#6B7280;font-size:14px;">{{ number_format($product->views_count??0) }} مشاهدة</span>
+        <span style="color:#6B7280;font-size:14px;">{{ number_format($product->rating_avg??0,1) }} ({{ $product->reviews_count??0 }} {{ __('product_rating_count') }})</span>
+        <span style="color:#6B7280;font-size:14px;">{{ number_format($product->views_count??0) }} {{ __('product_views') }}</span>
       </div>
 
       {{-- Price --}}
@@ -68,7 +68,7 @@
         <span style="font-size:2.2rem;font-weight:900;color:#E8711A;">{{ number_format($product->price, 2) }} ₪</span>
         @if($product->is_on_sale && $product->compare_price)
           <span style="font-size:1.2rem;text-decoration:line-through;color:#9CA3AF;">{{ number_format($product->compare_price, 2) }} ₪</span>
-          <span style="background:#FEF3C7;color:#D97706;padding:4px 10px;border-radius:20px;font-size:13px;font-weight:600;">وفر {{ number_format($product->compare_price - $product->price, 2) }} ₪</span>
+          <span style="background:#FEF3C7;color:#D97706;padding:4px 10px;border-radius:20px;font-size:13px;font-weight:600;">{{ __('product_save_amount') }} {{ number_format($product->compare_price - $product->price, 2) }} ₪</span>
         @endif
       </div>
 
@@ -76,18 +76,23 @@
       <div style="margin-bottom:20px;">
         @if($product->is_in_stock)
           @if($product->is_low_stock)
-            <span style="color:#D97706;font-size:14px;font-weight:600;">⚠️ كمية محدودة — {{ $product->stock_quantity }} متبقية</span>
+            <span style="color:#D97706;font-size:14px;font-weight:600;">⚠️ {{ __('product_limited_stock') }} — {{ $product->stock_quantity }}</span>
           @else
-            <span style="color:#10B981;font-size:14px;font-weight:600;">✓ متوفر في المخزون</span>
+            <span style="color:#10B981;font-size:14px;font-weight:600;">{{ __('product_status_available') }}</span>
           @endif
         @else
-          <span style="color:#EF4444;font-size:14px;font-weight:600;">✗ نفد المخزون</span>
+          <span style="color:#EF4444;font-size:14px;font-weight:600;">{{ __('product_status_out') }}</span>
         @endif
       </div>
 
       {{-- Short description --}}
-      @if($product->description_ar)
-        <p style="color:#4B5563;line-height:1.7;margin-bottom:24px;font-size:15px;">{{ Str::limit($product->description_ar, 200) }}</p>
+      @php
+        $locale = app()->getLocale();
+        $shortDesc = $product->short_description
+            ?: Str::limit(strip_tags($product->{'description_'.$locale} ?? $product->description_ar ?? ''), 200);
+      @endphp
+      @if($shortDesc)
+        <p style="color:#4B5563;line-height:1.7;margin-bottom:24px;font-size:15px;">{{ $shortDesc }}</p>
       @endif
 
       {{-- Add to cart form --}}
@@ -102,7 +107,7 @@
             @foreach($variantGroups as $type => $variants)
               <div class="variant-group" style="margin-bottom:16px;">
                 <label style="font-size:14px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">
-                  {{ $type === 'color' ? 'اللون' : ($type === 'size' ? 'الحجم' : $type) }}:
+                  {{ $type === 'color' ? __('product_color') : ($type === 'size' ? __('product_size') : ($type === 'volume' ? __('product_volume') : $type)) }}:
                   <span id="selected_{{ $type }}" style="color:#E8711A;"></span>
                 </label>
                 <div style="display:flex;flex-wrap:wrap;gap:8px;">
@@ -127,7 +132,7 @@
 
           {{-- Quantity --}}
           <div style="margin-bottom:20px;">
-            <label style="font-size:14px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">الكمية:</label>
+            <label style="font-size:14px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">{{ __('product_quantity') }}:</label>
             <div class="qty-selector" style="display:flex;align-items:center;gap:0;border:1px solid #E5E7EB;border-radius:10px;width:fit-content;">
               <button type="button" onclick="changeQty(-1)" style="padding:10px 16px;background:none;border:none;font-size:18px;cursor:pointer;color:#374151;">−</button>
               <input type="number" name="qty" id="qtyInput" value="1" min="1" max="{{ $product->stock_quantity }}"
@@ -155,29 +160,29 @@
           </button>
         </form>
       @else
-        <button class="btn" style="background:#9CA3AF;color:#fff;padding:16px;width:100%;border-radius:12px;cursor:not-allowed;">نفد المخزون</button>
+        <button class="btn" style="background:#9CA3AF;color:#fff;padding:16px;width:100%;border-radius:12px;cursor:not-allowed;">{{ __('out_of_stock') }}</button>
       @endif
 
       {{-- Features --}}
       <div style="margin-top:24px;padding:16px;background:#F0F4FF;border-radius:12px;display:grid;grid-template-columns:1fr 1fr;gap:12px;">
         <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;">
-          <span>🚚</span><span>شحن لجميع مناطق فلسطين</span>
+          <span>🚚</span><span>{{ __('feat_delivery_title') }}</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;">
-          <span>✓</span><span>منتجات أصلية 100%</span>
+          <span>✓</span><span>{{ __('feat_authentic_title') }}</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;">
-          <span>💳</span><span>دفع عند الاستلام</span>
+          <span>💳</span><span>{{ __('feat_cod_title') }}</span>
         </div>
         <div style="display:flex;align-items:center;gap:8px;font-size:13px;color:#374151;">
-          <span>↩️</span><span>سياسة إرجاع مرنة</span>
+          <span>↩️</span><span>{{ __('feat_return_title') }}</span>
         </div>
       </div>
 
       {{-- Share --}}
       <div style="margin-top:16px;display:flex;align-items:center;gap:12px;font-size:13px;color:#6B7280;">
-        <span>مشاركة:</span>
-        <a href="https://wa.me/?text={{ urlencode($product->name_ar.' '.url()->current()) }}" target="_blank" style="color:#25D366;text-decoration:none;">💬 واتساب</a>
+        <span>{{ __('product_share') }}:</span>
+        <a href="https://wa.me/?text={{ urlencode($product->name.' '.url()->current()) }}" target="_blank" style="color:#25D366;text-decoration:none;">💬 {{ __('product_wa_share') }}</a>
       </div>
     </div>
   </div>
@@ -185,29 +190,33 @@
   {{-- Tabs: Description | Specs | Reviews --}}
   <div class="product-tabs" style="margin-top:48px;">
     <div style="display:flex;gap:0;border-bottom:2px solid #E5E7EB;margin-bottom:32px;">
-      <button class="tab-btn active" onclick="showTab('desc',this)" style="padding:12px 28px;background:none;border:none;border-bottom:3px solid #1B3B8C;font-size:15px;font-weight:600;color:#1B3B8C;cursor:pointer;margin-bottom:-2px;">الوصف</button>
-      <button class="tab-btn" onclick="showTab('specs',this)" style="padding:12px 28px;background:none;border:none;border-bottom:3px solid transparent;font-size:15px;color:#6B7280;cursor:pointer;margin-bottom:-2px;">المواصفات</button>
-      <button class="tab-btn" onclick="showTab('reviews',this)" style="padding:12px 28px;background:none;border:none;border-bottom:3px solid transparent;font-size:15px;color:#6B7280;cursor:pointer;margin-bottom:-2px;">التقييمات ({{ $product->reviews_count ?? 0 }})</button>
+      <button class="tab-btn active" onclick="showTab('desc',this)" style="padding:12px 28px;background:none;border:none;border-bottom:3px solid #1B3B8C;font-size:15px;font-weight:600;color:#1B3B8C;cursor:pointer;margin-bottom:-2px;">{{ __('product_description') }}</button>
+      <button class="tab-btn" onclick="showTab('specs',this)" style="padding:12px 28px;background:none;border:none;border-bottom:3px solid transparent;font-size:15px;color:#6B7280;cursor:pointer;margin-bottom:-2px;">{{ __('product_specifications') }}</button>
+      <button class="tab-btn" onclick="showTab('reviews',this)" style="padding:12px 28px;background:none;border:none;border-bottom:3px solid transparent;font-size:15px;color:#6B7280;cursor:pointer;margin-bottom:-2px;">{{ __('product_reviews') }} ({{ $product->reviews_count ?? 0 }})</button>
     </div>
 
     {{-- Description tab --}}
     <div id="tab-desc" class="tab-content">
-      @if($product->description_ar)
+      @php
+        $locale = app()->getLocale();
+        $fullDesc = $product->{'description_'.$locale} ?: $product->description_ar;
+      @endphp
+      @if($fullDesc)
         <div style="color:#4B5563;line-height:1.9;font-size:15px;">
-          {!! nl2br(e($product->description_ar)) !!}
+          {!! $fullDesc !!}
         </div>
       @else
-        <p style="color:#9CA3AF;">لا يوجد وصف لهذا المنتج.</p>
+        <p style="color:#9CA3AF;">{{ __('product_no_description') }}</p>
       @endif
     </div>
 
     {{-- Specs tab --}}
     <div id="tab-specs" class="tab-content" style="display:none;">
       <table style="width:100%;border-collapse:collapse;font-size:14px;">
-        @if($product->sku)<tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:12px;color:#6B7280;width:200px;">الرمز</td><td style="padding:12px;font-weight:500;">{{ $product->sku }}</td></tr>@endif
-        @if($product->brand)<tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:12px;color:#6B7280;">الماركة</td><td style="padding:12px;font-weight:500;">{{ $product->brand->name }}</td></tr>@endif
-        @if($product->category)<tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:12px;color:#6B7280;">الفئة</td><td style="padding:12px;font-weight:500;">{{ $product->category->name_ar }}</td></tr>@endif
-        <tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:12px;color:#6B7280;">الحالة</td><td style="padding:12px;font-weight:500;">{{ $product->is_in_stock ? 'متوفر' : 'نفد المخزون' }}</td></tr>
+        @if($product->sku)<tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:12px;color:#6B7280;width:200px;">{{ __('product_sku_label') }}</td><td style="padding:12px;font-weight:500;">{{ $product->sku }}</td></tr>@endif
+        @if($product->brand)<tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:12px;color:#6B7280;">{{ __('product_brand_label') }}</td><td style="padding:12px;font-weight:500;">{{ $product->brand->name }}</td></tr>@endif
+        @if($product->category)<tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:12px;color:#6B7280;">{{ __('product_category_label') }}</td><td style="padding:12px;font-weight:500;">{{ $product->category->name }}</td></tr>@endif
+        <tr style="border-bottom:1px solid #E5E7EB;"><td style="padding:12px;color:#6B7280;">{{ __('product_status_label') }}</td><td style="padding:12px;font-weight:500;">{{ $product->is_in_stock ? __('in_stock') : __('out_of_stock') }}</td></tr>
       </table>
     </div>
 
@@ -235,17 +244,17 @@
           @endforeach
         </div>
       @else
-        <p style="color:#9CA3AF;text-align:center;padding:40px 0;">لا توجد تقييمات بعد. كن أول من يقيّم هذا المنتج!</p>
+        <p style="color:#9CA3AF;text-align:center;padding:40px 0;">{{ __('product_no_reviews') }}</p>
       @endif
 
       {{-- Add review form --}}
       @auth
         <div style="margin-top:32px;background:#F9FAFB;border-radius:16px;padding:24px;">
-          <h4 style="color:#1B3B8C;margin:0 0 20px;">أضف تقييمك</h4>
+          <h4 style="color:#1B3B8C;margin:0 0 20px;">{{ __('product_add_review') }}</h4>
           <form action="{{ route('products.review', $product->slug) }}" method="POST">
             @csrf
             <div style="margin-bottom:16px;">
-              <label style="font-size:14px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">التقييم</label>
+              <label style="font-size:14px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">{{ __('product_reviews') }}</label>
               <div class="star-rating-input" style="display:flex;gap:8px;font-size:28px;">
                 @for($i=1;$i<=5;$i++)
                   <label style="cursor:pointer;">
@@ -256,15 +265,15 @@
               </div>
             </div>
             <div style="margin-bottom:16px;">
-              <label style="font-size:14px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">التعليق (اختياري)</label>
-              <textarea name="comment" rows="4" style="width:100%;padding:12px;border:1px solid #E5E7EB;border-radius:10px;font-family:inherit;font-size:14px;resize:vertical;" placeholder="اكتب تجربتك مع المنتج..."></textarea>
+              <label style="font-size:14px;font-weight:600;color:#374151;display:block;margin-bottom:8px;">{{ __('product_review_comment') }}</label>
+              <textarea name="comment" rows="4" style="width:100%;padding:12px;border:1px solid #E5E7EB;border-radius:10px;font-family:inherit;font-size:14px;resize:vertical;" placeholder="{{ __('product_review_placeholder') }}"></textarea>
             </div>
-            <button type="submit" class="btn btn-blue" style="padding:12px 28px;">إرسال التقييم</button>
+            <button type="submit" class="btn btn-blue" style="padding:12px 28px;">{{ __('product_review_submit') }}</button>
           </form>
         </div>
       @else
         <div style="text-align:center;padding:24px;background:#F9FAFB;border-radius:12px;margin-top:20px;">
-          <a href="{{ route('login') }}" class="btn btn-blue" style="padding:12px 28px;">سجل دخول لإضافة تقييم</a>
+          <a href="{{ route('login') }}" class="btn btn-blue" style="padding:12px 28px;">{{ __('product_login_to_review') }}</a>
         </div>
       @endauth
     </div>
@@ -274,7 +283,7 @@
   @if($relatedProducts && $relatedProducts->count())
     <div style="margin-top:56px;">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
-        <h2 style="font-size:1.5rem;font-weight:700;color:#1B3B8C;margin:0;">منتجات مشابهة</h2>
+        <h2 style="font-size:1.5rem;font-weight:700;color:#1B3B8C;margin:0;">{{ __('product_similar') }}</h2>
         @if($product->category)
           <a href="{{ route('products.category', $product->category->slug) }}" style="color:#E8711A;font-weight:600;text-decoration:none;">عرض الكل ›</a>
         @endif
