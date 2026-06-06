@@ -237,15 +237,32 @@ class OrderResource extends Resource
                 Infolists\Components\RepeatableEntry::make('items')
                     ->label('')
                     ->schema([
-                        Infolists\Components\Grid::make(5)->schema([
+                        Infolists\Components\Grid::make(6)->schema([
+                            // ── الصورة ──────────────────────────────
+                            Infolists\Components\ImageEntry::make('product_image')
+                                ->label('')
+                                ->disk('public')
+                                ->height(56)
+                                ->width(56)
+                                ->extraImgAttributes([
+                                    'style' => 'border-radius:10px;object-fit:cover;border:1px solid #E5E7EB;',
+                                ])
+                                ->defaultImageUrl(fn ($record) =>
+                                    $record->product?->main_image
+                                        ? asset('storage/' . $record->product->main_image)
+                                        : null
+                                ),
+                            // ── اسم المنتج ───────────────────────────
                             Infolists\Components\TextEntry::make('product_name')
                                 ->label('المنتج')
                                 ->weight('bold'),
+                            // ── القسم ────────────────────────────────
                             Infolists\Components\TextEntry::make('product.category.name_ar')
                                 ->label('القسم')
                                 ->badge()
                                 ->color('primary')
                                 ->placeholder('—'),
+                            // ── الكمية / السعر / الإجمالي ────────────
                             Infolists\Components\TextEntry::make('quantity')->label('الكمية'),
                             Infolists\Components\TextEntry::make('price')->label('السعر')->money('ILS'),
                             Infolists\Components\TextEntry::make('total')->label('الإجمالي')->money('ILS')->weight('bold'),
@@ -385,19 +402,29 @@ class OrderResource extends Resource
                         );
                     }),
 
-                // ── المنتجات (أيقونات مضغوطة) ──────────────────────
+                // ── المنتجات (صور مصغرة) ───────────────────────────
                 Tables\Columns\TextColumn::make('products_preview')
                     ->label('المنتجات')
                     ->state(function ($record) {
-                        $count = $record->items()->count();
-                        $items = $record->items()->limit(2)->get();
-                        $bgs   = ['linear-gradient(135deg,#FFF0E8,#FFE0CC)','linear-gradient(135deg,#E8F0FF,#D0DFFF)'];
-                        $html  = '<div style="display:flex;gap:3px;align-items:center;">';
-                        foreach ($items as $i => $it) {
-                            $html .= '<div style="width:26px;height:26px;border-radius:7px;background:'.$bgs[$i % 2].';display:flex;align-items:center;justify-content:center;font-size:13px;">🛍️</div>';
+                        $items = $record->items;          // eager-loaded via getEloquentQuery()
+                        $count = $items->count();
+                        $shown = $items->take(3);
+                        $html  = '<div style="display:flex;gap:4px;align-items:center;">';
+                        foreach ($shown as $i => $it) {
+                            if ($it->product_image) {
+                                $url = str_starts_with($it->product_image, 'http')
+                                    ? $it->product_image
+                                    : asset('storage/' . $it->product_image);
+                                $html .= '<img src="'.e($url).'" '
+                                    . 'style="width:32px;height:32px;border-radius:8px;object-fit:cover;border:1px solid #E5E7EB;" '
+                                    . 'onerror="this.style.display=\'none\'" />';
+                            } else {
+                                $bgs = ['linear-gradient(135deg,#FFF0E8,#FFE0CC)','linear-gradient(135deg,#E8F0FF,#D0DFFF)','linear-gradient(135deg,#F0FDF4,#DCFCE7)'];
+                                $html .= '<div style="width:32px;height:32px;border-radius:8px;background:'.$bgs[$i % 3].';display:flex;align-items:center;justify-content:center;font-size:14px;">🛍️</div>';
+                            }
                         }
-                        if ($count > 2) {
-                            $html .= '<div style="width:26px;height:26px;border-radius:7px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#64748B;">+'.($count-2).'</div>';
+                        if ($count > 3) {
+                            $html .= '<div style="width:32px;height:32px;border-radius:8px;background:#F1F5F9;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#64748B;">+'  .($count-3).'</div>';
                         }
                         $html .= '</div>';
                         return new HtmlString($html);
@@ -558,7 +585,7 @@ class OrderResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         return parent::getEloquentQuery()
-            ->with(['items.product.category']);
+            ->with(['items', 'items.product:id,name_ar,main_image,category_id', 'items.product.category:id,name_ar']);
     }
 
     public static function getPages(): array
