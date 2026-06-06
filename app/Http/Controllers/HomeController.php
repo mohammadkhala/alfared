@@ -86,6 +86,19 @@ class HomeController extends Controller
         ));
     }
 
+    // ── All Categories Page ───────────────────────────────────────────────────
+
+    public function categories()
+    {
+        $categories = Category::where('is_active', true)
+            ->whereNull('parent_id')
+            ->withCount(['products' => fn($q) => $q->where('is_active', true)])
+            ->orderBy('sort_order')
+            ->get();
+
+        return view('categories.index', compact('categories'));
+    }
+
     // ── Flash sale helpers ────────────────────────────────────────────────────
 
     private function activeFlashSale(): ?FlashSale

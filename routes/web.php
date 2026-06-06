@@ -84,6 +84,7 @@ Route::get('admin-api/latest-notification', function () {
 
 // ── Store Pages ──
 Route::get('/', [HomeController::class, 'index'])->name('home');
+Route::get('/categories', [HomeController::class, 'categories'])->name('categories.index');
 Route::get('/products', [ProductController::class, 'index'])->name('products.index');
 Route::get('/search', [ProductController::class, 'search'])->name('products.search');
 Route::get('/category/{slug}', [ProductController::class, 'category'])->name('products.category');
