@@ -61,7 +61,7 @@
 
 <div class="ls faq-item" onclick="this.classList.toggle('open')">
   <div class="ls-head"><span class="ls-head-icon">❓</span><h2>كيف أرجع منتجاً؟</h2><span class="faq-arrow">▼</span></div>
-  <div class="ls-body"><p>تواصل معنا خلال 7 أيام من الاستلام عبر واتساب مع صور للمنتج. راجع <a href="{{ route('returns') }}" style="color:var(--orange);">سياسة الإرجاع الكاملة</a>.</p></div>
+  <div class="ls-body"><p>تواصل معنا خلال 3 أيام من الاستلام عبر واتساب مع صور للمنتج. راجع <a href="{{ route('returns') }}" style="color:var(--orange);">سياسة الإرجاع الكاملة</a>.</p></div>
 </div>
 
 <div class="ls faq-item" onclick="this.classList.toggle('open')">
