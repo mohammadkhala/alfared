@@ -237,8 +237,15 @@ class OrderResource extends Resource
                 Infolists\Components\RepeatableEntry::make('items')
                     ->label('')
                     ->schema([
-                        Infolists\Components\Grid::make(4)->schema([
-                            Infolists\Components\TextEntry::make('product_name')->label('المنتج')->weight('bold'),
+                        Infolists\Components\Grid::make(5)->schema([
+                            Infolists\Components\TextEntry::make('product_name')
+                                ->label('المنتج')
+                                ->weight('bold'),
+                            Infolists\Components\TextEntry::make('product.category.name_ar')
+                                ->label('القسم')
+                                ->badge()
+                                ->color('primary')
+                                ->placeholder('—'),
                             Infolists\Components\TextEntry::make('quantity')->label('الكمية'),
                             Infolists\Components\TextEntry::make('price')->label('السعر')->money('ILS'),
                             Infolists\Components\TextEntry::make('total')->label('الإجمالي')->money('ILS')->weight('bold'),
@@ -426,6 +433,23 @@ class OrderResource extends Resource
                         );
                     }),
 
+                // ── الأقسام المطلوبة ──────────────────────────────────
+                Tables\Columns\TextColumn::make('order_categories')
+                    ->label('الأقسام')
+                    ->state(function ($record) {
+                        return $record->items
+                            ->load('product.category')
+                            ->pluck('product.category.name_ar')
+                            ->filter()
+                            ->unique()
+                            ->values()
+                            ->implode('، ');
+                    })
+                    ->badge()
+                    ->color('primary')
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: false),
+
                 // ── المنطقة (مخفية افتراضياً) ────────────────────────
                 Tables\Columns\TextColumn::make('city')
                     ->label('المنطقة')
@@ -529,6 +553,12 @@ class OrderResource extends Resource
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
+    }
+
+    public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return parent::getEloquentQuery()
+            ->with(['items.product.category']);
     }
 
     public static function getPages(): array

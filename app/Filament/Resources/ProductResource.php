@@ -138,7 +138,11 @@ class ProductResource extends Resource
 
                 Forms\Components\Tabs\Tab::make('الألوان / المقاسات')->schema([
                     Forms\Components\Repeater::make('variants')
-                        ->label('المتغيرات')->relationship('variants')
+                        ->label('المتغيرات (اختياري)')
+                        ->relationship('variants')
+                        ->defaultItems(0)
+                        ->addActionLabel('+ إضافة متغير')
+                        ->helperText('اترك فارغاً إذا لم يكن للمنتج ألوان أو مقاسات مختلفة')
                         ->schema([
                             Forms\Components\Select::make('type')->label('النوع')
                                 ->options(['color'=>'لون','size'=>'مقاس','volume'=>'حجم'])->required(),
