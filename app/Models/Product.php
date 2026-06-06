@@ -36,6 +36,19 @@ class Product extends Model
     {
         parent::boot();
         static::creating(fn($m) => $m->slug ??= Str::slug($m->name_ar));
+
+        // ── Auto-translate to EN + HE after save ──────────────────────────
+        // Runs AFTER the HTTP response is sent (dispatchAfterResponse)
+        // so the admin doesn't wait for translation to complete.
+        static::saved(function (Product $product) {
+            $arChanged = $product->wasChanged('name_ar')
+                      || $product->wasChanged('description_ar')
+                      || $product->wasRecentlyCreated;
+
+            if ($arChanged) {
+                \App\Jobs\TranslateProductJob::dispatchAfterResponse($product->id);
+            }
+        });
     }
 
     /* ── Relations ── */

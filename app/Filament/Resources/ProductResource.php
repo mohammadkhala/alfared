@@ -35,31 +35,20 @@ class ProductResource extends Resource
 
                 Forms\Components\Tabs\Tab::make('المعلومات الأساسية')->schema([
 
-                    // ── أسماء المنتج بالثلاث لغات ────────────────────────
-                    Forms\Components\Grid::make(3)->schema([
-                        Forms\Components\TextInput::make('name_ar')
-                            ->label('اسم المنتج (عربي) *')
-                            ->required()->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function ($state, Forms\Set $set, $record) {
-                                if (!$record) {
-                                    $base = \Illuminate\Support\Str::slug($state);
+                    Forms\Components\TextInput::make('name_ar')
+                        ->label('اسم المنتج')
+                        ->required()->maxLength(255)
+                        ->live(onBlur: true)
+                        ->afterStateUpdated(function ($state, Forms\Set $set, $record) {
+                            if (!$record) {
+                                $base = \Illuminate\Support\Str::slug($state);
+                                $slug = $base . '-' . rand(100, 999);
+                                while (\App\Models\Product::where('slug', $slug)->exists()) {
                                     $slug = $base . '-' . rand(100, 999);
-                                    while (\App\Models\Product::where('slug', $slug)->exists()) {
-                                        $slug = $base . '-' . rand(100, 999);
-                                    }
-                                    $set('slug', $slug);
                                 }
-                            }),
-                        Forms\Components\TextInput::make('name_en')
-                            ->label('اسم المنتج (إنجليزي)')
-                            ->maxLength(255)
-                            ->helperText('يُملأ تلقائياً عبر زر الترجمة'),
-                        Forms\Components\TextInput::make('name_he')
-                            ->label('اسم المنتج (عبري)')
-                            ->maxLength(255)
-                            ->helperText('يُملأ تلقائياً عبر زر الترجمة'),
-                    ]),
+                                $set('slug', $slug);
+                            }
+                        }),
 
                     Forms\Components\TextInput::make('slug')
                         ->label('الرابط (Slug)')
@@ -79,86 +68,13 @@ class ProductResource extends Resource
                     ]),
 
                     Forms\Components\Textarea::make('short_description')
-                        ->label('وصف قصير (عربي)')->rows(2)->maxLength(500),
+                        ->label('وصف قصير')->rows(2)->maxLength(500),
 
-                    // ── الوصف الكامل عربي ─────────────────────────────────
                     Forms\Components\RichEditor::make('description_ar')
-                        ->label('الوصف الكامل (عربي)')
+                        ->label('الوصف الكامل')
                         ->toolbarButtons(['bold','italic','bulletList','orderedList','link'])
+                        ->helperText('🌐 تتم ترجمة الاسم والوصف تلقائياً عند الحفظ')
                         ->columnSpanFull(),
-
-                    // ── زر الترجمة التلقائية ──────────────────────────────
-                    Forms\Components\Actions::make([
-                        Forms\Components\Actions\Action::make('auto_translate')
-                            ->label('🌐 ترجم تلقائياً ← إنجليزي + عبري')
-                            ->color('info')
-                            ->icon('heroicon-o-language')
-                            ->requiresConfirmation()
-                            ->modalHeading('ترجمة تلقائية للمنتج')
-                            ->modalDescription('سيتم ترجمة الاسم والوصف العربي إلى الإنجليزية والعبرية. أي نص مكتوب مسبقاً في حقول اللغتين سيُستبدل.')
-                            ->modalSubmitActionLabel('ترجم الآن')
-                            ->action(function (Forms\Get $get, Forms\Set $set) {
-                                $translator = app(\App\Services\TranslationService::class);
-
-                                $nameAr = trim($get('name_ar') ?? '');
-                                $descAr = trim(strip_tags($get('description_ar') ?? ''));
-
-                                $errors = [];
-
-                                // ترجمة الاسم
-                                if ($nameAr !== '') {
-                                    $nameEn = $translator->translate($nameAr, 'ar', 'en');
-                                    $nameHe = $translator->translate($nameAr, 'ar', 'he');
-                                    if ($nameEn) $set('name_en', $nameEn);
-                                    else         $errors[] = 'الاسم → إنجليزي';
-                                    if ($nameHe) $set('name_he', $nameHe);
-                                    else         $errors[] = 'الاسم → عبري';
-                                }
-
-                                // ترجمة الوصف الكامل
-                                if ($descAr !== '') {
-                                    $descEn = $translator->translate($descAr, 'ar', 'en');
-                                    $descHe = $translator->translate($descAr, 'ar', 'he');
-                                    if ($descEn) $set('description_en', '<p>' . htmlspecialchars($descEn, ENT_QUOTES) . '</p>');
-                                    else         $errors[] = 'الوصف → إنجليزي';
-                                    if ($descHe) $set('description_he', '<p>' . htmlspecialchars($descHe, ENT_QUOTES) . '</p>');
-                                    else         $errors[] = 'الوصف → عبري';
-                                }
-
-                                if (empty($errors)) {
-                                    \Filament\Notifications\Notification::make()
-                                        ->title('تمت الترجمة بنجاح ✅')
-                                        ->body('تم ملء حقول الإنجليزية والعبرية. راجعها قبل الحفظ.')
-                                        ->success()
-                                        ->duration(6000)
-                                        ->send();
-                                } else {
-                                    \Filament\Notifications\Notification::make()
-                                        ->title('الترجمة اكتملت جزئياً ⚠️')
-                                        ->body('فشل: ' . implode('، ', $errors) . '. تحقق من الاتصال.')
-                                        ->warning()
-                                        ->duration(8000)
-                                        ->send();
-                                }
-                            })
-                            ->visible(fn(Forms\Get $get) => filled(trim($get('name_ar') ?? ''))),
-                    ])->columnSpanFull(),
-
-                    // ── الوصف الكامل بلغات أخرى (تُملأ تلقائياً) ──────────
-                    Forms\Components\Section::make('الوصف بلغات أخرى')
-                        ->description('تُملأ تلقائياً بالضغط على زر الترجمة أعلاه — يمكنك التعديل يدوياً')
-                        ->collapsible()
-                        ->collapsed(fn($record) => !$record?->description_en && !$record?->description_he)
-                        ->schema([
-                            Forms\Components\RichEditor::make('description_en')
-                                ->label('الوصف الكامل (إنجليزي)')
-                                ->toolbarButtons(['bold','italic','bulletList','orderedList','link'])
-                                ->columnSpanFull(),
-                            Forms\Components\RichEditor::make('description_he')
-                                ->label('الوصف الكامل (عبري)')
-                                ->toolbarButtons(['bold','italic','bulletList','orderedList','link'])
-                                ->columnSpanFull(),
-                        ]),
                 ]),
 
                 Forms\Components\Tabs\Tab::make('الأسعار والمخزون')->schema([
