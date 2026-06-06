@@ -286,15 +286,13 @@
     #aImgOverlay .a-zoom-close:hover { background: rgba(255,255,255,.28); }
 
     /* make Filament image entries look clickable */
-    .fi-in-image-entry img,
     .fi-in-image img {
       cursor: zoom-in !important;
       transition: transform .18s, box-shadow .18s;
     }
-    .fi-in-image-entry img:hover,
     .fi-in-image img:hover {
-      transform: scale(1.06);
-      box-shadow: 0 6px 24px rgba(0,0,0,.22);
+      transform: scale(1.08);
+      box-shadow: 0 8px 28px rgba(0,0,0,.25);
     }
   `;
   document.head.appendChild(style);
@@ -331,14 +329,22 @@
     });
   }
 
-  // ── event delegation: catch clicks on any fi-image-entry img ─────────────
+  // ── event delegation: capture phase fires BEFORE Livewire/Alpine handlers ──
   document.addEventListener('click', function (e) {
-    const img = e.target.closest(
-      '.fi-in-image-entry img, .fi-in-image img'
-    );
-    if (!img) return;
+    const target = e.target;
+
+    // Must be an <img> element
+    if (!target || target.tagName !== 'IMG') return;
+
+    // Must live inside a Filament image entry (.fi-in-image)
+    if (!target.closest('.fi-in-image')) return;
+
+    // Skip tiny placeholder images (no useful src)
+    const src = target.currentSrc || target.src;
+    if (!src || src.endsWith('placeholder.svg') || src === window.location.href) return;
+
     e.preventDefault();
-    e.stopPropagation();
-    openLightbox(img.src, img.alt);
-  });
+    e.stopImmediatePropagation();   // prevent all other handlers (Livewire etc.)
+    openLightbox(src, target.alt);
+  }, true);  // ← capture phase: fires before bubble-phase handlers
 })();

@@ -242,15 +242,17 @@ class OrderResource extends Resource
                             Infolists\Components\ImageEntry::make('product_image')
                                 ->label('')
                                 ->disk('public')
+                                ->checkFileExistence(false)
                                 ->height(56)
                                 ->width(56)
                                 ->extraImgAttributes([
-                                    'style' => 'border-radius:10px;object-fit:cover;border:1px solid #E5E7EB;',
+                                    'style'   => 'border-radius:10px;object-fit:cover;border:1px solid #E5E7EB;cursor:zoom-in;',
+                                    'onerror' => "this.src='/images/placeholder.svg';this.onerror=null;",
                                 ])
-                                ->defaultImageUrl(fn ($record) =>
-                                    $record->product?->main_image
+                                ->defaultImageUrl(fn ($state, $record) =>
+                                    $record instanceof \App\Models\OrderItem && $record->product?->main_image
                                         ? asset('storage/' . $record->product->main_image)
-                                        : null
+                                        : asset('images/placeholder.svg')
                                 ),
                             // ── اسم المنتج ───────────────────────────
                             Infolists\Components\TextEntry::make('product_name')
