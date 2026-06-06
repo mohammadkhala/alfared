@@ -139,7 +139,13 @@ class UserResource extends Resource
                         if ($record->role === User::ROLE_ADMIN) {
                             return 'جميع الصلاحيات';
                         }
-                        $perms = $state ?? User::$defaultStaffPermissions;
+                        // Normalize: may arrive as JSON string, array, or null
+                        if (is_string($state) && $state !== '') {
+                            $state = json_decode($state, true) ?? [];
+                        }
+                        $perms = (is_array($state) && count($state) > 0)
+                            ? $state
+                            : User::$defaultStaffPermissions;
                         return count($perms) . ' صلاحية';
                     })
                     ->badge()
