@@ -94,7 +94,7 @@
         <p>{{ __('section_categories_sub') }}</p>
         <div class="title-line"></div>
       </div>
-      <a href="{{ route('products.index') }}" class="see-all">{{ __('see_all') }}</a>
+      <a href="{{ route('categories.index') }}" class="see-all">{{ __('see_all') }}</a>
     </div>
     @php
       $catFallbackImages = [
