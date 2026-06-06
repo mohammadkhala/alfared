@@ -285,12 +285,14 @@
     }
     #aImgOverlay .a-zoom-close:hover { background: rgba(255,255,255,.28); }
 
-    /* make Filament image entries look clickable */
-    .fi-in-image img {
+    /* make Filament image entries/columns look clickable */
+    .fi-in-image img,
+    .fi-ta-image img {
       cursor: zoom-in !important;
       transition: transform .18s, box-shadow .18s;
     }
-    .fi-in-image img:hover {
+    .fi-in-image img:hover,
+    .fi-ta-image img:hover {
       transform: scale(1.08);
       box-shadow: 0 8px 28px rgba(0,0,0,.25);
     }
@@ -336,8 +338,8 @@
     // Must be an <img> element
     if (!target || target.tagName !== 'IMG') return;
 
-    // Must live inside a Filament image entry (.fi-in-image)
-    if (!target.closest('.fi-in-image')) return;
+    // Must live inside a Filament image entry (.fi-in-image) or table column (.fi-ta-image)
+    if (!target.closest('.fi-in-image, .fi-ta-image')) return;
 
     // Skip tiny placeholder images (no useful src)
     const src = target.currentSrc || target.src;
