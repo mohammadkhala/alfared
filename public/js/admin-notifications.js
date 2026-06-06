@@ -241,3 +241,104 @@
   `;
   document.head.appendChild(cursorStyle);
 })();
+
+// ════════════════════════════════════════════════════════════════════════════
+//  Image Zoom Lightbox — click any product image in the admin to enlarge it
+// ════════════════════════════════════════════════════════════════════════════
+(function () {
+  'use strict';
+
+  // ── inject CSS once ───────────────────────────────────────────────────────
+  const style = document.createElement('style');
+  style.textContent = `
+    #aImgOverlay {
+      position: fixed; inset: 0; z-index: 99999;
+      background: rgba(0, 0, 0, .82);
+      display: flex; align-items: center; justify-content: center;
+      cursor: zoom-out;
+      animation: aOverlayIn .18s ease-out;
+    }
+    @keyframes aOverlayIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+    #aImgOverlay img {
+      max-width: 92vw; max-height: 88vh;
+      border-radius: 14px;
+      box-shadow: 0 30px 80px rgba(0, 0, 0, .7);
+      animation: aImgPop .22s cubic-bezier(.34,1.56,.64,1);
+      pointer-events: none;
+      user-select: none;
+    }
+    @keyframes aImgPop {
+      from { transform: scale(.7); opacity: 0; }
+      to   { transform: scale(1);  opacity: 1; }
+    }
+    #aImgOverlay .a-zoom-close {
+      position: absolute; top: 18px; left: 18px;
+      width: 38px; height: 38px; border-radius: 50%;
+      background: rgba(255,255,255,.15);
+      border: none; color: #fff; font-size: 20px; line-height: 1;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+      pointer-events: auto;
+    }
+    #aImgOverlay .a-zoom-close:hover { background: rgba(255,255,255,.28); }
+
+    /* make Filament image entries look clickable */
+    .fi-in-image-entry img,
+    .fi-in-image img {
+      cursor: zoom-in !important;
+      transition: transform .18s, box-shadow .18s;
+    }
+    .fi-in-image-entry img:hover,
+    .fi-in-image img:hover {
+      transform: scale(1.06);
+      box-shadow: 0 6px 24px rgba(0,0,0,.22);
+    }
+  `;
+  document.head.appendChild(style);
+
+  // ── open lightbox ─────────────────────────────────────────────────────────
+  function openLightbox(src, alt) {
+    if (document.getElementById('aImgOverlay')) return;   // already open
+
+    const overlay = document.createElement('div');
+    overlay.id = 'aImgOverlay';
+
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = alt || '';
+
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'a-zoom-close';
+    closeBtn.innerHTML = '✕';
+    closeBtn.setAttribute('aria-label', 'إغلاق');
+
+    overlay.appendChild(img);
+    overlay.appendChild(closeBtn);
+    document.body.appendChild(overlay);
+
+    function close() {
+      overlay.style.animation = 'aOverlayIn .15s ease-out reverse forwards';
+      setTimeout(() => overlay.remove(), 150);
+    }
+
+    overlay.addEventListener('click', close);
+    closeBtn.addEventListener('click', (e) => { e.stopPropagation(); close(); });
+    document.addEventListener('keydown', function esc(e) {
+      if (e.key === 'Escape') { close(); document.removeEventListener('keydown', esc); }
+    });
+  }
+
+  // ── event delegation: catch clicks on any fi-image-entry img ─────────────
+  document.addEventListener('click', function (e) {
+    const img = e.target.closest(
+      '.fi-in-image-entry img, .fi-in-image img'
+    );
+    if (!img) return;
+    e.preventDefault();
+    e.stopPropagation();
+    openLightbox(img.src, img.alt);
+  });
+})();
