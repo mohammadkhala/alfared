@@ -25,8 +25,8 @@
               @error('name')<span class="form-error">{{ $message }}</span>@enderror
             </div>
             <div class="form-group">
-              <label>البريد الإلكتروني</label>
-              <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" required/>
+              <label>البريد الإلكتروني <span style="color:#9CA3AF;font-weight:400;font-size:12px;">(اختياري)</span></label>
+              <input type="email" name="email" value="{{ old('email', auth()->user()->email) }}" placeholder="email@example.com"/>
               @error('email')<span class="form-error">{{ $message }}</span>@enderror
             </div>
             <div class="form-group">

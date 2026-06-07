@@ -164,7 +164,7 @@ class PhoneAuthController extends Controller
         $user = User::create([
             'name'     => $request->name,
             'phone'    => $phone,
-            'email'    => $request->email ?: ($phone . '@phone.alfared.ps'),
+            'email'    => $request->email ?: null,
             'password' => Hash::make(Str::random(16)), // random password (phone login only)
             'role'     => 'customer',
         ]);

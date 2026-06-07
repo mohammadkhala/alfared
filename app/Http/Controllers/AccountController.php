@@ -66,7 +66,7 @@ class AccountController extends Controller
 
         $request->validate([
             'name'  => 'required|string|max:100',
-            'email' => 'required|email|unique:users,email,' . $user->id,
+            'email' => 'nullable|email|unique:users,email,' . $user->id,
             'phone' => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/'],
         ], [
             'phone.regex' => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972 ويتبعه 8 إلى 10 أرقام.',
@@ -74,7 +74,7 @@ class AccountController extends Controller
 
         $data = [
             'name'  => $request->name,
-            'email' => $request->email,
+            'email' => $request->filled('email') ? $request->email : null,
             'phone' => $request->phone,
         ];
 
@@ -235,7 +235,7 @@ class AccountController extends Controller
         $user = User::create([
             'name'     => session('reg_name'),
             'phone'    => $phone,
-            'email'    => session('reg_email') ?: ($phone . '@phone.alfared.ps'),
+            'email'    => session('reg_email') ?: null,
             'password' => Hash::make($rawPassword),
             'role'     => 'customer',
         ]);
