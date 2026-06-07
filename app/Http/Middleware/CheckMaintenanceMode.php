@@ -11,8 +11,8 @@ class CheckMaintenanceMode
 {
     public function handle(Request $request, Closure $next): Response
     {
-        // Always allow authenticated (admin) users through
-        if (auth()->check()) {
+        // Only allow admin/staff users through — regular customers are blocked too
+        if (auth()->check() && in_array(auth()->user()->role, ['admin', 'staff'])) {
             return $next($request);
         }
 
