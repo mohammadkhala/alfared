@@ -111,7 +111,7 @@ class UserResource extends Resource
                     ->searchable()
                     ->sortable()
                     ->weight('bold')
-                    ->description(fn($record) => $record->email),
+                    ->description(fn($record) => $record->email ?: '—'),
 
                 Tables\Columns\TextColumn::make('phone')
                     ->label('الهاتف')
