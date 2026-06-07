@@ -142,16 +142,16 @@ Route::get('/faq',            [PageController::class, 'faq'])->name('faq');
 // ── Wishlist ──
 Route::post('/wishlist/toggle/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 
-// ── Auth (email/password) ──
+// ── Auth (phone + password) ──
 Route::middleware('guest')->group(function () {
-    Route::get('/login', [AccountController::class, 'loginForm'])->name('login');
-    Route::post('/login', [AccountController::class, 'login'])
-        ->middleware('throttle:5,1')
-        ->name('login.submit');
-    Route::get('/register', [AccountController::class, 'registerForm'])->name('register');
-    Route::post('/register', [AccountController::class, 'register'])
-        ->middleware('throttle:3,10')
-        ->name('register.submit');
+    Route::get('/login',    [AccountController::class, 'loginForm'])->name('login');
+    Route::post('/login',   [AccountController::class, 'login'])->middleware('throttle:5,1')->name('login.submit');
+
+    Route::get('/register',          [AccountController::class, 'registerForm'])->name('register');
+    Route::post('/register',         [AccountController::class, 'register'])->middleware('throttle:3,10')->name('register.submit');
+    Route::get('/register/verify',   [AccountController::class, 'registerVerifyForm'])->name('register.verify');
+    Route::post('/register/verify',  [AccountController::class, 'registerVerify'])->middleware('throttle:10,5')->name('register.verify.submit');
+    Route::post('/register/resend',  [AccountController::class, 'registerResendOtp'])->middleware('throttle:3,10')->name('register.resend');
 });
 
 // ── Auth (phone OTP) ──

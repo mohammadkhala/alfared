@@ -1,5 +1,4 @@
 @extends('layouts.app')
-
 @section('title', 'تسجيل الدخول — أبناء الفريد')
 
 @section('content')
@@ -14,29 +13,41 @@
       <p style="color:#6B7280;margin:0;font-size:14px;">أهلاً بك في شركة أبناء الفريد</p>
     </div>
 
+    @if($errors->any())
+      <div style="background:#FEF2F2;border:1px solid #FECACA;border-radius:10px;padding:12px 16px;margin-bottom:20px;color:#DC2626;font-size:14px;">
+        {{ $errors->first() }}
+      </div>
+    @endif
+
+    @if(session('success'))
+      <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:10px;padding:12px 16px;margin-bottom:20px;color:#166534;font-size:14px;">
+        {{ session('success') }}
+      </div>
+    @endif
+
     <form action="{{ route('login.submit') }}" method="POST">
       @csrf
-      <div class="form-group" style="margin-bottom:16px;">
-        <label style="display:block;font-size:14px;font-weight:600;color:#374151;margin-bottom:6px;">البريد الإلكتروني</label>
-        <input type="email" name="email" value="{{ old('email') }}" required autofocus
-          placeholder="email@example.com"
-          style="width:100%;padding:13px 16px;border:1.5px solid {{ $errors->has('email') ? '#EF4444' : '#E5E7EB' }};border-radius:12px;font-family:inherit;font-size:15px;box-sizing:border-box;transition:border-color .2s;"
-          onfocus="this.style.borderColor='#1B3B8C'" onblur="this.style.borderColor='#E5E7EB'"/>
-        @error('email')<p style="color:#EF4444;font-size:12px;margin:4px 0 0;">{{ $message }}</p>@enderror
+
+      <div style="margin-bottom:16px;">
+        <label style="display:block;font-size:14px;font-weight:600;color:#374151;margin-bottom:6px;">رقم الهاتف</label>
+        <x-phone-input name="phone" :value="old('phone')" :required="true"/>
+        @error('phone')<p style="color:#EF4444;font-size:12px;margin:4px 0 0;">{{ $message }}</p>@enderror
       </div>
 
-      <div class="form-group" style="margin-bottom:24px;">
+      <div style="margin-bottom:24px;">
         <label style="display:block;font-size:14px;font-weight:600;color:#374151;margin-bottom:6px;">كلمة المرور</label>
-        <input type="password" name="password" required
-          placeholder="••••••••"
-          style="width:100%;padding:13px 16px;border:1.5px solid #E5E7EB;border-radius:12px;font-family:inherit;font-size:15px;box-sizing:border-box;transition:border-color .2s;"
-          onfocus="this.style.borderColor='#1B3B8C'" onblur="this.style.borderColor='#E5E7EB'"/>
+        <div style="position:relative;">
+          <input type="password" name="password" id="pwdField" required placeholder="••••••••"
+            style="width:100%;padding:13px 48px 13px 16px;border:1.5px solid #E5E7EB;border-radius:12px;font-family:inherit;font-size:15px;box-sizing:border-box;transition:border-color .2s;"
+            onfocus="this.style.borderColor='#1B3B8C'" onblur="this.style.borderColor='#E5E7EB'"/>
+          <button type="button" onclick="togglePwd()" tabindex="-1"
+            style="position:absolute;inset-inline-end:14px;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:#9CA3AF;font-size:18px;">👁</button>
+        </div>
       </div>
 
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:#4B5563;">
-          <input type="checkbox" name="remember" style="accent-color:#1B3B8C;width:16px;height:16px;"/>
-          تذكرني
+          <input type="checkbox" name="remember" style="accent-color:#1B3B8C;width:16px;height:16px;"/> تذكرني
         </label>
       </div>
 
@@ -46,14 +57,15 @@
     </form>
 
     {{-- Divider --}}
-    <div style="display:flex;align-items:center;gap:12px;margin:24px 0 20px;">
+    <div style="display:flex;align-items:center;gap:12px;margin:24px 0;">
       <div style="flex:1;height:1px;background:#E5E7EB;"></div>
       <span style="color:#9CA3AF;font-size:13px;">أو</span>
       <div style="flex:1;height:1px;background:#E5E7EB;"></div>
     </div>
 
+    {{-- OTP login --}}
     <a href="{{ route('phone-login.index') }}" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border:1.5px solid #25D366;border-radius:12px;color:#128C7E;font-weight:600;text-decoration:none;font-size:15px;background:#F0FFF4;">
-      <span style="font-size:18px;">💬</span> الدخول برقم الهاتف (واتساب)
+      <span style="font-size:18px;">💬</span> الدخول برمز واتساب (بدون كلمة مرور)
     </a>
 
     <p style="text-align:center;margin-top:20px;font-size:14px;color:#6B7280;">
@@ -62,4 +74,13 @@
     </p>
   </div>
 </div>
+
+@push('scripts')
+<script>
+function togglePwd() {
+  const f = document.getElementById('pwdField');
+  f.type = f.type === 'password' ? 'text' : 'password';
+}
+</script>
+@endpush
 @endsection
