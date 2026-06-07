@@ -45,7 +45,18 @@
       </button>
     </form>
 
-    <p style="text-align:center;margin-top:24px;font-size:14px;color:#6B7280;">
+    {{-- Divider --}}
+    <div style="display:flex;align-items:center;gap:12px;margin:24px 0 20px;">
+      <div style="flex:1;height:1px;background:#E5E7EB;"></div>
+      <span style="color:#9CA3AF;font-size:13px;">أو</span>
+      <div style="flex:1;height:1px;background:#E5E7EB;"></div>
+    </div>
+
+    <a href="{{ route('phone-login.index') }}" style="display:flex;align-items:center;justify-content:center;gap:10px;padding:13px;border:1.5px solid #25D366;border-radius:12px;color:#128C7E;font-weight:600;text-decoration:none;font-size:15px;background:#F0FFF4;">
+      <span style="font-size:18px;">💬</span> الدخول برقم الهاتف (واتساب)
+    </a>
+
+    <p style="text-align:center;margin-top:20px;font-size:14px;color:#6B7280;">
       ليس لديك حساب؟
       <a href="{{ route('register') }}" style="color:#1B3B8C;font-weight:700;text-decoration:none;">إنشاء حساب جديد</a>
     </p>

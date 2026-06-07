@@ -11,6 +11,7 @@ use App\Http\Controllers\LanguageController;
 use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\LahzaWebhookController;
+use App\Http\Controllers\PhoneAuthController;
 
 // ── Language Switch ──
 Route::get('lang/{locale}', [LanguageController::class, 'switch'])->name('lang.switch');
@@ -141,15 +142,27 @@ Route::get('/faq',            [PageController::class, 'faq'])->name('faq');
 // ── Wishlist ──
 Route::post('/wishlist/toggle/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
 
-// ── Auth ──
+// ── Auth (email/password) ──
 Route::middleware('guest')->group(function () {
     Route::get('/login', [AccountController::class, 'loginForm'])->name('login');
     Route::post('/login', [AccountController::class, 'login'])
-        ->middleware('throttle:5,1')      // 5 attempts per minute per IP
+        ->middleware('throttle:5,1')
         ->name('login.submit');
     Route::get('/register', [AccountController::class, 'registerForm'])->name('register');
     Route::post('/register', [AccountController::class, 'register'])
-        ->middleware('throttle:3,10')     // 3 registrations per 10 minutes per IP
+        ->middleware('throttle:3,10')
         ->name('register.submit');
 });
+
+// ── Auth (phone OTP) ──
+Route::middleware('guest')->prefix('phone-login')->name('phone-login.')->group(function () {
+    Route::get('/',           [PhoneAuthController::class, 'showPhoneForm'])->name('index');
+    Route::post('/send',      [PhoneAuthController::class, 'sendOtp'])->middleware('throttle:5,5')->name('send');
+    Route::get('/verify',     [PhoneAuthController::class, 'showVerifyForm'])->name('verify');
+    Route::post('/verify',    [PhoneAuthController::class, 'verifyOtp'])->middleware('throttle:10,5')->name('verify.submit');
+    Route::post('/resend',    [PhoneAuthController::class, 'resendOtp'])->middleware('throttle:3,10')->name('resend');
+    Route::get('/register',   [PhoneAuthController::class, 'showRegisterForm'])->name('register');
+    Route::post('/register',  [PhoneAuthController::class, 'completeRegistration'])->middleware('throttle:3,10')->name('register.submit');
+});
+
 Route::post('/logout', [AccountController::class, 'logout'])->name('logout')->middleware('auth');
