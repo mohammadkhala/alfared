@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use App\Models\LoyaltyTransaction;
+use App\Models\OtpCode;
 use App\Models\Wishlist;
 use App\Models\User;
+use App\Services\WaSenderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
@@ -96,6 +98,7 @@ class AccountController extends Controller
     }
 
     // ── Auth ──────────────────────────────────────────────
+
     public function loginForm()
     {
         return view('auth.login');
@@ -104,23 +107,30 @@ class AccountController extends Controller
     public function login(Request $request)
     {
         $request->validate([
-            'email'    => 'required|email',
+            'phone'    => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/'],
             'password' => 'required',
+        ], [
+            'phone.required' => 'رقم الهاتف مطلوب',
+            'phone.regex'    => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972',
+            'password.required' => 'كلمة المرور مطلوبة',
         ]);
 
-        if (Auth::attempt($request->only('email', 'password'), $request->boolean('remember'))) {
-            $request->session()->regenerate();
-            return redirect()->intended(route('account.index'))->with('success', 'أهلاً بعودتك! 👋');
+        $user = User::where('phone', $request->phone)->first();
+
+        if (! $user || ! Hash::check($request->password, $user->password)) {
+            \App\Models\FailedLogin::record($request, $request->phone, 'storefront', 'invalid_credentials');
+            return back()->withErrors([
+                'phone' => 'رقم الهاتف أو كلمة المرور غير صحيحة.',
+            ])->withInput($request->except('password'));
         }
 
-        // Log failed attempt for security audit
-        \App\Models\FailedLogin::record($request, $request->input('email'), 'storefront', 'invalid_credentials');
+        Auth::login($user, $request->boolean('remember'));
+        $request->session()->regenerate();
 
-        // Unified error message (don't reveal whether email exists)
-        return back()->withErrors([
-            'email' => 'البيانات المُدخلة غير صحيحة. حاول مرة أخرى.',
-        ])->withInput($request->except('password'));
+        return redirect()->intended(route('account.index'))->with('success', 'أهلاً بعودتك ' . $user->name . '! 👋');
     }
+
+    // ── Register: Step 1 — validate form + send OTP ───────────────────────
 
     public function registerForm()
     {
@@ -131,35 +141,149 @@ class AccountController extends Controller
     {
         $request->validate([
             'name'     => 'required|string|max:100',
-            'email'    => 'required|email|unique:users',
-            'phone'    => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/'],
+            'phone'    => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/', 'unique:users,phone'],
+            'email'    => 'nullable|email|max:191|unique:users,email',
             'password' => 'required|string|min:8|confirmed',
         ], [
-            'phone.regex' => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972 ويتبعه 8 إلى 10 أرقام.',
+            'name.required'    => 'الاسم مطلوب',
+            'phone.required'   => 'رقم الهاتف مطلوب',
+            'phone.regex'      => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972',
+            'phone.unique'     => 'رقم الهاتف مسجل مسبقاً — هل تريد تسجيل الدخول؟',
+            'email.unique'     => 'البريد الإلكتروني مسجل مسبقاً',
+            'password.min'     => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
+            'password.confirmed' => 'كلمة المرور وتأكيدها غير متطابقتين',
         ]);
+
+        // Rate limit OTP sending
+        $recentCount = OtpCode::where('phone', $request->phone)
+            ->where('created_at', '>=', now()->subMinutes(10))
+            ->count();
+
+        if ($recentCount >= 3) {
+            return back()->withErrors(['phone' => 'تم إرسال عدة رموز لهذا الرقم مؤخراً، انتظر 10 دقائق.'])->withInput();
+        }
+
+        // Save form data in session, send OTP
+        session([
+            'reg_name'     => $request->name,
+            'reg_phone'    => $request->phone,
+            'reg_email'    => $request->email,
+            'reg_password' => $request->password,
+            'reg_sent_at'  => now()->timestamp,
+        ]);
+
+        OtpCode::where('phone', $request->phone)->delete();
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        OtpCode::create(['phone' => $request->phone, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
+
+        $sent = app(WaSenderService::class)->sendOtp($request->phone, $code);
+
+        if (! $sent) {
+            return back()->withErrors(['phone' => 'فشل إرسال رمز التحقق عبر واتساب. تأكد أن رقمك مسجل على واتساب.'])->withInput();
+        }
+
+        return redirect()->route('register.verify');
+    }
+
+    // ── Register: Step 2 — OTP verification ─────────────────────────────
+
+    public function registerVerifyForm()
+    {
+        if (! session('reg_phone')) {
+            return redirect()->route('register')->withErrors(['phone' => 'ابدأ التسجيل من جديد.']);
+        }
+        return view('auth.register-verify', [
+            'phone'  => session('reg_phone'),
+            'sentAt' => session('reg_sent_at'),
+        ]);
+    }
+
+    public function registerVerify(Request $request)
+    {
+        $phone = session('reg_phone');
+        if (! $phone) {
+            return redirect()->route('register')->withErrors(['phone' => 'انتهت الجلسة، ابدأ التسجيل من جديد.']);
+        }
+
+        $request->validate([
+            'code' => ['required', 'string', 'size:6'],
+        ], [
+            'code.required' => 'أدخل رمز التحقق',
+            'code.size'     => 'الرمز يجب أن يكون 6 أرقام',
+        ]);
+
+        $otp = OtpCode::where('phone', $phone)
+            ->where('code', $request->code)
+            ->where('used', false)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (! $otp) {
+            return back()->withErrors(['code' => 'الرمز غير صحيح أو منتهي الصلاحية.']);
+        }
+
+        $otp->update(['used' => true]);
+
+        // Check again in case phone was taken during OTP wait
+        if (User::where('phone', $phone)->exists()) {
+            session()->forget(['reg_name','reg_phone','reg_email','reg_password','reg_sent_at']);
+            return redirect()->route('login')->withErrors(['phone' => 'رقم الهاتف مسجل مسبقاً، سجّل دخولك.']);
+        }
+
+        $rawPassword = session('reg_password');
 
         $user = User::create([
-            'name'     => $request->name,
-            'email'    => $request->email,
-            'phone'    => $request->phone,
-            'password' => Hash::make($request->password),
+            'name'     => session('reg_name'),
+            'phone'    => $phone,
+            'email'    => session('reg_email') ?: ($phone . '@phone.alfared.ps'),
+            'password' => Hash::make($rawPassword),
+            'role'     => 'customer',
         ]);
 
-        // ── Signup loyalty bonus ──
+        // Signup bonus
         $signupBonus = (int) \App\Models\Setting::get('signup_bonus', 0);
         if ($signupBonus > 0 && \App\Services\LoyaltyService::enabled()) {
             $user->increment('loyalty_points', $signupBonus);
             \App\Models\LoyaltyTransaction::create([
-                'user_id' => $user->id,
-                'points'  => $signupBonus,
-                'action'  => 'admin_add',
-                'note'    => 'مكافأة التسجيل (تلقائية)',
+                'user_id' => $user->id, 'points' => $signupBonus,
+                'action'  => 'admin_add', 'note' => 'مكافأة التسجيل (تلقائية)',
             ]);
         }
 
-        Auth::login($user);
+        session()->forget(['reg_name','reg_phone','reg_email','reg_password','reg_sent_at']);
+
+        Auth::login($user, true);
+        $request->session()->regenerate();
 
         return redirect()->route('account.index')->with('success', 'مرحباً بك في أبناء الفريد! 🎉');
+    }
+
+    public function registerResendOtp(Request $request)
+    {
+        $phone = session('reg_phone');
+        if (! $phone) {
+            return response()->json(['error' => 'انتهت الجلسة'], 422);
+        }
+
+        $recentCount = OtpCode::where('phone', $phone)
+            ->where('created_at', '>=', now()->subMinutes(10))
+            ->count();
+
+        if ($recentCount >= 3) {
+            return response()->json(['error' => 'تجاوزت الحد المسموح، انتظر قليلاً'], 429);
+        }
+
+        OtpCode::where('phone', $phone)->delete();
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        OtpCode::create(['phone' => $phone, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
+
+        $sent = app(WaSenderService::class)->sendOtp($phone, $code);
+        if (! $sent) {
+            return response()->json(['error' => 'فشل الإرسال'], 500);
+        }
+
+        session(['reg_sent_at' => now()->timestamp]);
+        return response()->json(['message' => 'تم إعادة الإرسال ✅']);
     }
 
     public function logout(Request $request)
