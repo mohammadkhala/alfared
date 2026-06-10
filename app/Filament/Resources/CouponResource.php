@@ -17,8 +17,8 @@ class CouponResource extends Resource
     protected static ?string $navigationLabel = 'كوبونات الخصم';
     protected static ?string $modelLabel = 'كوبون';
     protected static ?string $pluralModelLabel = 'كوبونات الخصم';
-    protected static ?string $navigationGroup = 'المتجر';
-    protected static ?int    $navigationSort  = 5;
+    protected static ?string $navigationGroup = 'التسويق';
+    protected static ?int    $navigationSort  = 3;
 
     public static function canViewAny(): bool
     {

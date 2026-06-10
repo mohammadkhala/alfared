@@ -14,12 +14,12 @@ use Filament\Tables\Table;
 class FlashSaleResource extends Resource
 {
     protected static ?string $model = FlashSale::class;
-    protected static ?string $navigationIcon  = 'heroicon-o-bolt';
-    protected static ?string $navigationLabel = 'العروض الخاصة';
+    protected static ?string $navigationIcon  = 'heroicon-o-tag';
+    protected static ?string $navigationLabel = 'عروض أسعار';
     protected static ?string $modelLabel      = 'عرض';
-    protected static ?string $pluralModelLabel = 'العروض الخاصة';
-    protected static ?string $navigationGroup = 'المتجر';
-    protected static ?int    $navigationSort  = 6;
+    protected static ?string $pluralModelLabel = 'عروض أسعار';
+    protected static ?string $navigationGroup = 'التسويق';
+    protected static ?int    $navigationSort  = 2;
 
     public static function canViewAny(): bool
     {
