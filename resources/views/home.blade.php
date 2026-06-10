@@ -70,97 +70,155 @@
   </div>
 </div>
 
-{{-- ═══════════════════ HERO BANNERS (dynamic) ═══════════════════ --}}
+{{-- ═══════════════════ PROMO POPUP BANNER ═══════════════════ --}}
 @if(isset($heroBanners) && $heroBanners->count())
-<div class="hero-banners-section" style="background:#F9FAFB;padding:24px 0 0;">
-  <div class="container">
+@php
+  $popupBanners = $heroBanners;
+  $popupKey     = 'promo_popup_' . $popupBanners->pluck('id')->sort()->implode('_');
+@endphp
 
-    @if($heroBanners->count() === 1)
-      {{-- Single banner: full width --}}
-      @php $b = $heroBanners->first(); @endphp
-      <a href="{{ $b->link ?? '#' }}" style="display:block;text-decoration:none;border-radius:20px;overflow:hidden;position:relative;box-shadow:0 8px 32px rgba(27,59,140,.12);">
+{{-- Overlay --}}
+<div id="promoPopupOverlay"
+     style="display:none;position:fixed;inset:0;background:rgba(10,18,40,.65);backdrop-filter:blur(4px);z-index:9998;align-items:center;justify-content:center;padding:20px;">
+
+  {{-- Modal box --}}
+  <div id="promoPopupBox"
+       style="position:relative;max-width:680px;width:100%;border-radius:24px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.45);transform:scale(.9) translateY(20px);opacity:0;transition:transform .4s cubic-bezier(.34,1.56,.64,1),opacity .4s ease;">
+
+    {{-- Close button --}}
+    <button onclick="closePromoPopup()"
+            style="position:absolute;top:14px;left:14px;z-index:10;width:36px;height:36px;border-radius:50%;background:rgba(0,0,0,.5);border:none;cursor:pointer;color:#fff;font-size:20px;line-height:1;display:flex;align-items:center;justify-content:center;transition:background .2s;"
+            onmouseover="this.style.background='rgba(0,0,0,.8)'"
+            onmouseout="this.style.background='rgba(0,0,0,.5)'">✕</button>
+
+    @if($popupBanners->count() === 1)
+      {{-- ── Single banner ── --}}
+      @php $b = $popupBanners->first(); @endphp
+      <a href="{{ $b->link ?? '#' }}" onclick="closePromoPopup()" style="display:block;text-decoration:none;position:relative;">
         <img src="{{ $b->image ? Storage::url($b->image) : '' }}" alt="{{ $b->title_ar }}"
-             style="width:100%;height:380px;object-fit:cover;display:block;"/>
-        <div style="position:absolute;inset:0;background:linear-gradient(to left,transparent 40%,rgba(10,20,60,.75));"></div>
-        <div style="position:absolute;top:50%;right:48px;transform:translateY(-50%);color:#fff;max-width:480px;">
+             style="width:100%;height:360px;object-fit:cover;display:block;"/>
+        <div style="position:absolute;inset:0;background:linear-gradient(to left,transparent 35%,rgba(10,20,60,.8));"></div>
+        <div style="position:absolute;top:50%;right:40px;transform:translateY(-50%);color:#fff;max-width:55%;">
           @if($b->badge_text)
-            <span style="display:inline-block;background:var(--orange, #E8711A);color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:14px;">{{ $b->badge_text }}</span>
+            <span style="display:inline-block;background:#E8711A;color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:12px;">{{ $b->badge_text }}</span>
           @endif
           @if($b->title_ar)
-            <h2 style="font-size:clamp(22px,3vw,38px);font-weight:900;margin:0 0 10px;line-height:1.2;">{{ $b->title_ar }}</h2>
+            <h2 style="font-size:clamp(20px,3.5vw,34px);font-weight:900;margin:0 0 8px;line-height:1.25;">{{ $b->title_ar }}</h2>
           @endif
           @if($b->subtitle_ar)
-            <p style="font-size:15px;opacity:.85;margin:0 0 20px;line-height:1.5;">{{ $b->subtitle_ar }}</p>
+            <p style="font-size:14px;opacity:.88;margin:0 0 18px;line-height:1.5;">{{ $b->subtitle_ar }}</p>
           @endif
           @if($b->button_text_ar)
-            <span style="display:inline-block;background:#E8711A;color:#fff;padding:13px 28px;border-radius:12px;font-weight:700;font-size:14px;">{{ $b->button_text_ar }} ←</span>
+            <span style="display:inline-block;background:#E8711A;color:#fff;padding:12px 26px;border-radius:12px;font-weight:700;font-size:14px;">{{ $b->button_text_ar }} ←</span>
           @endif
         </div>
       </a>
 
     @else
-      {{-- Multiple banners: slider --}}
-      <div class="hero-slider" style="position:relative;overflow:hidden;border-radius:20px;box-shadow:0 8px 32px rgba(27,59,140,.12);">
-        <div class="hero-slides" style="display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1);">
-          @foreach($heroBanners as $i => $b)
-          <div class="hero-slide" style="min-width:100%;position:relative;">
-            <img src="{{ $b->image ? Storage::url($b->image) : '' }}" alt="{{ $b->title_ar }}"
-                 style="width:100%;height:380px;object-fit:cover;display:block;"/>
-            <div style="position:absolute;inset:0;background:linear-gradient(to left,transparent 40%,rgba(10,20,60,.75));"></div>
-            <div style="position:absolute;top:50%;right:48px;transform:translateY(-50%);color:#fff;max-width:480px;">
-              @if($b->badge_text)
-                <span style="display:inline-block;background:var(--orange,#E8711A);color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:14px;">{{ $b->badge_text }}</span>
-              @endif
-              @if($b->title_ar)
-                <h2 style="font-size:clamp(22px,3vw,38px);font-weight:900;margin:0 0 10px;line-height:1.2;">{{ $b->title_ar }}</h2>
-              @endif
-              @if($b->subtitle_ar)
-                <p style="font-size:15px;opacity:.85;margin:0 0 20px;line-height:1.5;">{{ $b->subtitle_ar }}</p>
-              @endif
-              @if($b->button_text_ar)
-                <a href="{{ $b->link ?? '#' }}" style="display:inline-block;background:#E8711A;color:#fff;padding:13px 28px;border-radius:12px;font-weight:700;font-size:14px;text-decoration:none;">{{ $b->button_text_ar }} ←</a>
-              @endif
-            </div>
+      {{-- ── Multi-banner slider ── --}}
+      <div style="position:relative;overflow:hidden;">
+        <div id="popupSlides" style="display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1);">
+          @foreach($popupBanners as $i => $b)
+          <div style="min-width:100%;position:relative;flex-shrink:0;">
+            <a href="{{ $b->link ?? '#' }}" onclick="closePromoPopup()" style="display:block;text-decoration:none;">
+              <img src="{{ $b->image ? Storage::url($b->image) : '' }}" alt="{{ $b->title_ar }}"
+                   style="width:100%;height:360px;object-fit:cover;display:block;"/>
+              <div style="position:absolute;inset:0;background:linear-gradient(to left,transparent 35%,rgba(10,20,60,.8));"></div>
+              <div style="position:absolute;top:50%;right:40px;transform:translateY(-50%);color:#fff;max-width:55%;">
+                @if($b->badge_text)
+                  <span style="display:inline-block;background:#E8711A;color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:12px;">{{ $b->badge_text }}</span>
+                @endif
+                @if($b->title_ar)
+                  <h2 style="font-size:clamp(20px,3.5vw,34px);font-weight:900;margin:0 0 8px;line-height:1.25;">{{ $b->title_ar }}</h2>
+                @endif
+                @if($b->subtitle_ar)
+                  <p style="font-size:14px;opacity:.88;margin:0 0 18px;line-height:1.5;">{{ $b->subtitle_ar }}</p>
+                @endif
+                @if($b->button_text_ar)
+                  <span style="display:inline-block;background:#E8711A;color:#fff;padding:12px 26px;border-radius:12px;font-weight:700;font-size:14px;">{{ $b->button_text_ar }} ←</span>
+                @endif
+              </div>
+            </a>
           </div>
           @endforeach
         </div>
-
-        {{-- Prev/Next --}}
-        <button onclick="heroSlide(-1)" style="position:absolute;top:50%;right:16px;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);">›</button>
-        <button onclick="heroSlide(1)"  style="position:absolute;top:50%;left:16px; transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);">‹</button>
-
+        {{-- Arrows --}}
+        <button onclick="popupSlide(-1)" style="position:absolute;top:50%;right:12px;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.88);border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);">›</button>
+        <button onclick="popupSlide(1)"  style="position:absolute;top:50%;left:12px; transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.88);border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);">‹</button>
         {{-- Dots --}}
-        <div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;">
-          @foreach($heroBanners as $i => $b)
-            <button onclick="heroGoTo({{ $i }})"
-              class="hero-dot"
-              style="width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;background:{{ $i === 0 ? '#fff' : 'rgba(255,255,255,.4)' }};transition:.3s;padding:0;"></button>
+        <div id="popupDots" style="position:absolute;bottom:12px;left:50%;transform:translateX(-50%);display:flex;gap:7px;">
+          @foreach($popupBanners as $i => $b)
+            <button onclick="popupGoTo({{ $i }})" style="width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;background:{{ $i===0?'#fff':'rgba(255,255,255,.45)' }};padding:0;transition:.3s;"></button>
           @endforeach
         </div>
       </div>
-
-      @push('scripts')
-      <script>
-      (function(){
-        let cur = 0;
-        const total = {{ $heroBanners->count() }};
-        const track = document.querySelector('.hero-slides');
-        const dots  = document.querySelectorAll('.hero-dot');
-        function go(n){
-          cur = (n + total) % total;
-          track.style.transform = `translateX(${cur * 100}%)`;
-          dots.forEach((d,i) => d.style.background = i===cur ? '#fff' : 'rgba(255,255,255,.4)');
-        }
-        window.heroSlide = d => go(cur + d);
-        window.heroGoTo  = n => go(n);
-        setInterval(() => go(cur + 1), 5000);
-      })();
-      </script>
-      @endpush
     @endif
+
+    {{-- Footer strip --}}
+    <div style="background:#fff;padding:14px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+      <span style="font-size:13px;color:#6B7280;">لا تفوّتي عروضنا المميزة 🎁</span>
+      <button onclick="closePromoPopup()" style="background:none;border:1px solid #D1D5DB;border-radius:8px;padding:7px 18px;font-size:13px;color:#6B7280;cursor:pointer;">إغلاق</button>
+    </div>
 
   </div>
 </div>
+
+@push('scripts')
+<script>
+(function(){
+  const STORAGE_KEY = '{{ $popupKey }}';
+  const overlay = document.getElementById('promoPopupOverlay');
+  const box     = document.getElementById('promoPopupBox');
+
+  // Show only once per session
+  if (!sessionStorage.getItem(STORAGE_KEY)) {
+    setTimeout(function(){
+      overlay.style.display = 'flex';
+      requestAnimationFrame(function(){
+        requestAnimationFrame(function(){
+          box.style.transform = 'scale(1) translateY(0)';
+          box.style.opacity   = '1';
+        });
+      });
+    }, 800);
+  }
+
+  window.closePromoPopup = function(){
+    box.style.transform = 'scale(.9) translateY(20px)';
+    box.style.opacity   = '0';
+    setTimeout(function(){ overlay.style.display = 'none'; }, 350);
+    sessionStorage.setItem(STORAGE_KEY, '1');
+  };
+
+  // Close on overlay click
+  overlay.addEventListener('click', function(e){
+    if (e.target === overlay) closePromoPopup();
+  });
+
+  // Close on Escape
+  document.addEventListener('keydown', function(e){
+    if (e.key === 'Escape') closePromoPopup();
+  });
+
+  @if($popupBanners->count() > 1)
+  // Slider for multi-banner popup
+  let cur = 0;
+  const total  = {{ $popupBanners->count() }};
+  const track  = document.getElementById('popupSlides');
+  const dotsEl = document.querySelectorAll('#popupDots button');
+  function popupGo(n){
+    cur = (n + total) % total;
+    track.style.transform = 'translateX(' + (cur * 100) + '%)';
+    dotsEl.forEach(function(d,i){ d.style.background = i===cur ? '#fff' : 'rgba(255,255,255,.45)'; });
+  }
+  window.popupSlide = function(d){ popupGo(cur + d); };
+  window.popupGoTo  = function(n){ popupGo(n); };
+  setInterval(function(){ popupGo(cur + 1); }, 5000);
+  @endif
+})();
+</script>
+@endpush
+
 @endif
 
 {{-- ═══════════════════ MARQUEE ═══════════════════ --}}
