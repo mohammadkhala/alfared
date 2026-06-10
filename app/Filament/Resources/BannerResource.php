@@ -13,12 +13,12 @@ use Filament\Tables\Table;
 class BannerResource extends Resource
 {
     protected static ?string $model = Banner::class;
-    protected static ?string $navigationIcon = 'heroicon-o-photo';
-    protected static ?string $navigationLabel = 'البانرات';
-    protected static ?string $modelLabel = 'بانر';
-    protected static ?string $pluralModelLabel = 'البانرات';
-    protected static ?string $navigationGroup = 'الإعدادات';
-    protected static ?int    $navigationSort  = 5;
+    protected static ?string $navigationIcon = 'heroicon-o-megaphone';
+    protected static ?string $navigationLabel = 'لوحة الإعلانات';
+    protected static ?string $modelLabel = 'إعلان';
+    protected static ?string $pluralModelLabel = 'لوحة الإعلانات';
+    protected static ?string $navigationGroup = 'التسويق';
+    protected static ?int    $navigationSort  = 1;
 
     public static function canViewAny(): bool
     {
