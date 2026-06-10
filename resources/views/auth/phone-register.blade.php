@@ -52,6 +52,22 @@
           @error('email')<p style="color:#EF4444;font-size:12px;margin:4px 0 0;">{{ $message }}</p>@enderror
         </div>
 
+        {{-- Privacy Policy --}}
+        <div>
+          <label style="display:flex;align-items:flex-start;gap:10px;cursor:pointer;">
+            <input type="checkbox" name="privacy_policy" id="privacy_policy" value="1" required
+              style="margin-top:3px;width:18px;height:18px;accent-color:#1B3B8C;flex-shrink:0;cursor:pointer;"/>
+            <span style="font-size:13px;color:#374151;line-height:1.5;">
+              أوافق على
+              <a href="{{ route('privacy-policy') }}" target="_blank" style="color:#1B3B8C;font-weight:700;text-decoration:underline;">سياسة الخصوصية وشروط الاستخدام</a>
+              الخاصة بمتجر أبناء الفريد
+            </span>
+          </label>
+          @error('privacy_policy')
+            <p style="color:#EF4444;font-size:12px;margin:6px 0 0;">{{ $message }}</p>
+          @enderror
+        </div>
+
         <button type="submit" style="padding:15px;font-size:16px;font-weight:700;border:none;border-radius:12px;cursor:pointer;background:linear-gradient(135deg,#E8711A,#d4610e);color:#fff;font-family:inherit;">
           إنشاء الحساب والدخول 🚀
         </button>

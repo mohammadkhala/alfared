@@ -140,18 +140,20 @@ class AccountController extends Controller
     public function register(Request $request)
     {
         $request->validate([
-            'name'     => 'required|string|max:100',
-            'phone'    => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/', 'unique:users,phone'],
-            'email'    => 'nullable|email|max:191|unique:users,email',
-            'password' => 'required|string|min:8|confirmed',
+            'name'           => 'required|string|max:100',
+            'phone'          => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/', 'unique:users,phone'],
+            'email'          => 'nullable|email|max:191|unique:users,email',
+            'password'       => 'required|string|min:8|confirmed',
+            'privacy_policy' => 'accepted',
         ], [
-            'name.required'    => 'الاسم مطلوب',
-            'phone.required'   => 'رقم الهاتف مطلوب',
-            'phone.regex'      => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972',
-            'phone.unique'     => 'رقم الهاتف مسجل مسبقاً — هل تريد تسجيل الدخول؟',
-            'email.unique'     => 'البريد الإلكتروني مسجل مسبقاً',
-            'password.min'     => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
-            'password.confirmed' => 'كلمة المرور وتأكيدها غير متطابقتين',
+            'name.required'           => 'الاسم مطلوب',
+            'phone.required'          => 'رقم الهاتف مطلوب',
+            'phone.regex'             => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972',
+            'phone.unique'            => 'رقم الهاتف مسجل مسبقاً — هل تريد تسجيل الدخول؟',
+            'email.unique'            => 'البريد الإلكتروني مسجل مسبقاً',
+            'password.min'            => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
+            'password.confirmed'      => 'كلمة المرور وتأكيدها غير متطابقتين',
+            'privacy_policy.accepted' => 'يجب الموافقة على سياسة الخصوصية وشروط الاستخدام للمتابعة.',
         ]);
 
         // Rate limit OTP sending

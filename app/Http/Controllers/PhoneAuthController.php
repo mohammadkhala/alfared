@@ -147,12 +147,14 @@ class PhoneAuthController extends Controller
         }
 
         $request->validate([
-            'name'  => ['required', 'string', 'max:100'],
-            'email' => ['nullable', 'email', 'max:191', 'unique:users,email'],
+            'name'           => ['required', 'string', 'max:100'],
+            'email'          => ['nullable', 'email', 'max:191', 'unique:users,email'],
+            'privacy_policy' => ['accepted'],
         ], [
-            'name.required'  => 'الاسم مطلوب',
-            'email.email'    => 'البريد الإلكتروني غير صحيح',
-            'email.unique'   => 'هذا البريد مسجل مسبقاً',
+            'name.required'           => 'الاسم مطلوب',
+            'email.email'             => 'البريد الإلكتروني غير صحيح',
+            'email.unique'            => 'هذا البريد مسجل مسبقاً',
+            'privacy_policy.accepted' => 'يجب الموافقة على سياسة الخصوصية وشروط الاستخدام للمتابعة.',
         ]);
 
         // Prevent duplicate phone
