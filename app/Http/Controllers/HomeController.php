@@ -9,6 +9,7 @@ use App\Models\Brand;
 use App\Models\FlashSale;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Storage;
 
 class HomeController extends Controller
 {
