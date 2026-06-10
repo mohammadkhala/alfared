@@ -70,6 +70,99 @@
   </div>
 </div>
 
+{{-- ═══════════════════ HERO BANNERS (dynamic) ═══════════════════ --}}
+@if(isset($heroBanners) && $heroBanners->count())
+<div class="hero-banners-section" style="background:#F9FAFB;padding:24px 0 0;">
+  <div class="container">
+
+    @if($heroBanners->count() === 1)
+      {{-- Single banner: full width --}}
+      @php $b = $heroBanners->first(); @endphp
+      <a href="{{ $b->link ?? '#' }}" style="display:block;text-decoration:none;border-radius:20px;overflow:hidden;position:relative;box-shadow:0 8px 32px rgba(27,59,140,.12);">
+        <img src="{{ $b->image ? Storage::url($b->image) : '' }}" alt="{{ $b->title_ar }}"
+             style="width:100%;height:380px;object-fit:cover;display:block;"/>
+        <div style="position:absolute;inset:0;background:linear-gradient(to left,transparent 40%,rgba(10,20,60,.75));"></div>
+        <div style="position:absolute;top:50%;right:48px;transform:translateY(-50%);color:#fff;max-width:480px;">
+          @if($b->badge_text)
+            <span style="display:inline-block;background:var(--orange, #E8711A);color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:14px;">{{ $b->badge_text }}</span>
+          @endif
+          @if($b->title_ar)
+            <h2 style="font-size:clamp(22px,3vw,38px);font-weight:900;margin:0 0 10px;line-height:1.2;">{{ $b->title_ar }}</h2>
+          @endif
+          @if($b->subtitle_ar)
+            <p style="font-size:15px;opacity:.85;margin:0 0 20px;line-height:1.5;">{{ $b->subtitle_ar }}</p>
+          @endif
+          @if($b->button_text_ar)
+            <span style="display:inline-block;background:#E8711A;color:#fff;padding:13px 28px;border-radius:12px;font-weight:700;font-size:14px;">{{ $b->button_text_ar }} ←</span>
+          @endif
+        </div>
+      </a>
+
+    @else
+      {{-- Multiple banners: slider --}}
+      <div class="hero-slider" style="position:relative;overflow:hidden;border-radius:20px;box-shadow:0 8px 32px rgba(27,59,140,.12);">
+        <div class="hero-slides" style="display:flex;transition:transform .5s cubic-bezier(.4,0,.2,1);">
+          @foreach($heroBanners as $i => $b)
+          <div class="hero-slide" style="min-width:100%;position:relative;">
+            <img src="{{ $b->image ? Storage::url($b->image) : '' }}" alt="{{ $b->title_ar }}"
+                 style="width:100%;height:380px;object-fit:cover;display:block;"/>
+            <div style="position:absolute;inset:0;background:linear-gradient(to left,transparent 40%,rgba(10,20,60,.75));"></div>
+            <div style="position:absolute;top:50%;right:48px;transform:translateY(-50%);color:#fff;max-width:480px;">
+              @if($b->badge_text)
+                <span style="display:inline-block;background:var(--orange,#E8711A);color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:14px;">{{ $b->badge_text }}</span>
+              @endif
+              @if($b->title_ar)
+                <h2 style="font-size:clamp(22px,3vw,38px);font-weight:900;margin:0 0 10px;line-height:1.2;">{{ $b->title_ar }}</h2>
+              @endif
+              @if($b->subtitle_ar)
+                <p style="font-size:15px;opacity:.85;margin:0 0 20px;line-height:1.5;">{{ $b->subtitle_ar }}</p>
+              @endif
+              @if($b->button_text_ar)
+                <a href="{{ $b->link ?? '#' }}" style="display:inline-block;background:#E8711A;color:#fff;padding:13px 28px;border-radius:12px;font-weight:700;font-size:14px;text-decoration:none;">{{ $b->button_text_ar }} ←</a>
+              @endif
+            </div>
+          </div>
+          @endforeach
+        </div>
+
+        {{-- Prev/Next --}}
+        <button onclick="heroSlide(-1)" style="position:absolute;top:50%;right:16px;transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);">›</button>
+        <button onclick="heroSlide(1)"  style="position:absolute;top:50%;left:16px; transform:translateY(-50%);width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.9);border:none;cursor:pointer;font-size:18px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.2);">‹</button>
+
+        {{-- Dots --}}
+        <div style="position:absolute;bottom:14px;left:50%;transform:translateX(-50%);display:flex;gap:8px;">
+          @foreach($heroBanners as $i => $b)
+            <button onclick="heroGoTo({{ $i }})"
+              class="hero-dot"
+              style="width:8px;height:8px;border-radius:50%;border:none;cursor:pointer;background:{{ $i === 0 ? '#fff' : 'rgba(255,255,255,.4)' }};transition:.3s;padding:0;"></button>
+          @endforeach
+        </div>
+      </div>
+
+      @push('scripts')
+      <script>
+      (function(){
+        let cur = 0;
+        const total = {{ $heroBanners->count() }};
+        const track = document.querySelector('.hero-slides');
+        const dots  = document.querySelectorAll('.hero-dot');
+        function go(n){
+          cur = (n + total) % total;
+          track.style.transform = `translateX(${cur * 100}%)`;
+          dots.forEach((d,i) => d.style.background = i===cur ? '#fff' : 'rgba(255,255,255,.4)');
+        }
+        window.heroSlide = d => go(cur + d);
+        window.heroGoTo  = n => go(n);
+        setInterval(() => go(cur + 1), 5000);
+      })();
+      </script>
+      @endpush
+    @endif
+
+  </div>
+</div>
+@endif
+
 {{-- ═══════════════════ MARQUEE ═══════════════════ --}}
 <div class="marquee-wrap">
   <div class="marquee">
