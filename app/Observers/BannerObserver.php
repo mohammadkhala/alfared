@@ -19,9 +19,17 @@ class BannerObserver
 
     private function clearBannerCache(): void
     {
+        // Web cache (per locale)
         foreach (['ar', 'en', 'he'] as $loc) {
             Cache::forget("home:{$loc}:hero");
             Cache::forget("home:{$loc}:offer_banners");
+        }
+
+        // API cache
+        Cache::forget('api:home');
+        Cache::forget('api:offers:banners');
+        foreach (['hero', 'offers', 'popup'] as $pos) {
+            Cache::forget("api:banners:{$pos}");
         }
     }
 }

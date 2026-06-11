@@ -56,10 +56,20 @@ class AppServiceProvider extends ServiceProvider
             }
         };
 
+        // Extra bust for banners: also clear API cache keys
+        $bustBanner = function () use ($bust) {
+            $bust();
+            Cache::forget('api:home');
+            Cache::forget('api:offers:banners');
+            foreach (['hero', 'offers', 'popup'] as $pos) {
+                Cache::forget("api:banners:{$pos}");
+            }
+        };
+
         Product::saved($bust);
         Product::deleted($bust);
-        Banner::saved($bust);
-        Banner::deleted($bust);
+        Banner::saved($bustBanner);
+        Banner::deleted($bustBanner);
         Category::saved($bust);
         Category::deleted($bust);
         Brand::saved($bust);
