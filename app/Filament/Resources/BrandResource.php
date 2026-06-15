@@ -43,7 +43,7 @@ class BrandResource extends Resource
                         ->label('الشعار')
                         ->image()
                         ->directory('brands')
-                        ->maxSize(1024)
+                        ->maxSize(3072)
                         ->acceptedFileTypes(['image/jpeg','image/png','image/webp'])
                         ->helperText('📐 400 × 400 بكسل (مربع) · 💡 PNG بخلفية شفافة مثالي · 📁 أقل من 1 MB'),
                     Forms\Components\TextInput::make('website')->label('الموقع الإلكتروني')
