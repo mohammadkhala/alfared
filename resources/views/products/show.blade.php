@@ -88,7 +88,8 @@
       {{-- Short description --}}
       @php
         $locale = app()->getLocale();
-        $shortDesc = $product->short_description
+        $shortDesc = $product->{'short_description_'.$locale}
+            ?: $product->short_description
             ?: Str::limit(strip_tags($product->{'description_'.$locale} ?? $product->description_ar ?? ''), 200);
       @endphp
       @if($shortDesc)
