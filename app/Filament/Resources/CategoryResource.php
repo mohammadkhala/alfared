@@ -49,7 +49,7 @@ class CategoryResource extends Resource
                         ->label('الصورة')
                         ->image()
                         ->directory('categories')
-                        ->maxSize(1024)
+                        ->maxSize(3072)
                         ->acceptedFileTypes(['image/jpeg','image/png','image/webp'])
                         ->helperText('📐 400 × 400 بكسل (مربع) · 📁 أقل من 1 MB'),
                     Forms\Components\TextInput::make('icon')->label('أيقونة (emoji أو اسم)')->maxLength(50),
