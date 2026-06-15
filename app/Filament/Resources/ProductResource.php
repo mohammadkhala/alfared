@@ -79,7 +79,16 @@ class ProductResource extends Resource
                     ]),
 
                     Forms\Components\Textarea::make('short_description')
-                        ->label('وصف قصير')->rows(2)->maxLength(500),
+                        ->label('وصف قصير (عربي)')->rows(2)->maxLength(500),
+
+                    Forms\Components\Grid::make(2)->schema([
+                        Forms\Components\Textarea::make('short_description_en')
+                            ->label('وصف قصير (إنجليزي)')->rows(2)->maxLength(500)
+                            ->helperText('يُملأ تلقائياً عبر زر الترجمة'),
+                        Forms\Components\Textarea::make('short_description_he')
+                            ->label('وصف قصير (عبري)')->rows(2)->maxLength(500)
+                            ->helperText('يُملأ تلقائياً عبر زر الترجمة'),
+                    ]),
 
                     Forms\Components\RichEditor::make('description_ar')
                         ->label('الوصف الكامل (عربي)')
@@ -99,8 +108,9 @@ class ProductResource extends Resource
                             ->action(function (Forms\Get $get, Forms\Set $set) {
                                 $translator = app(\App\Services\TranslationService::class);
 
-                                $nameAr = trim($get('name_ar') ?? '');
-                                $descAr = trim(strip_tags($get('description_ar') ?? ''));
+                                $nameAr      = trim($get('name_ar') ?? '');
+                                $descAr      = trim(strip_tags($get('description_ar') ?? ''));
+                                $shortDescAr = trim($get('short_description') ?? '');
                                 $errors = [];
 
                                 if ($nameAr !== '') {
@@ -110,6 +120,15 @@ class ProductResource extends Resource
                                     else         $errors[] = 'الاسم → إنجليزي';
                                     if ($nameHe) $set('name_he', $nameHe);
                                     else         $errors[] = 'الاسم → عبري';
+                                }
+
+                                if ($shortDescAr !== '') {
+                                    $shortEn = $translator->translate($shortDescAr, 'ar', 'en');
+                                    $shortHe = $translator->translate($shortDescAr, 'ar', 'he');
+                                    if ($shortEn) $set('short_description_en', $shortEn);
+                                    else          $errors[] = 'الوصف القصير → إنجليزي';
+                                    if ($shortHe) $set('short_description_he', $shortHe);
+                                    else          $errors[] = 'الوصف القصير → عبري';
                                 }
 
                                 if ($descAr !== '') {
