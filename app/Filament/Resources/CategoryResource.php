@@ -36,11 +36,60 @@ class CategoryResource extends Resource
                         ->live(onBlur: true)
                         ->afterStateUpdated(fn($state, Forms\Set $set) =>
                             $set('slug', Str::slug($state))),
-                    Forms\Components\TextInput::make('name_he')->label('الاسم (عبري)')->maxLength(255),
-                    Forms\Components\TextInput::make('name_en')->label('الاسم (انجليزي)')->maxLength(255),
+                    Forms\Components\TextInput::make('name_he')->label('الاسم (عبري)')->maxLength(255)
+                        ->helperText('يُملأ تلقائياً عبر زر الترجمة'),
+                    Forms\Components\TextInput::make('name_en')->label('الاسم (انجليزي)')->maxLength(255)
+                        ->helperText('يُملأ تلقائياً عبر زر الترجمة'),
                 ]),
                 Forms\Components\TextInput::make('slug')->label('الرابط')->required()
                     ->unique(ignoreRecord: true)->maxLength(255),
+
+                // ── زر الترجمة التلقائية ──────────────────────────────
+                Forms\Components\Actions::make([
+                    Forms\Components\Actions\Action::make('auto_translate_category')
+                        ->label('🌐 ترجم تلقائياً ← إنجليزي + عبري')
+                        ->color('info')
+                        ->icon('heroicon-o-language')
+                        ->requiresConfirmation()
+                        ->modalHeading('ترجمة اسم القسم')
+                        ->modalDescription('سيتم ترجمة الاسم العربي إلى الإنجليزية والعبرية.')
+                        ->modalSubmitActionLabel('ترجم الآن')
+                        ->action(function (Forms\Get $get, Forms\Set $set) {
+                            $translator = app(\App\Services\TranslationService::class);
+                            $nameAr = trim($get('name_ar') ?? '');
+                            $descAr = trim($get('description_ar') ?? '');
+                            $errors = [];
+
+                            if ($nameAr !== '') {
+                                $nameEn = $translator->translate($nameAr, 'ar', 'en');
+                                $nameHe = $translator->translate($nameAr, 'ar', 'he');
+                                if ($nameEn) $set('name_en', $nameEn);
+                                else         $errors[] = 'الاسم → إنجليزي';
+                                if ($nameHe) $set('name_he', $nameHe);
+                                else         $errors[] = 'الاسم → عبري';
+                            }
+
+                            if ($descAr !== '') {
+                                $descEn = $translator->translate($descAr, 'ar', 'en');
+                                $descHe = $translator->translate($descAr, 'ar', 'he');
+                                if ($descEn) $set('description_en', $descEn);
+                                else         $errors[] = 'الوصف → إنجليزي';
+                                if ($descHe) $set('description_he', $descHe);
+                                else         $errors[] = 'الوصف → عبري';
+                            }
+
+                            if (empty($errors)) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('تمت الترجمة بنجاح ✅')
+                                    ->success()->duration(5000)->send();
+                            } else {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('فشل: ' . implode('، ', $errors))
+                                    ->warning()->duration(7000)->send();
+                            }
+                        })
+                        ->visible(fn(Forms\Get $get) => filled(trim($get('name_ar') ?? ''))),
+                ])->columnSpanFull(),
             ]),
 
             Forms\Components\Section::make('الشكل والترتيب')->schema([
@@ -65,7 +114,13 @@ class CategoryResource extends Resource
                         Forms\Components\Toggle::make('show_in_menu')->label('في القائمة')->default(true)->inline(false),
                     ]),
                 ]),
-                Forms\Components\Textarea::make('description_ar')->label('الوصف')->rows(2)->maxLength(500)->columnSpanFull(),
+                Forms\Components\Textarea::make('description_ar')->label('الوصف (عربي)')->rows(2)->maxLength(500)->columnSpanFull(),
+                Forms\Components\Grid::make(2)->schema([
+                    Forms\Components\Textarea::make('description_en')->label('الوصف (إنجليزي)')->rows(2)->maxLength(500)
+                        ->helperText('يُملأ تلقائياً عبر زر الترجمة'),
+                    Forms\Components\Textarea::make('description_he')->label('الوصف (عبري)')->rows(2)->maxLength(500)
+                        ->helperText('يُملأ تلقائياً عبر زر الترجمة'),
+                ]),
             ]),
         ]);
     }

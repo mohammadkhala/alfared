@@ -216,8 +216,14 @@ class CatalogController extends Controller
             'product' => array_merge(
                 $this->formatProduct($product),
                 [
-                    'description'  => $product->description_ar,
-                    'images'       => $product->images->map(fn($i) => (str_starts_with($i->image_url, 'http') ? $i->image_url : url('storage/' . $i->image_url)))->all(),
+                    'description'      => strip_tags($product->description_ar ?? ''),
+                    'description_html' => $product->description_ar,
+                    'images'           => collect(array_filter([
+                        // Always include main_image as first element
+                        $product->main_image ? (str_starts_with($product->main_image, 'http') ? $product->main_image : url('storage/' . $product->main_image)) : null,
+                    ]))->merge(
+                        $product->images->map(fn($i) => str_starts_with($i->image_url, 'http') ? $i->image_url : url('storage/' . $i->image_url))
+                    )->unique()->values()->all(),
                     'variants'     => $product->variants
                         ->where('is_active', true)
                         ->groupBy('type')
@@ -291,6 +297,8 @@ class CatalogController extends Controller
             'category'        => $p->category ? ['id'=>$p->category->id, 'name'=>$p->category->name_ar, 'slug'=>$p->category->slug] : null,
             'brand'           => $p->brand ? ['id'=>$p->brand->id, 'name'=>$p->brand->name, 'slug'=>$p->brand->slug] : null,
             'short_description' => $p->short_description,
+            'short_description_en' => $p->short_description_en,
+            'short_description_he' => $p->short_description_he,
             'stock_quantity'    => (int) $p->stock_quantity,
             'low_stock'         => $p->is_low_stock,
         ];
