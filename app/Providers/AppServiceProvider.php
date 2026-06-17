@@ -66,13 +66,30 @@ class AppServiceProvider extends ServiceProvider
             }
         };
 
-        Product::saved($bust);
-        Product::deleted($bust);
+        $bustCategory = function () use ($bust) {
+            $bust();
+            Cache::forget('api:categories');
+            Cache::forget('api:home');
+        };
+
+        $bustProduct = function () use ($bust) {
+            $bust();
+            Cache::forget('api:home');
+            Cache::forget('api:offers:products');
+        };
+
+        $bustBrand = function () use ($bust) {
+            $bust();
+            Cache::forget('api:home');
+        };
+
+        Product::saved($bustProduct);
+        Product::deleted($bustProduct);
         Banner::saved($bustBanner);
         Banner::deleted($bustBanner);
-        Category::saved($bust);
-        Category::deleted($bust);
-        Brand::saved($bust);
-        Brand::deleted($bust);
+        Category::saved($bustCategory);
+        Category::deleted($bustCategory);
+        Brand::saved($bustBrand);
+        Brand::deleted($bustBrand);
     }
 }
