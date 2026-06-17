@@ -43,23 +43,25 @@ class CatalogController extends Controller
                 ->map(fn ($c) => $this->formatCategory($c))
                 ->all();
 
-            $featured = Product::active()->inStock()
+            $featured = Product::active()
                 ->with(['category:id,name_ar,slug', 'brand:id,name,slug'])
+                ->orderByRaw('CASE WHEN stock_quantity > 0 THEN 0 ELSE 1 END')
                 ->orderByDesc('sales_count')
                 ->limit(8)
                 ->get()
                 ->map(fn ($p) => $this->formatProduct($p))
                 ->all();
 
-            $newArrivals = Product::active()->inStock()
+            $newArrivals = Product::active()
                 ->with(['category:id,name_ar,slug', 'brand:id,name,slug'])
+                ->orderByRaw('CASE WHEN stock_quantity > 0 THEN 0 ELSE 1 END')
                 ->orderByDesc('created_at')
                 ->limit(8)
                 ->get()
                 ->map(fn ($p) => $this->formatProduct($p))
                 ->all();
 
-            $offers = Product::active()->inStock()
+            $offers = Product::active()
                 ->whereColumn('compare_price', '>', 'price')
                 ->with(['category:id,name_ar,slug', 'brand:id,name,slug'])
                 ->orderByDesc('sales_count')
@@ -126,7 +128,7 @@ class CatalogController extends Controller
     /** GET /api/v1/products?category=slug&brand=slug&q=text&sort=newest&page=1 */
     public function products(Request $request): JsonResponse
     {
-        $query = Product::active()->inStock()->with(['category:id,name_ar,name_en,name_he,slug', 'brand:id,name,slug']);
+        $query = Product::active()->with(['category:id,name_ar,name_en,name_he,slug', 'brand:id,name,slug']);
 
         if ($slug = $request->query('category')) {
             $cat = Category::where('slug', $slug)->first();
@@ -156,6 +158,9 @@ class CatalogController extends Controller
             $query->whereColumn('compare_price', '>', 'price');
         }
 
+        // Always show in-stock products first
+        $query->orderByRaw('CASE WHEN stock_quantity > 0 THEN 0 ELSE 1 END');
+
         switch ($request->query('sort', 'newest')) {
             case 'price_asc':    $query->orderBy('price', 'asc'); break;
             case 'price_desc':   $query->orderBy('price', 'desc'); break;
@@ -172,7 +177,7 @@ class CatalogController extends Controller
     public function offers(): JsonResponse
     {
         $products = Cache::remember('api:offers:products', 300, fn () =>
-            Product::active()->inStock()
+            Product::active()
                 ->whereColumn('compare_price', '>', 'price')
                 ->with(['category:id,name_ar,slug', 'brand:id,name,slug'])
                 ->orderByDesc('sales_count')
