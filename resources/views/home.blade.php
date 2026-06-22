@@ -261,70 +261,86 @@
     {{-- Categories Slider --}}
     <div style="position:relative;padding:0 32px;">
 
-      <button onclick="catMove(1)" aria-label="التالي"
+      {{-- زر اليمين: في RTL = السابق (step--) --}}
+      <button id="cs-prev" aria-label="السابق"
         style="position:absolute;top:50%;right:0;transform:translateY(-50%);z-index:10;width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid #E5E7EB;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.12);">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B3B8C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
 
-      <div id="catTrack" style="display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;padding:4px 0 8px;">
-        <style>#catTrack::-webkit-scrollbar{display:none}</style>
+      {{-- الـ viewport يقطع --}}
+      <div style="overflow:hidden;">
+        {{-- الـ track يتحرك بـ transform --}}
+        <div id="cs-track" style="display:flex;gap:16px;transition:transform .5s ease;will-change:transform;">
 
-        @forelse($categories as $cat)
-          <a href="{{ route('products.category', $cat->slug) }}" class="cat-card" style="flex:0 0 200px;min-width:200px;">
-            @php $catImg = $cat->image ? (str_starts_with($cat->image,'http') ? $cat->image : asset('storage/'.$cat->image)) : ($catFallbackImages[$cat->slug] ?? $defaultCatImage); @endphp
-            <img src="{{ $catImg }}" alt="{{ $cat->name }}" loading="lazy"/>
-            <div class="cat-overlay"></div>
-            <div class="cat-info">
-              <h3>{{ $cat->name }}</h3>
-              @if($cat->products_count ?? 0)<span>+{{ $cat->products_count }} {{ __('products_unit') }}</span>@endif
-            </div>
-          </a>
-        @empty
-          @foreach([['makeup','مكياج',$catFallbackImages['makeup']],['skincare','عناية بالبشرة',$catFallbackImages['skincare']],['hair','شعر',$catFallbackImages['hair']],['perfume','عطور',$catFallbackImages['perfume']],['nails','أظافر',$catFallbackImages['nails']],['devices','أجهزة',$catFallbackImages['devices']]] as [$slug,$label,$img])
-            <a href="{{ route('products.category', $slug) }}" class="cat-card" style="flex:0 0 200px;min-width:200px;">
-              <img src="{{ $img }}" alt="{{ $label }}" loading="lazy"/>
+          @forelse($categories as $cat)
+            <a href="{{ route('products.category', $cat->slug) }}" class="cat-card cs-item" style="flex:0 0 200px;min-width:200px;max-width:200px;">
+              @php $catImg = $cat->image ? (str_starts_with($cat->image,'http') ? $cat->image : asset('storage/'.$cat->image)) : ($catFallbackImages[$cat->slug] ?? $defaultCatImage); @endphp
+              <img src="{{ $catImg }}" alt="{{ $cat->name }}" loading="lazy"/>
               <div class="cat-overlay"></div>
-              <div class="cat-info"><h3>{{ $label }}</h3></div>
+              <div class="cat-info">
+                <h3>{{ $cat->name }}</h3>
+                @if($cat->products_count ?? 0)<span>+{{ $cat->products_count }} {{ __('products_unit') }}</span>@endif
+              </div>
             </a>
-          @endforeach
-        @endforelse
+          @empty
+            @foreach([['makeup','مكياج',$catFallbackImages['makeup']],['skincare','عناية بالبشرة',$catFallbackImages['skincare']],['hair','شعر',$catFallbackImages['hair']],['perfume','عطور',$catFallbackImages['perfume']],['nails','أظافر',$catFallbackImages['nails']],['devices','أجهزة',$catFallbackImages['devices']]] as [$slug,$label,$img])
+              <a href="{{ route('products.category', $slug) }}" class="cat-card cs-item" style="flex:0 0 200px;min-width:200px;max-width:200px;">
+                <img src="{{ $img }}" alt="{{ $label }}" loading="lazy"/>
+                <div class="cat-overlay"></div>
+                <div class="cat-info"><h3>{{ $label }}</h3></div>
+              </a>
+            @endforeach
+          @endforelse
+
+        </div>
       </div>
 
-      <button onclick="catMove(-1)" aria-label="السابق"
+      {{-- زر اليسار: في RTL = التالي (step++) --}}
+      <button id="cs-next" aria-label="التالي"
         style="position:absolute;top:50%;left:0;transform:translateY(-50%);z-index:10;width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid #E5E7EB;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.12);">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B3B8C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
     </div>
 
     <script>
-    var _catStep  = 0;
-    var _catTimer = null;
-    var _catItems = [];
+    (function(){
+      var STEP = 216; // 200px item + 16px gap
+      var cur  = 0;
+      var tmr  = null;
+      var track, items, total;
 
-    window.addEventListener('load', function() {
-      var t = document.getElementById('catTrack');
-      if (!t) return;
-      _catItems = Array.from(t.querySelectorAll('.cat-card'));
-      if (!_catItems.length) return;
+      function init() {
+        track = document.getElementById('cs-track');
+        if (!track) return;
+        items = track.querySelectorAll('.cs-item');
+        total = items.length;
+        if (!total) return;
 
-      function goTo(n) {
-        _catStep = ((n % _catItems.length) + _catItems.length) % _catItems.length;
-        _catItems[_catStep].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+        document.getElementById('cs-prev').onclick = function(){ go(cur - 1); };
+        document.getElementById('cs-next').onclick = function(){ go(cur + 1); };
+
+        track.parentElement.addEventListener('mouseenter', function(){ clearInterval(tmr); });
+        track.parentElement.addEventListener('mouseleave',  startAuto);
+
+        startAuto();
       }
 
-      window.catMove = function(dir) {
-        goTo(_catStep + dir);
-        clearInterval(_catTimer);
-        _catTimer = setInterval(function() { goTo(_catStep + 1); }, 3500);
-      };
+      function go(n) {
+        cur = ((n % total) + total) % total;
+        track.style.transform = 'translateX(' + (-cur * STEP) + 'px)';
+      }
 
-      t.addEventListener('mouseenter', function() { clearInterval(_catTimer); });
-      t.addEventListener('mouseleave',  function() {
-        _catTimer = setInterval(function() { goTo(_catStep + 1); }, 3500);
-      });
+      function startAuto() {
+        clearInterval(tmr);
+        tmr = setInterval(function(){ go(cur + 1); }, 3000);
+      }
 
-      _catTimer = setInterval(function() { goTo(_catStep + 1); }, 3500);
-    });
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', init);
+      } else {
+        init();
+      }
+    })();
     </script>
   </div>
 </section>
