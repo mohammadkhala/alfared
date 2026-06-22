@@ -259,30 +259,19 @@
       $defaultCatImage = 'https://images.unsplash.com/photo-1512207736890-6ffed8a84e8d?w=400&q=80';
     @endphp
     {{-- Categories Slider --}}
-    <div style="position:relative;padding:0 28px;">
+    <div style="position:relative;padding:0 32px;">
 
-      {{-- Right arrow (RTL: goes forward) --}}
-      <button id="catBtnR" aria-label="التالي"
-        style="position:absolute;top:50%;right:0;transform:translateY(-50%);z-index:10;
-               width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid #E5E7EB;
-               cursor:pointer;display:flex;align-items:center;justify-content:center;
-               box-shadow:0 2px 10px rgba(0,0,0,.1);transition:all .2s;">
+      <button onclick="catMove(1)" aria-label="التالي"
+        style="position:absolute;top:50%;right:0;transform:translateY(-50%);z-index:10;width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid #E5E7EB;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.12);">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B3B8C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
 
-      {{-- Scrollable track --}}
-      <div id="catTrack"
-           style="display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;
-                  scrollbar-width:none;-ms-overflow-style:none;padding:4px 0 8px;">
+      <div id="catTrack" style="display:flex;gap:16px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;-ms-overflow-style:none;padding:4px 0 8px;">
+        <style>#catTrack::-webkit-scrollbar{display:none}</style>
 
         @forelse($categories as $cat)
-          <a href="{{ route('products.category', $cat->slug) }}" class="cat-card cat-slide-item"
-             style="flex:0 0 200px;min-width:200px;">
-            @php
-              $catImg = $cat->image
-                ? (str_starts_with($cat->image, 'http') ? $cat->image : asset('storage/'.$cat->image))
-                : ($catFallbackImages[$cat->slug] ?? $defaultCatImage);
-            @endphp
+          <a href="{{ route('products.category', $cat->slug) }}" class="cat-card" style="flex:0 0 200px;min-width:200px;">
+            @php $catImg = $cat->image ? (str_starts_with($cat->image,'http') ? $cat->image : asset('storage/'.$cat->image)) : ($catFallbackImages[$cat->slug] ?? $defaultCatImage); @endphp
             <img src="{{ $catImg }}" alt="{{ $cat->name }}" loading="lazy"/>
             <div class="cat-overlay"></div>
             <div class="cat-info">
@@ -291,101 +280,47 @@
             </div>
           </a>
         @empty
-          @php
-            $emptyCats = [
-              ['makeup',  'مكياج',  $catFallbackImages['makeup']],
-              ['skincare','عناية بالبشرة', $catFallbackImages['skincare']],
-              ['hair',    'شعر',    $catFallbackImages['hair']],
-              ['perfume', 'عطور',   $catFallbackImages['perfume']],
-              ['nails',   'أظافر',  $catFallbackImages['nails']],
-              ['devices', 'أجهزة',  $catFallbackImages['devices']],
-            ];
-          @endphp
-          @foreach($emptyCats as [$slug, $label, $img])
-            <a href="{{ route('products.category', $slug) }}" class="cat-card cat-slide-item"
-               style="flex:0 0 200px;min-width:200px;">
+          @foreach([['makeup','مكياج',$catFallbackImages['makeup']],['skincare','عناية بالبشرة',$catFallbackImages['skincare']],['hair','شعر',$catFallbackImages['hair']],['perfume','عطور',$catFallbackImages['perfume']],['nails','أظافر',$catFallbackImages['nails']],['devices','أجهزة',$catFallbackImages['devices']]] as [$slug,$label,$img])
+            <a href="{{ route('products.category', $slug) }}" class="cat-card" style="flex:0 0 200px;min-width:200px;">
               <img src="{{ $img }}" alt="{{ $label }}" loading="lazy"/>
               <div class="cat-overlay"></div>
               <div class="cat-info"><h3>{{ $label }}</h3></div>
             </a>
           @endforeach
         @endforelse
-
       </div>
-      <style>#catTrack::-webkit-scrollbar{display:none;}</style>
 
-      {{-- Left arrow (RTL: goes back) --}}
-      <button id="catBtnL" aria-label="السابق"
-        style="position:absolute;top:50%;left:0;transform:translateY(-50%);z-index:10;
-               width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid #E5E7EB;
-               cursor:pointer;display:flex;align-items:center;justify-content:center;
-               box-shadow:0 2px 10px rgba(0,0,0,.1);transition:all .2s;opacity:.4;">
+      <button onclick="catMove(-1)" aria-label="السابق"
+        style="position:absolute;top:50%;left:0;transform:translateY(-50%);z-index:10;width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid #E5E7EB;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.12);">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B3B8C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
-
     </div>
 
-    @push('scripts')
     <script>
-    (function(){
-      var track  = document.getElementById('catTrack');
-      var btnR   = document.getElementById('catBtnR');
-      var btnL   = document.getElementById('catBtnL');
-      if (!track) return;
-
-      var STEP  = 220; // px to scroll per click
-      var timer = null;
-
-      function scrollBy(px) {
-        // RTL: scrollLeft works with negative direction in RTL browsers
-        track.scrollLeft -= px; // subtract = scroll right-to-left (show next in RTL)
-      }
-
-      function updateArrows() {
-        var sl  = track.scrollLeft;
-        var max = track.scrollWidth - track.clientWidth;
-        // In RTL, scrollLeft is 0 at the start (rightmost), goes negative
-        var atStart = Math.abs(sl) < 2;
-        var atEnd   = Math.abs(sl) >= max - 2;
-        if (btnR) btnR.style.opacity = atEnd   ? '.4' : '1';
-        if (btnL) btnL.style.opacity = atStart ? '.4' : '1';
-      }
-
-      if (btnR) btnR.addEventListener('click', function() {
-        scrollBy(-STEP); // RTL: negative = scroll left (show more on left = next)
-        resetTimer();
-      });
-      if (btnL) btnL.addEventListener('click', function() {
-        scrollBy(STEP);
-        resetTimer();
-      });
-
-      track.addEventListener('scroll', updateArrows);
-
-      function autoStep() {
-        var sl  = track.scrollLeft;
-        var max = track.scrollWidth - track.clientWidth;
-        if (Math.abs(sl) >= max - 2) {
-          // reached end, scroll back to start
-          track.scrollLeft = 0;
-        } else {
-          scrollBy(-STEP);
-        }
-      }
-
-      function resetTimer() {
-        clearInterval(timer);
-        timer = setInterval(autoStep, 3500);
-      }
-
-      track.addEventListener('mouseenter', function() { clearInterval(timer); });
-      track.addEventListener('mouseleave', resetTimer);
-
-      updateArrows();
-      resetTimer();
-    })();
+    var _catTimer = null;
+    function catMove(dir) {
+      var t = document.getElementById('catTrack');
+      if (!t) return;
+      t.scrollBy({ left: dir * -220, behavior: 'smooth' });
+    }
+    function _catAuto() {
+      var t = document.getElementById('catTrack');
+      if (!t) return;
+      var atEnd = t.scrollLeft <= -(t.scrollWidth - t.clientWidth - 5);
+      t.scrollBy({ left: atEnd ? t.scrollWidth : -220, behavior: 'smooth' });
+    }
+    function _catReset() {
+      clearInterval(_catTimer);
+      _catTimer = setInterval(_catAuto, 3500);
+    }
+    window.addEventListener('load', function() {
+      var t = document.getElementById('catTrack');
+      if (!t) return;
+      t.addEventListener('mouseenter', function() { clearInterval(_catTimer); });
+      t.addEventListener('mouseleave', _catReset);
+      _catReset();
+    });
     </script>
-    @endpush
   </div>
 </section>
 
