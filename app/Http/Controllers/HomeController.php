@@ -24,10 +24,8 @@ class HomeController extends Controller
 
         $categories = Cache::remember("home:{$loc}:categories", $ttl, fn () =>
             Category::where('is_active', true)
-                ->where('show_in_menu', true)
                 ->whereNull('parent_id')
                 ->orderBy('sort_order')
-                ->limit(6)
                 ->get()
         );
 
