@@ -32,19 +32,22 @@ class HomeController extends Controller
         );
 
         $featuredProducts = Cache::remember("home:{$loc}:featured", $ttl, fn () =>
-            Product::active()->featured()->inStock()
+            Product::active()->featured()
                 ->with(['category:id,name_ar,name_en,name_he,slug', 'brand:id,name,slug'])
+                ->orderByRaw('CASE WHEN stock_quantity > 0 THEN 0 ELSE 1 END')
                 ->limit(8)->get()
         );
 
         $newProducts = Cache::remember("home:{$loc}:new", $ttl, fn () =>
-            Product::active()->where('is_new', true)->inStock()
+            Product::active()->where('is_new', true)
                 ->with(['category:id,name_ar,name_en,name_he,slug', 'brand:id,name,slug'])
+                ->orderByRaw('CASE WHEN stock_quantity > 0 THEN 0 ELSE 1 END')
                 ->limit(8)->get()
         );
 
         $bestSellers = Cache::remember("home:{$loc}:bestsellers", $ttl, fn () =>
-            Product::active()->inStock()
+            Product::active()
+                ->orderByRaw('CASE WHEN stock_quantity > 0 THEN 0 ELSE 1 END')
                 ->orderBy('sales_count', 'desc')
                 ->with(['category:id,name_ar,name_en,name_he,slug', 'brand:id,name,slug'])
                 ->limit(8)->get()
@@ -52,9 +55,10 @@ class HomeController extends Controller
 
         // ─── On-sale products (have compare_price > price) ───────────────
         $saleProducts = Cache::remember("home:{$loc}:sale", $ttl, fn () =>
-            Product::active()->inStock()
+            Product::active()
                 ->whereColumn('compare_price', '>', 'price')
                 ->with(['category:id,name_ar,name_en,name_he,slug', 'brand:id,name,slug'])
+                ->orderByRaw('CASE WHEN stock_quantity > 0 THEN 0 ELSE 1 END')
                 ->orderBy('sales_count', 'desc')
                 ->limit(8)->get()
         );
