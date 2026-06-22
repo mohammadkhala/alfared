@@ -307,6 +307,18 @@ class ProductResource extends Resource
                     Tables\Actions\BulkAction::make('deactivate')->label('إخفاء')
                         ->icon('heroicon-o-eye-slash')
                         ->action(fn($records) => $records->each->update(['is_active' => false])),
+                    Tables\Actions\BulkAction::make('mark_featured')->label('تمييز ★')
+                        ->icon('heroicon-o-star')
+                        ->color('warning')
+                        ->requiresConfirmation()
+                        ->modalHeading('تمييز المنتجات المحددة')
+                        ->modalDescription('سيتم إضافة المنتجات المحددة إلى قسم "المنتجات المميزة" في الصفحة الرئيسية.')
+                        ->modalSubmitActionLabel('تمييز')
+                        ->action(fn($records) => $records->each->update(['is_featured' => true])),
+                    Tables\Actions\BulkAction::make('unmark_featured')->label('إلغاء التمييز')
+                        ->icon('heroicon-o-no-symbol')
+                        ->color('gray')
+                        ->action(fn($records) => $records->each->update(['is_featured' => false])),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
