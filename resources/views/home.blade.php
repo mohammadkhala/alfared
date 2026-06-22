@@ -297,28 +297,33 @@
     </div>
 
     <script>
+    var _catStep  = 0;
     var _catTimer = null;
-    function catMove(dir) {
-      var t = document.getElementById('catTrack');
-      if (!t) return;
-      t.scrollBy({ left: dir * -220, behavior: 'smooth' });
-    }
-    function _catAuto() {
-      var t = document.getElementById('catTrack');
-      if (!t) return;
-      var atEnd = t.scrollLeft <= -(t.scrollWidth - t.clientWidth - 5);
-      t.scrollBy({ left: atEnd ? t.scrollWidth : -220, behavior: 'smooth' });
-    }
-    function _catReset() {
-      clearInterval(_catTimer);
-      _catTimer = setInterval(_catAuto, 3500);
-    }
+    var _catItems = [];
+
     window.addEventListener('load', function() {
       var t = document.getElementById('catTrack');
       if (!t) return;
+      _catItems = Array.from(t.querySelectorAll('.cat-card'));
+      if (!_catItems.length) return;
+
+      function goTo(n) {
+        _catStep = ((n % _catItems.length) + _catItems.length) % _catItems.length;
+        _catItems[_catStep].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'start' });
+      }
+
+      window.catMove = function(dir) {
+        goTo(_catStep + dir);
+        clearInterval(_catTimer);
+        _catTimer = setInterval(function() { goTo(_catStep + 1); }, 3500);
+      };
+
       t.addEventListener('mouseenter', function() { clearInterval(_catTimer); });
-      t.addEventListener('mouseleave', _catReset);
-      _catReset();
+      t.addEventListener('mouseleave',  function() {
+        _catTimer = setInterval(function() { goTo(_catStep + 1); }, 3500);
+      });
+
+      _catTimer = setInterval(function() { goTo(_catStep + 1); }, 3500);
     });
     </script>
   </div>
