@@ -270,7 +270,7 @@
       {{-- الـ viewport يقطع --}}
       <div style="overflow:hidden;">
         {{-- الـ track يتحرك بـ transform --}}
-        <div id="cs-track" style="display:flex;gap:16px;transition:transform .5s ease;will-change:transform;">
+        <div id="cs-track" dir="ltr" style="display:flex;gap:16px;transition:transform .5s ease;will-change:transform;width:max-content;">
 
           @forelse($categories as $cat)
             <a href="{{ route('products.category', $cat->slug) }}" class="cat-card cs-item" style="flex:0 0 200px;min-width:200px;max-width:200px;">
