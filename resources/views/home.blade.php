@@ -261,19 +261,20 @@
     {{-- Categories Slider --}}
     <div style="position:relative;padding:0 32px;">
 
-      {{-- زر اليمين: في RTL = السابق (step--) --}}
-      <button id="cs-prev" aria-label="السابق"
+      {{-- زر اليمين: التالي في LTR = scrollLeft زائد --}}
+      <button id="cs-next" aria-label="التالي"
         style="position:absolute;top:50%;right:0;transform:translateY(-50%);z-index:10;width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid #E5E7EB;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.12);">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B3B8C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
       </button>
 
-      {{-- الـ viewport يقطع --}}
-      <div style="overflow:hidden;">
-        {{-- الـ track يتحرك بـ transform --}}
-        <div id="cs-track" dir="ltr" style="display:flex;gap:16px;transition:transform .5s ease;will-change:transform;width:max-content;">
+      {{-- Viewport: dir=ltr يجعل scrollLeft دائماً موجب وبسيط --}}
+      <div id="cs-vp" dir="ltr"
+           style="overflow-x:auto;scrollbar-width:none;-ms-overflow-style:none;scroll-behavior:smooth;">
+        <style>#cs-vp::-webkit-scrollbar{display:none}</style>
+        <div style="display:flex;gap:16px;padding:4px 0 8px;">
 
           @forelse($categories as $cat)
-            <a href="{{ route('products.category', $cat->slug) }}" class="cat-card cs-item" style="flex:0 0 200px;min-width:200px;max-width:200px;">
+            <a href="{{ route('products.category', $cat->slug) }}" class="cat-card" style="flex:0 0 200px;min-width:200px;max-width:200px;">
               @php $catImg = $cat->image ? (str_starts_with($cat->image,'http') ? $cat->image : asset('storage/'.$cat->image)) : ($catFallbackImages[$cat->slug] ?? $defaultCatImage); @endphp
               <img src="{{ $catImg }}" alt="{{ $cat->name }}" loading="lazy"/>
               <div class="cat-overlay"></div>
@@ -284,7 +285,7 @@
             </a>
           @empty
             @foreach([['makeup','مكياج',$catFallbackImages['makeup']],['skincare','عناية بالبشرة',$catFallbackImages['skincare']],['hair','شعر',$catFallbackImages['hair']],['perfume','عطور',$catFallbackImages['perfume']],['nails','أظافر',$catFallbackImages['nails']],['devices','أجهزة',$catFallbackImages['devices']]] as [$slug,$label,$img])
-              <a href="{{ route('products.category', $slug) }}" class="cat-card cs-item" style="flex:0 0 200px;min-width:200px;max-width:200px;">
+              <a href="{{ route('products.category', $slug) }}" class="cat-card" style="flex:0 0 200px;min-width:200px;max-width:200px;">
                 <img src="{{ $img }}" alt="{{ $label }}" loading="lazy"/>
                 <div class="cat-overlay"></div>
                 <div class="cat-info"><h3>{{ $label }}</h3></div>
@@ -295,8 +296,8 @@
         </div>
       </div>
 
-      {{-- زر اليسار: في RTL = التالي (step++) --}}
-      <button id="cs-next" aria-label="التالي"
+      {{-- زر اليسار: السابق --}}
+      <button id="cs-prev" aria-label="السابق"
         style="position:absolute;top:50%;left:0;transform:translateY(-50%);z-index:10;width:40px;height:40px;border-radius:50%;background:#fff;border:2px solid #E5E7EB;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 10px rgba(0,0,0,.12);">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#1B3B8C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
       </button>
@@ -304,35 +305,34 @@
 
     <script>
     (function(){
-      var STEP = 216; // 200px item + 16px gap
-      var cur  = 0;
+      var STEP = 216;
       var tmr  = null;
-      var track, items, total;
+      var vp;
 
       function init() {
-        track = document.getElementById('cs-track');
-        if (!track) return;
-        items = track.querySelectorAll('.cs-item');
-        total = items.length;
-        if (!total) return;
+        vp = document.getElementById('cs-vp');
+        if (!vp) return;
 
-        document.getElementById('cs-prev').onclick = function(){ go(cur - 1); };
-        document.getElementById('cs-next').onclick = function(){ go(cur + 1); };
+        document.getElementById('cs-next').onclick = function(){ scroll(STEP); };
+        document.getElementById('cs-prev').onclick = function(){ scroll(-STEP); };
 
-        track.parentElement.addEventListener('mouseenter', function(){ clearInterval(tmr); });
-        track.parentElement.addEventListener('mouseleave',  startAuto);
-
+        vp.addEventListener('mouseenter', function(){ clearInterval(tmr); });
+        vp.addEventListener('mouseleave',  startAuto);
         startAuto();
       }
 
-      function go(n) {
-        cur = ((n % total) + total) % total;
-        track.style.transform = 'translateX(' + (-cur * STEP) + 'px)';
+      function scroll(px) {
+        var max = vp.scrollWidth - vp.clientWidth;
+        var next = vp.scrollLeft + px;
+        // wrap around
+        if (next > max) next = 0;
+        if (next < 0)   next = max;
+        vp.scrollLeft = next;
       }
 
       function startAuto() {
         clearInterval(tmr);
-        tmr = setInterval(function(){ go(cur + 1); }, 3000);
+        tmr = setInterval(function(){ scroll(STEP); }, 3000);
       }
 
       if (document.readyState === 'loading') {
