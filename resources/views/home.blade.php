@@ -258,41 +258,138 @@
       ];
       $defaultCatImage = 'https://images.unsplash.com/photo-1512207736890-6ffed8a84e8d?w=400&q=80';
     @endphp
-    <div class="categories-grid">
-      @forelse($categories as $cat)
-        <a href="{{ route('products.category', $cat->slug) }}" class="cat-card">
-          @php
-            $catImg = $cat->image
-              ? (str_starts_with($cat->image, 'http') ? $cat->image : asset('storage/'.$cat->image))
-              : ($catFallbackImages[$cat->slug] ?? $defaultCatImage);
-          @endphp
-          <img src="{{ $catImg }}" alt="{{ $cat->name }}" loading="lazy"/>
-          <div class="cat-overlay"></div>
-          <div class="cat-info">
-            <h3>{{ $cat->name }}</h3>
-            @if($cat->products_count ?? 0)<span>+{{ $cat->products_count }} {{ __('products_unit') }}</span>@endif
-          </div>
-        </a>
-      @empty
-        @php
-          $emptyCats = [
-            ['makeup',  '💄', 'مكياج',  $catFallbackImages['makeup']],
-            ['skincare','🧴', 'عناية بالبشرة', $catFallbackImages['skincare']],
-            ['hair',    '💆', 'شعر',    $catFallbackImages['hair']],
-            ['perfume', '🌹', 'عطور',   $catFallbackImages['perfume']],
-            ['nails',   '💅', 'أظافر',  $catFallbackImages['nails']],
-            ['devices', '⚡', 'أجهزة',  $catFallbackImages['devices']],
-          ];
-        @endphp
-        @foreach($emptyCats as [$slug, $icon, $label, $img])
-          <a href="{{ route('products.category', $slug) }}" class="cat-card">
-            <img src="{{ $img }}" alt="{{ $label }}" loading="lazy"/>
-            <div class="cat-overlay"></div>
-            <div class="cat-info"><h3>{{ $label }}</h3></div>
-          </a>
-        @endforeach
-      @endforelse
+    {{-- Categories Slider --}}
+    <div class="cat-slider-wrap" style="position:relative;">
+
+      {{-- Prev arrow --}}
+      <button class="cat-arrow cat-arrow-prev" onclick="catSlide(-1)" aria-label="السابق"
+        style="position:absolute;top:50%;right:-20px;transform:translateY(-50%);z-index:10;
+               width:44px;height:44px;border-radius:50%;background:#fff;border:none;cursor:pointer;
+               box-shadow:0 4px 16px rgba(27,59,140,.15);display:flex;align-items:center;justify-content:center;
+               transition:background .2s,transform .2s;"
+        onmouseover="this.style.background='var(--navy,#1B3B8C)';this.querySelector('svg').style.stroke='#fff'"
+        onmouseout="this.style.background='#fff';this.querySelector('svg').style.stroke='var(--navy,#1B3B8C)'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--navy,#1B3B8C)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:stroke .2s"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+
+      {{-- Track --}}
+      <div class="cat-slider-viewport" style="overflow:hidden;">
+        <div class="cat-slider-track" style="display:flex;gap:18px;transition:transform .45s cubic-bezier(.4,0,.2,1);will-change:transform;">
+
+          @forelse($categories as $cat)
+            <a href="{{ route('products.category', $cat->slug) }}" class="cat-card cat-slide-item"
+               style="flex:0 0 calc((100% - 90px) / 6);min-width:160px;">
+              @php
+                $catImg = $cat->image
+                  ? (str_starts_with($cat->image, 'http') ? $cat->image : asset('storage/'.$cat->image))
+                  : ($catFallbackImages[$cat->slug] ?? $defaultCatImage);
+              @endphp
+              <img src="{{ $catImg }}" alt="{{ $cat->name }}" loading="lazy"/>
+              <div class="cat-overlay"></div>
+              <div class="cat-info">
+                <h3>{{ $cat->name }}</h3>
+                @if($cat->products_count ?? 0)<span>+{{ $cat->products_count }} {{ __('products_unit') }}</span>@endif
+              </div>
+            </a>
+          @empty
+            @php
+              $emptyCats = [
+                ['makeup',  'مكياج',  $catFallbackImages['makeup']],
+                ['skincare','عناية بالبشرة', $catFallbackImages['skincare']],
+                ['hair',    'شعر',    $catFallbackImages['hair']],
+                ['perfume', 'عطور',   $catFallbackImages['perfume']],
+                ['nails',   'أظافر',  $catFallbackImages['nails']],
+                ['devices', 'أجهزة',  $catFallbackImages['devices']],
+              ];
+            @endphp
+            @foreach($emptyCats as [$slug, $label, $img])
+              <a href="{{ route('products.category', $slug) }}" class="cat-card cat-slide-item"
+                 style="flex:0 0 calc((100% - 90px) / 6);min-width:160px;">
+                <img src="{{ $img }}" alt="{{ $label }}" loading="lazy"/>
+                <div class="cat-overlay"></div>
+                <div class="cat-info"><h3>{{ $label }}</h3></div>
+              </a>
+            @endforeach
+          @endforelse
+
+        </div>
+      </div>
+
+      {{-- Next arrow --}}
+      <button class="cat-arrow cat-arrow-next" onclick="catSlide(1)" aria-label="التالي"
+        style="position:absolute;top:50%;left:-20px;transform:translateY(-50%);z-index:10;
+               width:44px;height:44px;border-radius:50%;background:#fff;border:none;cursor:pointer;
+               box-shadow:0 4px 16px rgba(27,59,140,.15);display:flex;align-items:center;justify-content:center;
+               transition:background .2s,transform .2s;"
+        onmouseover="this.style.background='var(--navy,#1B3B8C)';this.querySelector('svg').style.stroke='#fff'"
+        onmouseout="this.style.background='#fff';this.querySelector('svg').style.stroke='var(--navy,#1B3B8C)'">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--navy,#1B3B8C)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:stroke .2s"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+
     </div>
+
+    @push('scripts')
+    <script>
+    (function(){
+      const track    = document.querySelector('.cat-slider-track');
+      const viewport = document.querySelector('.cat-slider-viewport');
+      const items    = document.querySelectorAll('.cat-slide-item');
+      if (!track || !items.length) return;
+
+      let pos      = 0;
+      let autoTimer;
+
+      function visibleCount() {
+        const vw = viewport.offsetWidth;
+        if (vw < 480)  return 2;
+        if (vw < 768)  return 3;
+        if (vw < 1024) return 4;
+        return 6;
+      }
+
+      function itemWidth() {
+        return items[0] ? items[0].offsetWidth + 18 : 0;
+      }
+
+      function maxPos() {
+        return Math.max(0, items.length - visibleCount());
+      }
+
+      function go(n) {
+        pos = Math.max(0, Math.min(n, maxPos()));
+        track.style.transform = 'translateX(' + (pos * itemWidth() * (document.dir === 'rtl' ? 1 : -1)) + 'px)';
+        // Update arrow visibility
+        document.querySelector('.cat-arrow-prev').style.opacity = pos <= 0 ? '.35' : '1';
+        document.querySelector('.cat-arrow-next').style.opacity = pos >= maxPos() ? '.35' : '1';
+      }
+
+      window.catSlide = function(dir) {
+        // RTL: arrows are visually swapped
+        const rtl = document.documentElement.dir === 'rtl';
+        go(pos + (rtl ? -dir : dir));
+        resetAuto();
+      };
+
+      function resetAuto() {
+        clearInterval(autoTimer);
+        autoTimer = setInterval(function() {
+          const next = pos >= maxPos() ? 0 : pos + 1;
+          go(next);
+        }, 3500);
+      }
+
+      go(0);
+      resetAuto();
+
+      // Pause on hover
+      viewport.addEventListener('mouseenter', () => clearInterval(autoTimer));
+      viewport.addEventListener('mouseleave', resetAuto);
+
+      // Recalc on resize
+      window.addEventListener('resize', () => go(Math.min(pos, maxPos())));
+    })();
+    </script>
+    @endpush
   </div>
 </section>
 
