@@ -261,12 +261,12 @@
     {{-- Categories Slider --}}
     <div class="cat-slider-wrap" style="position:relative;">
 
-      {{-- Prev arrow --}}
-      <button class="cat-arrow cat-arrow-prev" onclick="catSlide(-1)" aria-label="السابق"
+      {{-- RTL: right arrow = next (higher pos), left arrow = prev (lower pos) --}}
+      <button class="cat-arrow cat-arrow-prev" onclick="catSlide(1)" aria-label="التالي"
         style="position:absolute;top:50%;right:-20px;transform:translateY(-50%);z-index:10;
                width:44px;height:44px;border-radius:50%;background:#fff;border:none;cursor:pointer;
                box-shadow:0 4px 16px rgba(27,59,140,.15);display:flex;align-items:center;justify-content:center;
-               transition:background .2s,transform .2s;"
+               transition:background .2s;"
         onmouseover="this.style.background='var(--navy,#1B3B8C)';this.querySelector('svg').style.stroke='#fff'"
         onmouseout="this.style.background='#fff';this.querySelector('svg').style.stroke='var(--navy,#1B3B8C)'">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--navy,#1B3B8C)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:stroke .2s"><polyline points="9 18 15 12 9 6"/></svg>
@@ -315,12 +315,11 @@
         </div>
       </div>
 
-      {{-- Next arrow --}}
-      <button class="cat-arrow cat-arrow-next" onclick="catSlide(1)" aria-label="التالي"
+      <button class="cat-arrow cat-arrow-next" onclick="catSlide(-1)" aria-label="السابق"
         style="position:absolute;top:50%;left:-20px;transform:translateY(-50%);z-index:10;
                width:44px;height:44px;border-radius:50%;background:#fff;border:none;cursor:pointer;
                box-shadow:0 4px 16px rgba(27,59,140,.15);display:flex;align-items:center;justify-content:center;
-               transition:background .2s,transform .2s;"
+               transition:background .2s;"
         onmouseover="this.style.background='var(--navy,#1B3B8C)';this.querySelector('svg').style.stroke='#fff'"
         onmouseout="this.style.background='#fff';this.querySelector('svg').style.stroke='var(--navy,#1B3B8C)'">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--navy,#1B3B8C)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="transition:stroke .2s"><polyline points="15 18 9 12 15 6"/></svg>
@@ -331,62 +330,70 @@
     @push('scripts')
     <script>
     (function(){
-      const track    = document.querySelector('.cat-slider-track');
-      const viewport = document.querySelector('.cat-slider-viewport');
-      const items    = document.querySelectorAll('.cat-slide-item');
+      var track    = document.querySelector('.cat-slider-track');
+      var viewport = document.querySelector('.cat-slider-viewport');
+      var items    = document.querySelectorAll('.cat-slide-item');
+      var prevBtn  = document.querySelector('.cat-arrow-prev');
+      var nextBtn  = document.querySelector('.cat-arrow-next');
       if (!track || !items.length) return;
 
-      let pos      = 0;
-      let autoTimer;
+      var GAP = 18;
+      var pos = 0;
+      var timer;
 
-      function visibleCount() {
-        const vw = viewport.offsetWidth;
-        if (vw < 480)  return 2;
-        if (vw < 768)  return 3;
-        if (vw < 1024) return 4;
+      function visible() {
+        var w = window.innerWidth;
+        if (w < 480) return 2;
+        if (w < 768) return 3;
+        if (w < 1024) return 4;
         return 6;
       }
 
-      function itemWidth() {
-        return items[0] ? items[0].offsetWidth + 18 : 0;
+      function resize() {
+        var v   = visible();
+        var vpW = viewport.offsetWidth;
+        var iw  = (vpW - GAP * (v - 1)) / v;
+        for (var i = 0; i < items.length; i++) {
+          items[i].style.flex    = '0 0 ' + iw + 'px';
+          items[i].style.width   = iw + 'px';
+          items[i].style.minWidth = iw + 'px';
+        }
+        go(Math.min(pos, Math.max(0, items.length - v)));
+      }
+
+      function itemW() {
+        return items[0].offsetWidth + GAP;
       }
 
       function maxPos() {
-        return Math.max(0, items.length - visibleCount());
+        return Math.max(0, items.length - visible());
       }
 
       function go(n) {
         pos = Math.max(0, Math.min(n, maxPos()));
-        track.style.transform = 'translateX(' + (pos * itemWidth() * (document.dir === 'rtl' ? 1 : -1)) + 'px)';
-        // Update arrow visibility
-        document.querySelector('.cat-arrow-prev').style.opacity = pos <= 0 ? '.35' : '1';
-        document.querySelector('.cat-arrow-next').style.opacity = pos >= maxPos() ? '.35' : '1';
+        track.style.transform = 'translateX(' + (-pos * itemW()) + 'px)';
+        if (prevBtn) prevBtn.style.opacity = pos <= 0          ? '0.35' : '1';
+        if (nextBtn) nextBtn.style.opacity = pos >= maxPos()   ? '0.35' : '1';
       }
 
       window.catSlide = function(dir) {
-        // RTL: arrows are visually swapped
-        const rtl = document.documentElement.dir === 'rtl';
-        go(pos + (rtl ? -dir : dir));
-        resetAuto();
+        go(pos + dir);
+        resetTimer();
       };
 
-      function resetAuto() {
-        clearInterval(autoTimer);
-        autoTimer = setInterval(function() {
-          const next = pos >= maxPos() ? 0 : pos + 1;
-          go(next);
+      function resetTimer() {
+        clearInterval(timer);
+        timer = setInterval(function() {
+          go(pos >= maxPos() ? 0 : pos + 1);
         }, 3500);
       }
 
-      go(0);
-      resetAuto();
+      resize();
+      resetTimer();
 
-      // Pause on hover
-      viewport.addEventListener('mouseenter', () => clearInterval(autoTimer));
-      viewport.addEventListener('mouseleave', resetAuto);
-
-      // Recalc on resize
-      window.addEventListener('resize', () => go(Math.min(pos, maxPos())));
+      viewport.addEventListener('mouseenter', function() { clearInterval(timer); });
+      viewport.addEventListener('mouseleave', resetTimer);
+      window.addEventListener('resize', resize);
     })();
     </script>
     @endpush
