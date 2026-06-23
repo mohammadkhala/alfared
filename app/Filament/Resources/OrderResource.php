@@ -570,15 +570,20 @@ class OrderResource extends Resource
                             $ids = $records->pluck('id')->implode(',');
                             return redirect()->away(route('orders.export', ['ids' => $ids]));
                         }),
-                    Tables\Actions\BulkAction::make('mark_confirmed')
-                        ->label('تأكيد الطلبات')
-                        ->icon('heroicon-o-check-circle')
+                    Tables\Actions\BulkAction::make('change_status')
+                        ->label('تغيير الحالة')
+                        ->icon('heroicon-o-arrow-path')
                         ->color('info')
-                        ->action(fn($records) => $records->each->update(['status' => 'confirmed'])),
-                    Tables\Actions\BulkAction::make('mark_shipped')
-                        ->label('تحديد كـ شُحن')
-                        ->icon('heroicon-o-truck')
-                        ->action(fn($records) => $records->each->update(['status' => 'shipped'])),
+                        ->form([
+                            Forms\Components\Select::make('status')
+                                ->label('الحالة الجديدة')
+                                ->options(\App\Models\Order::$statusLabels)
+                                ->required(),
+                        ])
+                        ->action(function ($records, array $data) {
+                            $records->each->update(['status' => $data['status']]);
+                        })
+                        ->deselectRecordsAfterCompletion(),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
