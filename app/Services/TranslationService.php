@@ -51,10 +51,15 @@ class TranslationService
     protected function callApi(string $text, string $from, string $to): string
     {
         try {
-            $response = Http::timeout(12)->get($this->endpoint, [
+            $params = [
                 'q'        => $text,
                 'langpair' => "{$from}|{$to}",
-            ]);
+            ];
+            // Registered email raises daily limit from 10k to 50k chars
+            $email = config('services.mymemory.email', env('MYMEMORY_EMAIL'));
+            if ($email) $params['de'] = $email;
+
+            $response = Http::timeout(15)->get($this->endpoint, $params);
 
             if ($response->successful()) {
                 $data   = $response->json();

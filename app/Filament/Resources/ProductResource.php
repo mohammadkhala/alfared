@@ -330,8 +330,7 @@ class ProductResource extends Resource
                         ->deselectRecordsAfterCompletion()
                         ->action(function ($records) {
                             $translator = app(\App\Services\TranslationService::class);
-                            $done = 0;
-                            $failed = 0;
+                            $done = 0; $failed = 0; $apiError = false;
 
                             foreach ($records as $product) {
                                 $updates = [];
@@ -343,6 +342,7 @@ class ProductResource extends Resource
                                     $he = $translator->translate($nameAr, 'ar', 'he');
                                     if ($en) $updates['name_en'] = $en;
                                     if ($he) $updates['name_he'] = $he;
+                                    if (!$en && !$he) { $apiError = true; break; }
                                 }
 
                                 // Short description
@@ -369,12 +369,21 @@ class ProductResource extends Resource
                                 } else {
                                     $failed++;
                                 }
+
+                                // 0.5s between products to respect API rate limit
+                                usleep(500_000);
                             }
 
-                            \Filament\Notifications\Notification::make()
-                                ->title("تمت الترجمة: {$done} منتج" . ($failed ? " | فشل: {$failed}" : ''))
-                                ->success()
-                                ->send();
+                            if ($apiError) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('فشلت الترجمة — تجاوز الحد اليومي لـ MyMemory API')
+                                    ->body("تمت ترجمة {$done} منتج. أضف MYMEMORY_EMAIL في ملف .env لرفع الحد إلى 50,000 حرف/يوم.")
+                                    ->warning()->persistent()->send();
+                            } else {
+                                \Filament\Notifications\Notification::make()
+                                    ->title("✅ تمت الترجمة: {$done} منتج" . ($failed ? " | تجاهل: {$failed}" : ''))
+                                    ->success()->send();
+                            }
                         }),
                 ]),
             ])
