@@ -319,6 +319,63 @@ class ProductResource extends Resource
                         ->icon('heroicon-o-no-symbol')
                         ->color('gray')
                         ->action(fn($records) => $records->each->update(['is_featured' => false])),
+                    Tables\Actions\BulkAction::make('bulk_translate')
+                        ->label('🌐 ترجمة تلقائية')
+                        ->icon('heroicon-o-language')
+                        ->color('info')
+                        ->requiresConfirmation()
+                        ->modalHeading('ترجمة المنتجات المحددة')
+                        ->modalDescription('سيتم ترجمة (الاسم + الوصف القصير + الوصف) من العربية إلى الإنجليزية والعبرية لكل المنتجات المحددة. قد يستغرق ذلك بعض الوقت.')
+                        ->modalSubmitActionLabel('ابدأ الترجمة')
+                        ->deselectRecordsAfterCompletion()
+                        ->action(function ($records) {
+                            $translator = app(\App\Services\TranslationService::class);
+                            $done = 0;
+                            $failed = 0;
+
+                            foreach ($records as $product) {
+                                $updates = [];
+
+                                // Name
+                                $nameAr = trim($product->name_ar ?? '');
+                                if ($nameAr) {
+                                    $en = $translator->translate($nameAr, 'ar', 'en');
+                                    $he = $translator->translate($nameAr, 'ar', 'he');
+                                    if ($en) $updates['name_en'] = $en;
+                                    if ($he) $updates['name_he'] = $he;
+                                }
+
+                                // Short description
+                                $shortAr = trim($product->short_description ?? '');
+                                if ($shortAr) {
+                                    $en = $translator->translate($shortAr, 'ar', 'en');
+                                    $he = $translator->translate($shortAr, 'ar', 'he');
+                                    if ($en) $updates['short_description_en'] = $en;
+                                    if ($he) $updates['short_description_he'] = $he;
+                                }
+
+                                // Description (strip HTML)
+                                $descAr = trim(strip_tags($product->description_ar ?? ''));
+                                if ($descAr) {
+                                    $en = $translator->translate($descAr, 'ar', 'en');
+                                    $he = $translator->translate($descAr, 'ar', 'he');
+                                    if ($en) $updates['description_en'] = '<p>' . htmlspecialchars($en, ENT_QUOTES) . '</p>';
+                                    if ($he) $updates['description_he'] = '<p>' . htmlspecialchars($he, ENT_QUOTES) . '</p>';
+                                }
+
+                                if (!empty($updates)) {
+                                    $product->updateQuietly($updates);
+                                    $done++;
+                                } else {
+                                    $failed++;
+                                }
+                            }
+
+                            \Filament\Notifications\Notification::make()
+                                ->title("تمت الترجمة: {$done} منتج" . ($failed ? " | فشل: {$failed}" : ''))
+                                ->success()
+                                ->send();
+                        }),
                 ]),
             ])
             ->defaultSort('created_at', 'desc');
