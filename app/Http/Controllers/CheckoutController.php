@@ -55,11 +55,6 @@ class CheckoutController extends Controller
 
     public function placeOrder(Request $request)
     {
-        \Log::info('CHECKOUT_DEBUG', [
-            'payment_method'  => $request->input('payment_method'),
-            'all_inputs'      => $request->except(['_token']),
-            'cart_count'      => count(session('cart', [])),
-        ]);
 
         $request->validate([
             'first_name'       => 'required|string|max:100',

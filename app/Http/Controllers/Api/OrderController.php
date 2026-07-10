@@ -31,11 +31,24 @@ class OrderController extends Controller
         return response()->json(['order' => $this->formatOrder($order, true)]);
     }
 
-    public function track(string $orderNumber): JsonResponse
+    public function track(Request $request, string $orderNumber): JsonResponse
     {
-        // Public tracking by order number (no auth) - useful for guests too
         $order = Order::where('order_number', $orderNumber)->with('items')->firstOrFail();
-        return response()->json(['order' => $this->formatOrder($order, true)]);
+
+        // Strip PII for unauthenticated requests; authenticated users see full order
+        $user = $request->user('sanctum');
+        if ($user && $user->id !== $order->user_id) {
+            abort(403);
+        }
+
+        $data = $this->formatOrder($order, true);
+
+        // Remove PII from guest responses
+        if (! $user) {
+            unset($data['customer_name'], $data['customer_phone'], $data['address']);
+        }
+
+        return response()->json(['order' => $data]);
     }
 
     /**

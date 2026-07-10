@@ -60,7 +60,7 @@ class User extends Authenticatable implements FilamentUser
 
     protected $fillable = [
         'name', 'email', 'phone', 'password',
-        'role', 'permissions', 'loyalty_points',
+        'loyalty_points',
         'fcm_token', 'device_type',
         'referral_code', 'referred_by', 'last_checkin_at', 'checkin_streak',
     ];

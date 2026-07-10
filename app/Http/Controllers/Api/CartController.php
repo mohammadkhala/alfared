@@ -236,7 +236,7 @@ class CartController extends Controller
             'delivery_zone_id' => 'required|exists:delivery_zones,id',
             'coupon_code'      => 'nullable|string',
             'loyalty_points'   => 'nullable|integer|min:0',
-            'payment_method'   => 'nullable|in:cod,lahza,card,transfer',
+            'payment_method'   => 'nullable|in:cod,lahza',
         ]);
 
         $user = $request->user();

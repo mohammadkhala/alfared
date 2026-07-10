@@ -106,7 +106,7 @@ Route::prefix('cart')->name('cart.')->group(function () {
 Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/place', [CheckoutController::class, 'placeOrder'])->name('place');
-    Route::get('/delivery-fee', [CheckoutController::class, 'getDeliveryFee'])->name('delivery-fee');
+    Route::get('/delivery-fee', [CheckoutController::class, 'getDeliveryFee'])->name('delivery-fee')->middleware('throttle:30,1');
     Route::get('/success/{orderNumber}', [CheckoutController::class, 'success'])->name('success');
     Route::get('/failed/{orderNumber}', [CheckoutController::class, 'paymentFailed'])->name('failed');
     Route::get('/tracking/{orderNumber}', [CheckoutController::class, 'tracking'])->name('tracking');
@@ -140,7 +140,7 @@ Route::get('/shipping',       [PageController::class, 'shipping'])->name('shippi
 Route::get('/faq',            [PageController::class, 'faq'])->name('faq');
 
 // ── Wishlist ──
-Route::post('/wishlist/toggle/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle');
+Route::post('/wishlist/toggle/{product}', [WishlistController::class, 'toggle'])->name('wishlist.toggle')->middleware('auth');
 
 // ── Auth (phone + password) ──
 Route::middleware('guest')->group(function () {
