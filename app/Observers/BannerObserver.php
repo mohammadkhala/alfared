@@ -23,6 +23,7 @@ class BannerObserver
         foreach (['ar', 'en', 'he'] as $loc) {
             Cache::forget("home:{$loc}:hero");
             Cache::forget("home:{$loc}:offer_banners");
+            Cache::forget("home:{$loc}:promo_banners");
         }
 
         // API cache

@@ -34,7 +34,7 @@
   <link rel="sitemap" type="application/xml" href="{{ url('/sitemap.xml') }}"/>
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
-  <link rel="stylesheet" href="{{ asset('css/store.css') }}"/>
+  <link rel="stylesheet" href="{{ asset('css/store.css') }}?v={{ @filemtime(public_path('css/store.css')) ?: '1' }}"/>
   @stack('styles')
 
   <!-- TikTok Pixel Code Start -->
