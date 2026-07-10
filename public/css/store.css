@@ -823,6 +823,7 @@ footer { background:var(--blue-dk); color:#CBD5E1; padding:60px 0 0; }
   .categories-grid { grid-template-columns:repeat(3,1fr); }
   .features-grid { grid-template-columns:repeat(2,1fr); }
   .product-detail-layout { grid-template-columns:1fr; }
+  .product-gallery { position:static !important; }
   .cart-layout { grid-template-columns:1fr; }
   .checkout-layout { grid-template-columns:1fr; }
 }

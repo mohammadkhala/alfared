@@ -78,6 +78,11 @@ class HomeController extends Controller
             Banner::active()->where('position', 'offers')->orderBy('sort_order')->get()
         );
 
+        // Dual promo banners (managed from admin → لوحة الإعلانات → موضع "ترويجي")
+        $promoBanners = Cache::remember("home:{$loc}:promo_banners", $ttl, fn () =>
+            Banner::active()->where('position', 'promo')->orderBy('sort_order')->limit(2)->get()
+        );
+
         $brands = Cache::remember("home:{$loc}:brands", $ttl, fn () =>
             Brand::where('is_active', true)->orderBy('sort_order')->limit(12)->get()
         );
@@ -85,7 +90,7 @@ class HomeController extends Controller
         return view('home', compact(
             'heroBanners', 'categories', 'featuredProducts',
             'newProducts', 'bestSellers', 'brands',
-            'offerProducts', 'offerBanners', 'flashSale'
+            'offerProducts', 'offerBanners', 'promoBanners', 'flashSale'
         ));
     }
 

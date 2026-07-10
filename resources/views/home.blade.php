@@ -367,28 +367,46 @@
 @endif
 
 {{-- ═══════════════════ DUAL BANNERS ═══════════════════ --}}
+{{-- تُدار من لوحة الأدمن: لوحة الإعلانات → الموضع "ترويجي" (promo). --}}
+{{-- إذا لم يُضف أي بانر ترويجي، تُعرض البطاقتان الافتراضيتان أدناه. --}}
 <div style="padding:0 24px 56px;max-width:1280px;margin:0 auto;">
   <div class="dual-banners">
-    <div class="d-banner">
-      <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=700&q=80" alt="{{ __('skincare') }}"/>
-      <div class="d-banner-overlay blue"></div>
-      <div class="d-banner-content">
-        <span class="tag">{{ __('banner_skincare_tag') }}</span>
-        <h3>{{ __('banner_skincare_title') }}</h3>
-        <p>{{ __('banner_skincare_desc') }}</p>
-        <a href="{{ route('products.category','skincare') }}">{{ __('banner_skincare_btn') }}</a>
+    @if(isset($promoBanners) && $promoBanners->count())
+      @foreach($promoBanners as $i => $banner)
+        <a href="{{ $banner->link ?? '#' }}" class="d-banner" style="text-decoration:none;">
+          <img src="{{ $banner->image ? asset('storage/'.$banner->image) : asset('images/placeholder.svg') }}"
+               alt="{{ $banner->title_ar }}"/>
+          <div class="d-banner-overlay {{ $i % 2 === 0 ? 'blue' : 'orange' }}"></div>
+          <div class="d-banner-content">
+            @if($banner->badge_text)<span class="tag">{{ $banner->badge_text }}</span>@endif
+            @if($banner->title_ar)<h3>{{ $banner->title_ar }}</h3>@endif
+            @if($banner->subtitle_ar)<p>{{ $banner->subtitle_ar }}</p>@endif
+            @if($banner->button_text_ar)<span class="d-banner-btn">{{ $banner->button_text_ar }}</span>@endif
+          </div>
+        </a>
+      @endforeach
+    @else
+      <div class="d-banner">
+        <img src="https://images.unsplash.com/photo-1571781926291-c477ebfd024b?w=700&q=80" alt="{{ __('skincare') }}"/>
+        <div class="d-banner-overlay blue"></div>
+        <div class="d-banner-content">
+          <span class="tag">{{ __('banner_skincare_tag') }}</span>
+          <h3>{{ __('banner_skincare_title') }}</h3>
+          <p>{{ __('banner_skincare_desc') }}</p>
+          <a href="{{ route('products.category','skincare') }}">{{ __('banner_skincare_btn') }}</a>
+        </div>
       </div>
-    </div>
-    <div class="d-banner">
-      <img src="https://images.unsplash.com/photo-1512207736890-6ffed8a84e8d?w=700&q=80" alt="{{ __('perfume') }}"/>
-      <div class="d-banner-overlay orange"></div>
-      <div class="d-banner-content">
-        <span class="tag">{{ __('banner_perfume_tag') }}</span>
-        <h3>{{ __('banner_perfume_title') }}</h3>
-        <p>{{ __('banner_perfume_desc') }}</p>
-        <a href="{{ route('products.category','perfume') }}">{{ __('banner_perfume_btn') }}</a>
+      <div class="d-banner">
+        <img src="https://images.unsplash.com/photo-1512207736890-6ffed8a84e8d?w=700&q=80" alt="{{ __('perfume') }}"/>
+        <div class="d-banner-overlay orange"></div>
+        <div class="d-banner-content">
+          <span class="tag">{{ __('banner_perfume_tag') }}</span>
+          <h3>{{ __('banner_perfume_title') }}</h3>
+          <p>{{ __('banner_perfume_desc') }}</p>
+          <a href="{{ route('products.category','perfume') }}">{{ __('banner_perfume_btn') }}</a>
+        </div>
       </div>
-    </div>
+    @endif
   </div>
 </div>
 
