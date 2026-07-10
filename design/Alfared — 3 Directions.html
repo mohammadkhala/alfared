@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>أبناء الفريد — 3 اتجاهات تصميمية</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;700;800;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Tajawal',sans-serif;background:#0e0e0e;color:#fff}
+
+/* TITLE BAR */
+.title-bar{
+  background:#0e0e0e;
+  border-bottom:1px solid #222;
+  padding:24px 40px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.title-bar h1{font-size:14px;font-weight:400;color:#666;letter-spacing:.1em;text-transform:uppercase}
+.title-bar span{font-size:12px;color:#444;letter-spacing:.06em}
+
+/* GRID of 3 cards */
+.grid3{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:3px;
+  background:#222;
+  min-height:100vh;
+}
+
+/* DIRECTION LABEL */
+.dir-label{
+  background:#0e0e0e;
+  border-bottom:1px solid #222;
+  padding:18px 28px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.dir-num{font-size:11px;font-weight:700;letter-spacing:.2em;text-transform:uppercase}
+.dir-title{font-size:18px;font-weight:800;margin-top:4px}
+.dir-keywords{font-size:11px;font-weight:300;opacity:.5;margin-top:2px;letter-spacing:.04em}
+
+/* ════════════════════════════════════════
+   DIRECTION A — Warm Editorial
+   Cream · Terracotta · Olive · Palestinian Earth
+════════════════════════════════════════ */
+.dir-a{background:#FAF7F2;color:#1C1410;font-family:'Tajawal',sans-serif}
+
+.a-label{background:#FAF7F2;border-bottom:1px solid #E8E0D5}
+.a-label .dir-num{color:#B5662A}
+.a-label .dir-title{color:#1C1410}
+
+.a-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 28px;
+  background:#FAF7F2;
+  border-bottom:1px solid #E8E0D5;
+}
+.a-logo{font-size:16px;font-weight:900;color:#1C1410;letter-spacing:-.01em}
+.a-logo span{color:#B5662A}
+.a-nav-links{display:flex;gap:20px;font-size:12px;color:#9B8878;font-weight:400}
+.a-btn{background:#B5662A;color:#fff;border:none;padding:9px 20px;font-size:12px;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;border-radius:2px}
+
+.a-hero{
+  background:#FAF7F2;
+  padding:56px 28px 48px;
+  position:relative;
+  overflow:hidden;
+  min-height:440px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+}
+.a-hero-bg-text{
+  position:absolute;
+  top:-20px;right:-10px;
+  font-size:140px;font-weight:900;
+  color:rgba(181,102,42,.06);
+  line-height:1;
+  font-family:'Playfair Display',serif;
+  user-select:none;
+}
+.a-eyebrow{
+  font-size:10px;font-weight:600;
+  color:#B5662A;letter-spacing:.2em;text-transform:uppercase;
+  display:flex;align-items:center;gap:10px;margin-bottom:20px;
+}
+.a-eyebrow::before{content:'';display:block;width:24px;height:1px;background:#B5662A}
+.a-h1{
+  font-size:46px;font-weight:200;
+  color:#1C1410;line-height:1.15;
+  margin-bottom:16px;
+  font-family:'Playfair Display',serif;
+}
+.a-h1 strong{font-weight:700;font-family:'Tajawal',sans-serif;display:block;font-size:52px}
+.a-sub{font-size:13px;font-weight:300;color:#9B8878;line-height:1.7;margin-bottom:28px;max-width:340px}
+.a-actions{display:flex;gap:12px;align-items:center}
+.a-btn-primary{
+  background:#1C1410;color:#FAF7F2;
+  padding:14px 28px;font-size:13px;font-weight:700;
+  font-family:'Tajawal',sans-serif;border:none;cursor:pointer;
+  letter-spacing:.04em;
+}
+.a-btn-sec{
+  background:transparent;color:#B5662A;border:1px solid #B5662A;
+  padding:13px 24px;font-size:13px;font-weight:500;
+  font-family:'Tajawal',sans-serif;cursor:pointer;
+}
+.a-stats{
+  display:flex;gap:32px;margin-top:36px;
+  padding-top:28px;border-top:1px solid #E8E0D5;
+}
+.a-stat-n{font-size:26px;font-weight:900;color:#1C1410}
+.a-stat-n em{color:#B5662A;font-style:normal}
+.a-stat-l{font-size:10px;font-weight:300;color:#9B8878;text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+
+.a-cats{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:#E8E0D5;margin-top:2px}
+.a-cat{
+  background:#FAF7F2;padding:24px 20px;
+  display:flex;flex-direction:column;align-items:flex-start;gap:10px;
+  cursor:pointer;transition:background .2s;
+}
+.a-cat:hover{background:#F0E9DF}
+.a-cat-icon{font-size:28px}
+.a-cat-name{font-size:14px;font-weight:700;color:#1C1410}
+.a-cat-count{font-size:11px;color:#9B8878;font-weight:300}
+
+.a-feats{display:grid;grid-template-columns:repeat(2,1fr);gap:2px;background:#E8E0D5;margin-top:2px}
+.a-feat{
+  background:#FAF7F2;padding:24px 20px;
+}
+.a-feat-icon{font-size:22px;margin-bottom:10px}
+.a-feat-title{font-size:13px;font-weight:700;color:#1C1410;margin-bottom:4px}
+.a-feat-desc{font-size:11px;font-weight:300;color:#9B8878;line-height:1.6}
+
+/* ════════════════════════════════════════
+   DIRECTION B — Clean Minimal Pink
+   White · Rose · Soft · Modern Sephora-style
+════════════════════════════════════════ */
+.dir-b{background:#fff;color:#111;font-family:'Tajawal',sans-serif}
+
+.b-label{background:#fff;border-bottom:1px solid #F0F0F0}
+.b-label .dir-num{color:#E85D8A}
+.b-label .dir-title{color:#111}
+
+.b-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 28px;
+  border-bottom:1px solid #F0F0F0;
+}
+.b-logo{font-size:16px;font-weight:900;color:#111;letter-spacing:.02em}
+.b-logo span{color:#E85D8A}
+.b-nav-links{display:flex;gap:20px;font-size:12px;color:#999;font-weight:400}
+.b-btn{background:#111;color:#fff;border:none;padding:9px 20px;font-size:12px;font-weight:700;font-family:'Tajawal',sans-serif;cursor:pointer;border-radius:100px}
+
+.b-hero{
+  background:linear-gradient(160deg,#FFF0F5 0%,#fff 60%);
+  padding:52px 28px 44px;
+  min-height:440px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  position:relative;overflow:hidden;
+}
+.b-hero-blob{
+  position:absolute;
+  top:-60px;left:-40px;
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(232,93,138,.12) 0%,transparent 70%);
+  border-radius:50%;
+}
+.b-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#FFF0F5;border:1px solid #FBBDD3;
+  border-radius:100px;padding:6px 14px;
+  font-size:11px;font-weight:600;color:#E85D8A;
+  margin-bottom:20px;width:fit-content;
+}
+.b-tag::before{content:'●';font-size:8px}
+.b-h1{
+  font-size:44px;font-weight:900;
+  color:#111;line-height:1.18;
+  margin-bottom:14px;
+  letter-spacing:-.02em;
+}
+.b-h1 em{color:#E85D8A;font-style:normal}
+.b-sub{font-size:13px;font-weight:400;color:#888;line-height:1.7;margin-bottom:28px;max-width:360px}
+.b-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.b-btn-primary{
+  background:#E85D8A;color:#fff;
+  padding:14px 28px;font-size:13px;font-weight:700;
+  font-family:'Tajawal',sans-serif;border:none;cursor:pointer;
+  border-radius:100px;box-shadow:0 8px 24px rgba(232,93,138,.3);
+}
+.b-btn-sec{
+  display:inline-flex;align-items:center;gap:6px;
+  font-size:13px;font-weight:600;color:#111;
+  text-decoration:none;cursor:pointer;border:none;background:none;font-family:'Tajawal',sans-serif;
+}
+.b-stats{
+  display:flex;gap:28px;margin-top:32px;
+  padding-top:24px;border-top:1px solid #F0F0F0;
+}
+.b-stat-n{font-size:24px;font-weight:900;color:#111}
+.b-stat-n em{color:#E85D8A;font-style:normal}
+.b-stat-l{font-size:10px;color:#aaa;text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+
+.b-cats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
+  padding:20px;background:#fff;margin-top:2px;
+}
+.b-cat{
+  background:#FAFAFA;border:1px solid #F0F0F0;border-radius:16px;
+  padding:20px 16px;text-align:center;cursor:pointer;transition:all .2s;
+}
+.b-cat:hover{background:#FFF0F5;border-color:#FBBDD3;transform:translateY(-3px)}
+.b-cat-icon{font-size:28px;margin-bottom:8px}
+.b-cat-name{font-size:13px;font-weight:700;color:#111;margin-bottom:2px}
+.b-cat-count{font-size:11px;color:#aaa}
+
+.b-feats{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+  padding:20px;background:#fff;margin-top:0;
+}
+.b-feat{
+  background:#FAFAFA;border-radius:16px;padding:20px 16px;
+}
+.b-feat-icon{
+  width:44px;height:44px;background:#FFF0F5;border-radius:12px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;
+}
+.b-feat-title{font-size:13px;font-weight:700;color:#111;margin-bottom:4px}
+.b-feat-desc{font-size:11px;color:#888;line-height:1.6}
+
+/* ════════════════════════════════════════
+   DIRECTION C — Bold & Electric
+   Deep Purple · Electric Violet · White
+════════════════════════════════════════ */
+.dir-c{background:#0D0518;color:#fff;font-family:'Tajawal',sans-serif}
+
+.c-label{background:#0D0518;border-bottom:1px solid rgba(255,255,255,.08)}
+.c-label .dir-num{color:#A855F7}
+.c-label .dir-title{color:#fff}
+
+.c-nav{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 28px;
+  border-bottom:1px solid rgba(255,255,255,.07);
+}
+.c-logo{font-size:16px;font-weight:900;color:#fff}
+.c-logo em{font-style:normal;color:#A855F7}
+.c-nav-links{display:flex;gap:20px;font-size:12px;color:rgba(255,255,255,.4)}
+.c-btn{
+  background:linear-gradient(135deg,#A855F7,#7C3AED);
+  color:#fff;border:none;padding:9px 20px;font-size:12px;font-weight:700;
+  font-family:'Tajawal',sans-serif;cursor:pointer;border-radius:8px;
+}
+
+.c-hero{
+  padding:48px 28px 40px;
+  min-height:440px;
+  display:flex;flex-direction:column;justify-content:flex-end;
+  position:relative;overflow:hidden;
+  background:#0D0518;
+}
+/* animated gradient orbs */
+.c-orb1{
+  position:absolute;top:-80px;right:-80px;
+  width:300px;height:300px;
+  background:radial-gradient(circle,rgba(168,85,247,.25),transparent 70%);
+  border-radius:50%;
+  animation:float1 6s ease-in-out infinite;
+}
+.c-orb2{
+  position:absolute;bottom:0;left:-60px;
+  width:240px;height:240px;
+  background:radial-gradient(circle,rgba(236,72,153,.2),transparent 70%);
+  border-radius:50%;
+  animation:float2 8s ease-in-out infinite;
+}
+@keyframes float1{0%,100%{transform:translate(0,0)}50%{transform:translate(-20px,20px)}}
+@keyframes float2{0%,100%{transform:translate(0,0)}50%{transform:translate(20px,-15px)}}
+
+.c-tag{
+  display:inline-flex;align-items:center;gap:8px;
+  border:1px solid rgba(168,85,247,.4);
+  border-radius:100px;padding:6px 14px;
+  font-size:11px;font-weight:600;
+  background:rgba(168,85,247,.1);
+  color:#C084FC;
+  margin-bottom:20px;width:fit-content;
+}
+.c-h1{
+  font-size:46px;font-weight:900;
+  color:#fff;line-height:1.12;
+  margin-bottom:14px;letter-spacing:-.02em;
+}
+.c-h1 em{
+  font-style:normal;
+  background:linear-gradient(135deg,#A855F7,#EC4899);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.c-sub{font-size:13px;color:rgba(255,255,255,.5);line-height:1.7;margin-bottom:28px;max-width:360px}
+.c-actions{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.c-btn-primary{
+  background:linear-gradient(135deg,#A855F7 0%,#EC4899 100%);
+  color:#fff;padding:14px 28px;font-size:13px;font-weight:700;
+  font-family:'Tajawal',sans-serif;border:none;cursor:pointer;border-radius:10px;
+  box-shadow:0 8px 32px rgba(168,85,247,.4);
+}
+.c-btn-sec{
+  background:rgba(255,255,255,.07);
+  color:#fff;border:1px solid rgba(255,255,255,.15);
+  padding:13px 24px;font-size:13px;font-weight:400;
+  font-family:'Tajawal',sans-serif;cursor:pointer;border-radius:10px;
+}
+.c-stats{
+  display:flex;gap:28px;margin-top:32px;
+  padding-top:24px;border-top:1px solid rgba(255,255,255,.08);
+}
+.c-stat-n{
+  font-size:26px;font-weight:900;
+  background:linear-gradient(135deg,#A855F7,#EC4899);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;
+}
+.c-stat-l{font-size:10px;color:rgba(255,255,255,.35);text-transform:uppercase;letter-spacing:.1em;margin-top:2px}
+
+.c-cats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:2px;
+  background:rgba(255,255,255,.05);margin-top:2px;
+}
+.c-cat{
+  background:#0D0518;padding:22px 18px;cursor:pointer;transition:background .2s;
+  border:1px solid rgba(168,85,247,.0);transition:all .2s;
+}
+.c-cat:hover{background:#150828;border-color:rgba(168,85,247,.3)}
+.c-cat-icon{font-size:28px;margin-bottom:10px}
+.c-cat-name{font-size:14px;font-weight:700;color:#fff;margin-bottom:2px}
+.c-cat-count{font-size:11px;color:rgba(255,255,255,.3)}
+.c-cat-arrow{font-size:11px;color:#A855F7;margin-top:8px;opacity:0;transition:.2s}
+.c-cat:hover .c-cat-arrow{opacity:1}
+
+.c-feats{
+  display:grid;grid-template-columns:repeat(2,1fr);gap:2px;
+  background:rgba(255,255,255,.05);margin-top:2px;
+}
+.c-feat{background:#0D0518;padding:22px 18px}
+.c-feat-icon{
+  width:44px;height:44px;
+  background:rgba(168,85,247,.15);border:1px solid rgba(168,85,247,.2);border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:20px;margin-bottom:10px;
+}
+.c-feat-title{font-size:13px;font-weight:700;color:#fff;margin-bottom:4px}
+.c-feat-desc{font-size:11px;color:rgba(255,255,255,.4);line-height:1.6}
+
+/* VOTE ROW */
+.vote-row{
+  background:#0e0e0e;
+  border-top:3px solid #222;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:3px;
+  background:#222;
+}
+.vote-btn{
+  background:#0e0e0e;
+  padding:20px 28px;
+  border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:space-between;
+  transition:background .2s;
+  font-family:'Tajawal',sans-serif;
+}
+.vote-btn:hover{background:#161616}
+.vote-btn.a-vote:hover{background:#1A110A}
+.vote-btn.b-vote:hover{background:#1A0A10}
+.vote-btn.c-vote:hover{background:#110A1A}
+.vote-label{font-size:13px;font-weight:700;color:#fff;margin-bottom:2px}
+.vote-sub{font-size:11px;color:#555;font-weight:300}
+.vote-arrow{
+  width:36px;height:36px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:16px;
+}
+.a-arrow{background:#B5662A}
+.b-arrow{background:#E85D8A}
+.c-arrow{background:#A855F7}
+</style>
+</head>
+<body>
+
+<div class="title-bar">
+  <h1>أبناء الفريد — 3 اتجاهات تصميمية</h1>
+  <span>اختر الاتجاه الأقرب لما تريد</span>
+</div>
+
+<div class="grid3">
+
+  <!-- ════ A: WARM EDITORIAL ════ -->
+  <div class="dir-a">
+    <div class="dir-label a-label">
+      <div>
+        <div class="dir-num" style="color:#B5662A">A — دافئ تراثي</div>
+        <div class="dir-title" style="color:#1C1410">Warm Editorial</div>
+        <div class="dir-keywords" style="color:#9B8878">كريمي · ترراكوتا · تراثي عصري</div>
+      </div>
+    </div>
+
+    <div class="a-nav">
+      <div class="a-logo">أبناء <span>الفريد</span></div>
+      <div class="a-nav-links">
+        <span>المتجر</span><span>العروض</span><span>الماركات</span>
+      </div>
+      <button class="a-btn">دخول</button>
+    </div>
+
+    <div class="a-hero">
+      <div class="a-hero-bg-text">ف</div>
+      <div class="a-eyebrow">تشكيلة صيف 2025</div>
+      <h1 class="a-h1">
+        جمالكِ<br/>
+        <strong>يبدأ هنا</strong>
+      </h1>
+      <p class="a-sub">أفضل ماركات التجميل الأصيلة — توصيل سريع لفلسطين والداخل</p>
+      <div class="a-actions">
+        <button class="a-btn-primary">تسوّقي الآن</button>
+        <button class="a-btn-sec">اكتشفي الماركات</button>
+      </div>
+      <div class="a-stats">
+        <div>
+          <div class="a-stat-n">1200<em>+</em></div>
+          <div class="a-stat-l">منتج أصيل</div>
+        </div>
+        <div>
+          <div class="a-stat-n">80<em>+</em></div>
+          <div class="a-stat-l">ماركة</div>
+        </div>
+        <div>
+          <div class="a-stat-n">48<em>h</em></div>
+          <div class="a-stat-l">توصيل</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="a-cats">
+      <div class="a-cat"><div class="a-cat-icon">💄</div><div class="a-cat-name">البشرة</div><div class="a-cat-count">240+ منتج</div></div>
+      <div class="a-cat"><div class="a-cat-icon">🌸</div><div class="a-cat-name">العطور</div><div class="a-cat-count">180+ منتج</div></div>
+      <div class="a-cat"><div class="a-cat-icon">💆‍♀️</div><div class="a-cat-name">الشعر</div><div class="a-cat-count">95+ منتج</div></div>
+      <div class="a-cat"><div class="a-cat-icon">👁️</div><div class="a-cat-name">المكياج</div><div class="a-cat-count">310+ منتج</div></div>
+      <div class="a-cat"><div class="a-cat-icon">💅</div><div class="a-cat-name">الأظافر</div><div class="a-cat-count">60+ منتج</div></div>
+      <div class="a-cat"><div class="a-cat-icon">🧴</div><div class="a-cat-name">الجسم</div><div class="a-cat-count">120+ منتج</div></div>
+    </div>
+
+    <div class="a-feats">
+      <div class="a-feat"><div class="a-feat-icon">🚚</div><div class="a-feat-title">توصيل لفلسطين والداخل</div><div class="a-feat-desc">24–48 ساعة سريع وموثوق</div></div>
+      <div class="a-feat"><div class="a-feat-icon">🛡️</div><div class="a-feat-title">أصيلة 100٪</div><div class="a-feat-desc">مباشرة من الموزعين الرسميين</div></div>
+      <div class="a-feat"><div class="a-feat-icon">💳</div><div class="a-feat-title">دفع عند الاستلام</div><div class="a-feat-desc">استلمي أولاً ثم ادفعي</div></div>
+      <div class="a-feat"><div class="a-feat-icon">↩️</div><div class="a-feat-title">إرجاع مجاني 14 يوم</div><div class="a-feat-desc">بلا أسئلة وبلا تعقيدات</div></div>
+    </div>
+  </div>
+
+  <!-- ════ B: CLEAN PINK ════ -->
+  <div class="dir-b">
+    <div class="dir-label b-label">
+      <div>
+        <div class="dir-num" style="color:#E85D8A">B — نظيف عصري</div>
+        <div class="dir-title" style="color:#111">Clean & Fresh</div>
+        <div class="dir-keywords" style="color:#aaa">أبيض · وردي · minimalist · سيفورا</div>
+      </div>
+    </div>
+
+    <div class="b-nav">
+      <div class="b-logo">أبناء <span>الفريد</span></div>
+      <div class="b-nav-links">
+        <span>المتجر</span><span>العروض</span><span>الماركات</span>
+      </div>
+      <button class="b-btn">دخول</button>
+    </div>
+
+    <div class="b-hero">
+      <div class="b-hero-blob"></div>
+      <div class="b-tag">🌟 تشكيلة صيف 2025 وصلت</div>
+      <h1 class="b-h1">جمالكِ<br/><em>الأصيل</em> هنا</h1>
+      <p class="b-sub">أفضل ماركات التجميل بأسعار مناسبة — توصيل سريع لفلسطين والداخل</p>
+      <div class="b-actions">
+        <button class="b-btn-primary">تسوّقي الآن ←</button>
+        <button class="b-btn-sec">اكتشفي الماركات ←</button>
+      </div>
+      <div class="b-stats">
+        <div>
+          <div class="b-stat-n">1200<em>+</em></div>
+          <div class="b-stat-l">منتج</div>
+        </div>
+        <div>
+          <div class="b-stat-n">80<em>+</em></div>
+          <div class="b-stat-l">ماركة</div>
+        </div>
+        <div>
+          <div class="b-stat-n">48<em>h</em></div>
+          <div class="b-stat-l">توصيل</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="b-cats">
+      <div class="b-cat"><div class="b-cat-icon">💄</div><div class="b-cat-name">البشرة</div><div class="b-cat-count">240+ منتج</div></div>
+      <div class="b-cat"><div class="b-cat-icon">🌸</div><div class="b-cat-name">العطور</div><div class="b-cat-count">180+ منتج</div></div>
+      <div class="b-cat"><div class="b-cat-icon">💆‍♀️</div><div class="b-cat-name">الشعر</div><div class="b-cat-count">95+ منتج</div></div>
+      <div class="b-cat"><div class="b-cat-icon">👁️</div><div class="b-cat-name">المكياج</div><div class="b-cat-count">310+</div></div>
+      <div class="b-cat"><div class="b-cat-icon">💅</div><div class="b-cat-name">الأظافر</div><div class="b-cat-count">60+</div></div>
+      <div class="b-cat"><div class="b-cat-icon">🧴</div><div class="b-cat-name">الجسم</div><div class="b-cat-count">120+</div></div>
+    </div>
+
+    <div class="b-feats">
+      <div class="b-feat"><div class="b-feat-icon">🚚</div><div class="b-feat-title">توصيل لفلسطين والداخل</div><div class="b-feat-desc">24–48 ساعة سريع وموثوق</div></div>
+      <div class="b-feat"><div class="b-feat-icon">🛡️</div><div class="b-feat-title">أصيلة 100٪</div><div class="b-feat-desc">من الموزعين الرسميين</div></div>
+      <div class="b-feat"><div class="b-feat-icon">💳</div><div class="b-feat-title">دفع عند الاستلام</div><div class="b-feat-desc">استلمي أولاً ثم ادفعي</div></div>
+      <div class="b-feat"><div class="b-feat-icon">↩️</div><div class="b-feat-title">إرجاع مجاني</div><div class="b-feat-desc">14 يوم بلا أسئلة</div></div>
+    </div>
+  </div>
+
+  <!-- ════ C: BOLD PURPLE ════ -->
+  <div class="dir-c">
+    <div class="dir-label c-label">
+      <div>
+        <div class="dir-num" style="color:#A855F7">C — جريء وعصري</div>
+        <div class="dir-title">Bold & Electric</div>
+        <div class="dir-keywords" style="color:rgba(255,255,255,.3)">بنفسجي · electric · Gen Z · جريء</div>
+      </div>
+    </div>
+
+    <div class="c-nav">
+      <div class="c-logo">أبناء <em>الفريد</em></div>
+      <div class="c-nav-links">
+        <span>المتجر</span><span>العروض</span><span>الماركات</span>
+      </div>
+      <button class="c-btn">دخول</button>
+    </div>
+
+    <div class="c-hero">
+      <div class="c-orb1"></div>
+      <div class="c-orb2"></div>
+      <div class="c-tag">✨ تشكيلة صيف 2025</div>
+      <h1 class="c-h1">جمالكِ<br/><em>لا حدود له</em></h1>
+      <p class="c-sub">أفضل ماركات التجميل العالمية — أصيلة، توصيل سريع لفلسطين والداخل</p>
+      <div class="c-actions">
+        <button class="c-btn-primary">تسوّقي الآن ←</button>
+        <button class="c-btn-sec">اكتشفي الماركات</button>
+      </div>
+      <div class="c-stats">
+        <div>
+          <div class="c-stat-n">1200+</div>
+          <div class="c-stat-l">منتج أصيل</div>
+        </div>
+        <div>
+          <div class="c-stat-n">80+</div>
+          <div class="c-stat-l">ماركة</div>
+        </div>
+        <div>
+          <div class="c-stat-n">48h</div>
+          <div class="c-stat-l">توصيل</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="c-cats">
+      <div class="c-cat"><div class="c-cat-icon">💄</div><div class="c-cat-name">البشرة</div><div class="c-cat-count">240+ منتج</div><div class="c-cat-arrow">← تسوّقي</div></div>
+      <div class="c-cat"><div class="c-cat-icon">🌸</div><div class="c-cat-name">العطور</div><div class="c-cat-count">180+ منتج</div><div class="c-cat-arrow">← تسوّقي</div></div>
+      <div class="c-cat"><div class="c-cat-icon">💆‍♀️</div><div class="c-cat-name">الشعر</div><div class="c-cat-count">95+ منتج</div><div class="c-cat-arrow">← تسوّقي</div></div>
+      <div class="c-cat"><div class="c-cat-icon">👁️</div><div class="c-cat-name">المكياج</div><div class="c-cat-count">310+</div><div class="c-cat-arrow">← تسوّقي</div></div>
+      <div class="c-cat"><div class="c-cat-icon">💅</div><div class="c-cat-name">الأظافر</div><div class="c-cat-count">60+</div><div class="c-cat-arrow">← تسوّقي</div></div>
+      <div class="c-cat"><div class="c-cat-icon">🧴</div><div class="c-cat-name">الجسم</div><div class="c-cat-count">120+</div><div class="c-cat-arrow">← تسوّقي</div></div>
+    </div>
+
+    <div class="c-feats">
+      <div class="c-feat"><div class="c-feat-icon">🚚</div><div class="c-feat-title">توصيل لفلسطين والداخل</div><div class="c-feat-desc">24–48 ساعة سريع وموثوق</div></div>
+      <div class="c-feat"><div class="c-feat-icon">🛡️</div><div class="c-feat-title">أصيلة 100٪</div><div class="c-feat-desc">من الموزعين الرسميين</div></div>
+      <div class="c-feat"><div class="c-feat-icon">💳</div><div class="c-feat-title">دفع عند الاستلام</div><div class="c-feat-desc">استلمي أولاً ثم ادفعي</div></div>
+      <div class="c-feat"><div class="c-feat-icon">↩️</div><div class="c-feat-title">إرجاع مجاني</div><div class="c-feat-desc">14 يوم بلا أسئلة</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- VOTE ROW -->
+<div class="vote-row">
+  <button class="vote-btn a-vote">
+    <div>
+      <div class="vote-label" style="color:#E8CFBA">A — دافئ تراثي</div>
+      <div class="vote-sub">كريمي · ترراكوتا · editorial</div>
+    </div>
+    <div class="vote-arrow a-arrow">A</div>
+  </button>
+  <button class="vote-btn b-vote">
+    <div>
+      <div class="vote-label" style="color:#F9BCCF">B — نظيف عصري</div>
+      <div class="vote-sub">أبيض · وردي · minimalist</div>
+    </div>
+    <div class="vote-arrow b-arrow">B</div>
+  </button>
+  <button class="vote-btn c-vote">
+    <div>
+      <div class="vote-label" style="color:#D8B4FE">C — جريء electric</div>
+      <div class="vote-sub">بنفسجي · gradient · gen-z</div>
+    </div>
+    <div class="vote-arrow c-arrow">C</div>
+  </button>
+</div>
+
+</body>
+</html>

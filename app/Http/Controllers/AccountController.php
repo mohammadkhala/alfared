@@ -170,7 +170,7 @@ class AccountController extends Controller
             'reg_name'     => $request->name,
             'reg_phone'    => $request->phone,
             'reg_email'    => $request->email,
-            'reg_password' => $request->password,
+            'reg_password' => bcrypt($request->password),
             'reg_sent_at'  => now()->timestamp,
         ]);
 
@@ -232,15 +232,17 @@ class AccountController extends Controller
             return redirect()->route('login')->withErrors(['phone' => 'رقم الهاتف مسجل مسبقاً، سجّل دخولك.']);
         }
 
-        $rawPassword = session('reg_password');
-
-        $user = User::create([
-            'name'     => session('reg_name'),
-            'phone'    => $phone,
-            'email'    => session('reg_email') ?: null,
-            'password' => Hash::make($rawPassword),
-            'role'     => 'customer',
+        $user = new User([
+            'name'  => session('reg_name'),
+            'phone' => $phone,
+            'email' => session('reg_email') ?: null,
+            'role'  => 'customer',
         ]);
+        // Write hashed password directly to bypass the 'hashed' cast re-hashing
+        $user->setRawAttributes(array_merge($user->getAttributes(), [
+            'password' => session('reg_password'),
+        ]));
+        $user->save();
 
         // Signup bonus
         $signupBonus = (int) \App\Models\Setting::get('signup_bonus', 0);

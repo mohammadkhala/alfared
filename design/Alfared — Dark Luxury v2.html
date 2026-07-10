@@ -1,0 +1,1050 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>أبناء الفريد — Dark Luxury v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap" rel="stylesheet"/>
+
+<style>
+/* ═══════════════════════════════════════════
+   DARK LUXURY SYSTEM
+   ─────────────────────────────────────────
+   Black      #080808
+   Surface    #111111
+   Surface+   #191919
+   Gold       #C9A96E
+   Gold-lt    #E2CAAA
+   Gold-dim   rgba(201,169,110,.15)
+   White      #F0EDE8  (warm, not cold)
+   Muted      rgba(240,237,232,.45)
+   Border     rgba(201,169,110,.18)
+   ═══════════════════════════════════════════ */
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+
+:root{
+  --black:    #080808;
+  --s1:       #111111;
+  --s2:       #191919;
+  --s3:       #222222;
+  --gold:     #C9A96E;
+  --gold-lt:  #E2CAAA;
+  --gold-dim: rgba(201,169,110,.14);
+  --gold-br:  rgba(201,169,110,.22);
+  --white:    #F0EDE8;
+  --muted:    rgba(240,237,232,.45);
+  --border:   rgba(201,169,110,.18);
+  --t: all .32s cubic-bezier(.4,0,.2,1);
+}
+
+html{scroll-behavior:smooth}
+body{
+  font-family:'Tajawal',sans-serif;
+  background:var(--black);
+  color:var(--white);
+  -webkit-font-smoothing:antialiased;
+  line-height:1.6;
+}
+
+.container{max-width:1320px;margin:0 auto;padding:0 48px}
+
+/* ── DESIGN BANNER ── */
+.design-banner{
+  background:var(--gold);
+  color:var(--black);
+  text-align:center;
+  padding:9px;
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:.12em;
+  text-transform:uppercase;
+}
+
+/* ───────────────────────────────
+   NAVBAR
+─────────────────────────────── */
+.nav{
+  background:rgba(8,8,8,.92);
+  backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+.nav-inner{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  height:72px;
+  gap:24px;
+}
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  text-decoration:none;
+}
+.logo-mark{
+  width:40px;height:40px;
+  border:1px solid var(--gold);
+  border-radius:10px;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--gold);
+  font-size:18px;font-weight:900;
+  letter-spacing:-1px;
+}
+.logo-text{
+  font-size:17px;font-weight:800;
+  color:var(--white);letter-spacing:.02em;
+  line-height:1.1;
+}
+.logo-text span{
+  display:block;font-size:10px;font-weight:300;
+  color:var(--gold);letter-spacing:.15em;
+  text-transform:uppercase;
+}
+.nav-links{display:flex;align-items:center;gap:2px;list-style:none}
+.nav-links a{
+  display:block;padding:8px 16px;
+  font-size:13px;font-weight:400;
+  color:var(--muted);text-decoration:none;
+  border-radius:8px;
+  transition:var(--t);letter-spacing:.03em;
+}
+.nav-links a:hover{color:var(--gold);background:var(--gold-dim)}
+.nav-actions{display:flex;align-items:center;gap:10px}
+.nav-btn{
+  width:42px;height:42px;
+  border:1px solid rgba(201,169,110,.2);
+  border-radius:10px;
+  background:transparent;
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:16px;
+  cursor:pointer;transition:var(--t);position:relative;
+}
+.nav-btn:hover{border-color:var(--gold);color:var(--gold);background:var(--gold-dim)}
+.nav-badge{
+  position:absolute;top:-5px;left:-5px;
+  background:var(--gold);color:var(--black);
+  border-radius:50%;width:18px;height:18px;
+  font-size:10px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;
+}
+.btn-cta{
+  background:var(--gold);
+  color:var(--black);
+  border:none;border-radius:10px;
+  padding:11px 24px;
+  font-size:13px;font-weight:700;
+  font-family:'Tajawal',sans-serif;
+  cursor:pointer;transition:var(--t);
+  letter-spacing:.04em;
+}
+.btn-cta:hover{background:var(--gold-lt);transform:translateY(-1px)}
+
+/* ───────────────────────────────
+   HERO
+─────────────────────────────── */
+.hero{
+  min-height:92vh;
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  align-items:center;
+  position:relative;
+  overflow:hidden;
+}
+
+/* Subtle texture overlay */
+.hero::before{
+  content:'';
+  position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 55% 70% at 100% 50%, rgba(201,169,110,.07) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 50% at 0% 80%, rgba(201,169,110,.04) 0%, transparent 50%);
+  pointer-events:none;
+}
+
+/* Thin vertical gold line divider */
+.hero-divider{
+  position:absolute;
+  top:10%;bottom:10%;
+  right:50%;
+  width:1px;
+  background:linear-gradient(to bottom,transparent,var(--gold-br),transparent);
+}
+
+.hero-left{
+  position:relative;z-index:1;
+  padding:80px 64px 80px 48px;
+}
+
+.hero-overline{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:36px;
+}
+.hero-overline-line{
+  width:40px;height:1px;
+  background:var(--gold);
+}
+.hero-overline-text{
+  font-size:11px;font-weight:600;
+  color:var(--gold);
+  letter-spacing:.2em;text-transform:uppercase;
+}
+
+.hero-h1{
+  font-size:clamp(42px,5.5vw,78px);
+  font-weight:200;
+  color:var(--white);
+  line-height:1.12;
+  letter-spacing:-.02em;
+  margin-bottom:28px;
+}
+.hero-h1 strong{
+  font-weight:900;
+  display:block;
+}
+.hero-h1 em{
+  font-style:normal;
+  color:var(--gold);
+  font-weight:300;
+}
+
+.hero-desc{
+  font-size:15px;font-weight:300;
+  color:var(--muted);
+  line-height:1.8;
+  max-width:400px;
+  margin-bottom:48px;
+  letter-spacing:.02em;
+}
+
+.hero-btns{display:flex;align-items:center;gap:16px;flex-wrap:wrap}
+.btn-gold{
+  display:inline-flex;align-items:center;gap:10px;
+  background:var(--gold);
+  color:var(--black);
+  border:none;border-radius:0;
+  padding:17px 36px;
+  font-size:14px;font-weight:700;
+  font-family:'Tajawal',sans-serif;
+  cursor:pointer;text-decoration:none;
+  transition:var(--t);
+  letter-spacing:.06em;text-transform:uppercase;
+}
+.btn-gold:hover{background:var(--gold-lt);transform:translateY(-2px);box-shadow:0 12px 40px rgba(201,169,110,.3)}
+.btn-outline{
+  display:inline-flex;align-items:center;gap:10px;
+  background:transparent;
+  color:var(--white);
+  border:1px solid rgba(240,237,232,.2);
+  border-radius:0;
+  padding:16px 32px;
+  font-size:14px;font-weight:300;
+  font-family:'Tajawal',sans-serif;
+  cursor:pointer;text-decoration:none;
+  transition:var(--t);letter-spacing:.04em;
+}
+.btn-outline:hover{border-color:var(--gold);color:var(--gold)}
+
+/* Stats row */
+.hero-stats{
+  display:flex;align-items:center;gap:40px;
+  margin-top:56px;padding-top:40px;
+  border-top:1px solid var(--border);
+}
+.hero-stat{}
+.hero-stat-n{
+  font-size:32px;font-weight:900;
+  color:var(--white);line-height:1;
+  letter-spacing:-.02em;
+}
+.hero-stat-n span{color:var(--gold)}
+.hero-stat-l{
+  font-size:11px;font-weight:300;
+  color:var(--muted);margin-top:6px;
+  letter-spacing:.1em;text-transform:uppercase;
+}
+.hero-stat-sep{width:1px;height:40px;background:var(--border)}
+
+/* Right visual */
+.hero-right{
+  position:relative;
+  height:92vh;
+  overflow:hidden;
+}
+.hero-bg{
+  position:absolute;inset:0;
+  background:var(--s1);
+  display:flex;align-items:center;justify-content:center;
+}
+
+/* Decorative concentric rings */
+.rings{
+  position:absolute;
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+}
+.ring{
+  position:absolute;
+  border-radius:50%;
+  border:1px solid rgba(201,169,110,.1);
+  top:50%;left:50%;
+  transform:translate(-50%,-50%);
+}
+.r1{width:500px;height:500px}
+.r2{width:360px;height:360px;border-color:rgba(201,169,110,.16)}
+.r3{width:220px;height:220px;background:rgba(201,169,110,.04);border-color:rgba(201,169,110,.2)}
+
+.hero-ph{
+  position:relative;z-index:1;
+  text-align:center;color:rgba(240,237,232,.2);
+  font-size:12px;letter-spacing:.08em;
+}
+.hero-ph-icon{font-size:64px;display:block;margin-bottom:16px;opacity:.3}
+
+/* Floating card */
+.float-card{
+  position:absolute;
+  bottom:60px;right:40px;
+  background:rgba(17,17,17,.96);
+  border:1px solid var(--border);
+  border-radius:4px;
+  padding:20px 24px;
+  display:flex;align-items:center;gap:16px;
+  backdrop-filter:blur(16px);
+  min-width:220px;
+}
+.float-card-icon{
+  width:48px;height:48px;
+  background:var(--gold-dim);
+  border:1px solid var(--gold-br);
+  border-radius:4px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:22px;
+}
+.float-card-title{font-size:13px;font-weight:700;color:var(--white);margin-bottom:3px}
+.float-card-sub{font-size:11px;font-weight:300;color:var(--muted)}
+
+/* ───────────────────────────────
+   SECTION HEADER
+─────────────────────────────── */
+.sec-eyebrow{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:20px;
+}
+.sec-eyebrow-line{width:32px;height:1px;background:var(--gold)}
+.sec-eyebrow-text{
+  font-size:10px;font-weight:600;
+  color:var(--gold);letter-spacing:.2em;text-transform:uppercase;
+}
+.sec-h2{
+  font-size:clamp(28px,3.5vw,48px);
+  font-weight:800;color:var(--white);
+  line-height:1.2;letter-spacing:-.02em;
+}
+.sec-sub{
+  font-size:15px;font-weight:300;
+  color:var(--muted);margin-top:10px;
+  line-height:1.7;
+}
+.sec-head-row{
+  display:flex;align-items:flex-end;
+  justify-content:space-between;
+  margin-bottom:48px;
+}
+.link-gold{
+  display:inline-flex;align-items:center;gap:8px;
+  font-size:13px;font-weight:600;
+  color:var(--gold);text-decoration:none;
+  letter-spacing:.06em;text-transform:uppercase;
+  transition:var(--t);
+}
+.link-gold:hover{gap:14px;color:var(--gold-lt)}
+
+/* ───────────────────────────────
+   CATEGORIES
+─────────────────────────────── */
+.categories-sec{
+  padding:100px 0;
+  background:var(--black);
+}
+
+.cat-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  grid-template-rows:auto auto;
+  gap:2px;
+}
+.cat-featured{
+  grid-column:span 2;
+  grid-row:span 2;
+}
+
+.cat-item{
+  position:relative;
+  overflow:hidden;
+  cursor:pointer;
+  aspect-ratio:1;
+  background:var(--s1);
+}
+.cat-featured{aspect-ratio:unset}
+.cat-item:hover .cat-ph-img{transform:scale(1.08)}
+.cat-item:hover .cat-overlay{opacity:1}
+.cat-item:hover .cat-reveal{transform:translateY(0);opacity:1}
+
+.cat-ph-img{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(48px,5vw,80px);
+  transition:transform .6s cubic-bezier(.4,0,.2,1);
+}
+.cat-featured .cat-ph-img{font-size:100px}
+
+/* Gold overlay on hover */
+.cat-overlay{
+  position:absolute;inset:0;
+  background:rgba(201,169,110,.08);
+  opacity:0;transition:var(--t);
+}
+
+/* Dark gradient bottom */
+.cat-grad{
+  position:absolute;bottom:0;left:0;right:0;
+  background:linear-gradient(to top,rgba(8,8,8,.95) 0%,rgba(8,8,8,.4) 60%,transparent 100%);
+  padding:28px 24px;
+}
+.cat-featured .cat-grad{padding:36px 32px}
+
+.cat-name{
+  font-size:16px;font-weight:700;
+  color:var(--white);margin-bottom:4px;
+}
+.cat-featured .cat-name{font-size:24px;margin-bottom:8px}
+.cat-count{font-size:12px;font-weight:300;color:var(--muted)}
+
+/* Gold underline reveal on hover */
+.cat-reveal{
+  display:inline-flex;align-items:center;gap:8px;
+  margin-top:12px;
+  font-size:11px;font-weight:600;
+  color:var(--gold);letter-spacing:.12em;text-transform:uppercase;
+  transform:translateY(10px);opacity:0;
+  transition:var(--t);
+}
+
+/* color palettes for placeholders */
+.cp1{background:linear-gradient(145deg,#1a0f0f,#2a1515)}
+.cp2{background:linear-gradient(145deg,#0f0f1a,#15152a)}
+.cp3{background:linear-gradient(145deg,#1a1500,#2a2200)}
+.cp4{background:linear-gradient(145deg,#0f1a15,#152a20)}
+.cp5{background:linear-gradient(145deg,#1a0f1a,#2a152a)}
+.cp6{background:linear-gradient(145deg,#1a1a0f,#2a2a15)}
+
+/* ───────────────────────────────
+   PRODUCTS
+─────────────────────────────── */
+.products-sec{
+  padding:100px 0;
+  background:var(--s1);
+  border-top:1px solid var(--border);
+  border-bottom:1px solid var(--border);
+}
+
+.filter-row{
+  display:flex;align-items:center;gap:0;
+  margin-bottom:48px;
+  border-bottom:1px solid var(--border);
+}
+.ftab{
+  padding:14px 24px;
+  font-size:13px;font-weight:400;
+  color:var(--muted);
+  background:transparent;border:none;
+  font-family:'Tajawal',sans-serif;
+  cursor:pointer;transition:var(--t);
+  letter-spacing:.04em;
+  position:relative;
+}
+.ftab::after{
+  content:'';position:absolute;
+  bottom:-1px;left:0;right:0;
+  height:1px;background:var(--gold);
+  transform:scaleX(0);transition:var(--t);
+}
+.ftab.on{color:var(--white);font-weight:700}
+.ftab.on::after{transform:scaleX(1)}
+.ftab:hover{color:var(--white)}
+
+.prod-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:2px;
+}
+
+/* PRODUCT CARD */
+.pc{
+  background:var(--s2);
+  border:1px solid transparent;
+  cursor:pointer;
+  transition:var(--t);
+  position:relative;
+  overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.pc:hover{
+  border-color:var(--gold-br);
+  background:var(--s3);
+}
+.pc:hover .pc-img{transform:scale(1.05)}
+.pc:hover .pc-add{opacity:1;transform:translateY(0)}
+.pc:hover .pc-wish{opacity:1}
+
+/* image */
+.pc-img-wrap{
+  position:relative;
+  aspect-ratio:1;
+  overflow:hidden;
+  background:var(--s1);
+}
+.pc-img{
+  width:100%;height:100%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:64px;padding:20px;
+  transition:transform .45s cubic-bezier(.4,0,.2,1);
+}
+
+/* wishlist */
+.pc-wish{
+  position:absolute;top:14px;left:14px;
+  width:36px;height:36px;
+  background:rgba(8,8,8,.7);
+  border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:15px;cursor:pointer;
+  opacity:0;transition:var(--t);
+  border-radius:2px;
+}
+.pc-wish:hover{background:var(--gold-dim);border-color:var(--gold)}
+
+/* badge */
+.pc-badges{
+  position:absolute;top:14px;right:14px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.pb{
+  font-size:10px;font-weight:700;
+  padding:4px 10px;letter-spacing:.08em;
+  text-transform:uppercase;
+}
+.pb-new{background:var(--gold);color:var(--black)}
+.pb-hot{background:#C53030;color:#fff}
+.pb-off{background:var(--s3);color:var(--gold);border:1px solid var(--gold-br)}
+
+/* add to cart bar */
+.pc-add{
+  position:absolute;bottom:0;left:0;right:0;
+  background:var(--gold);
+  color:var(--black);
+  text-align:center;padding:13px;
+  font-size:12px;font-weight:700;
+  letter-spacing:.1em;text-transform:uppercase;
+  opacity:0;transform:translateY(100%);
+  transition:var(--t);
+}
+
+/* info */
+.pc-info{padding:20px;flex:1;display:flex;flex-direction:column;gap:10px}
+.pc-brand{
+  font-size:10px;font-weight:600;
+  color:var(--gold);letter-spacing:.14em;text-transform:uppercase;
+}
+.pc-name{
+  font-size:14px;font-weight:500;
+  color:var(--white);line-height:1.45;
+  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+}
+.pc-rating{display:flex;align-items:center;gap:8px}
+.pc-stars{color:var(--gold);font-size:12px;letter-spacing:1px}
+.pc-rc{font-size:11px;color:var(--muted)}
+.pc-price-row{
+  display:flex;align-items:center;gap:10px;
+  margin-top:auto;padding-top:12px;
+  border-top:1px solid rgba(201,169,110,.1);
+}
+.pc-price{font-size:20px;font-weight:900;color:var(--white)}
+.pc-old{font-size:13px;color:var(--muted);text-decoration:line-through}
+.pc-save{
+  font-size:10px;font-weight:700;
+  color:var(--black);background:var(--gold);
+  padding:3px 8px;letter-spacing:.06em;
+  text-transform:uppercase;margin-right:auto;
+}
+
+/* ───────────────────────────────
+   FEATURES
+─────────────────────────────── */
+.features-sec{
+  padding:100px 0;
+  background:var(--black);
+}
+
+.feat-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:1px;
+  background:var(--border);
+  border:1px solid var(--border);
+}
+
+.feat{
+  background:var(--black);
+  padding:48px 36px;
+  display:flex;flex-direction:column;gap:20px;
+  position:relative;overflow:hidden;
+  transition:var(--t);
+}
+.feat::after{
+  content:'';
+  position:absolute;
+  bottom:0;left:0;right:0;height:2px;
+  background:var(--gold);
+  transform:scaleX(0);
+  transition:transform .4s cubic-bezier(.4,0,.2,1);
+  transform-origin:right;
+}
+.feat:hover::after{transform:scaleX(1);transform-origin:left}
+.feat:hover{background:var(--s1)}
+.feat:hover .feat-icon{color:var(--gold);border-color:var(--gold-br)}
+
+.feat-icon{
+  width:60px;height:60px;
+  border:1px solid rgba(201,169,110,.2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:26px;
+  color:rgba(201,169,110,.7);
+  transition:var(--t);
+}
+.feat-title{
+  font-size:17px;font-weight:700;
+  color:var(--white);line-height:1.3;
+}
+.feat-desc{
+  font-size:13px;font-weight:300;
+  color:var(--muted);line-height:1.7;
+}
+
+/* ───────────────────────────────
+   MARQUEE BAND
+─────────────────────────────── */
+.marquee-band{
+  background:var(--gold);
+  padding:14px 0;
+  overflow:hidden;
+  white-space:nowrap;
+}
+.marquee-inner{
+  display:inline-block;
+  animation:marquee 25s linear infinite;
+}
+@keyframes marquee{
+  0%{transform:translateX(0)}
+  100%{transform:translateX(-50%)}
+}
+.marquee-item{
+  display:inline-flex;align-items:center;gap:16px;
+  font-size:11px;font-weight:700;
+  color:var(--black);letter-spacing:.15em;text-transform:uppercase;
+  padding:0 32px;
+}
+.marquee-dot{
+  width:4px;height:4px;
+  background:var(--black);border-radius:50%;opacity:.4;
+}
+
+/* ───────────────────────────────
+   NOTES BAR
+─────────────────────────────── */
+.notes-bar{
+  background:var(--s1);
+  border-top:1px solid var(--border);
+  padding:28px 48px;
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;
+  font-size:12px;line-height:1.7;color:var(--muted);
+  font-weight:300;
+}
+.notes-bar strong{color:rgba(201,169,110,.8);font-weight:600;display:block;margin-bottom:4px}
+</style>
+</head>
+<body>
+
+<div class="design-banner">أبناء الفريد — Dark Luxury v2 · مفهوم التصميم</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="logo" href="#">
+      <div class="logo-mark">ف</div>
+      <div class="logo-text">
+        أبناء الفريد
+        <span>Beauty &amp; Cosmetics</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#">الرئيسية</a></li>
+      <li><a href="#">المتجر</a></li>
+      <li><a href="#">العروض</a></li>
+      <li><a href="#">الماركات</a></li>
+      <li><a href="#">تواصلي معنا</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-btn">🔍</button>
+      <button class="nav-btn">♡</button>
+      <button class="nav-btn" style="position:relative">🛍<span class="nav-badge">3</span></button>
+      <button class="btn-cta">دخول</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════
+     HERO
+══════════════════════════════ -->
+<section class="hero">
+  <div class="hero-divider"></div>
+
+  <div class="hero-left">
+    <div class="hero-overline">
+      <div class="hero-overline-line"></div>
+      <div class="hero-overline-text">تشكيلة صيف 2025 — وصلت للتو</div>
+    </div>
+
+    <h1 class="hero-h1">
+      <em>جمالكِ</em>
+      <strong>يستحق</strong>
+      الأصيل
+    </h1>
+
+    <p class="hero-desc">
+      أفضل ماركات التجميل العالمية — أصلية 100٪،<br/>
+      توصيل سريع لفلسطين والداخل
+    </p>
+
+    <div class="hero-btns">
+      <a class="btn-gold" href="#">تسوّقي الآن ←</a>
+      <a class="btn-outline" href="#">اكتشفي الماركات</a>
+    </div>
+
+    <div class="hero-stats">
+      <div class="hero-stat">
+        <div class="hero-stat-n">+1200<span>+</span></div>
+        <div class="hero-stat-l">منتج أصيل</div>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-n">80<span>+</span></div>
+        <div class="hero-stat-l">ماركة عالمية</div>
+      </div>
+      <div class="hero-stat-sep"></div>
+      <div class="hero-stat">
+        <div class="hero-stat-n">48<span>h</span></div>
+        <div class="hero-stat-l">توصيل سريع</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hero-right">
+    <div class="hero-bg">
+      <div class="rings">
+        <div class="ring r1"></div>
+        <div class="ring r2"></div>
+        <div class="ring r3"></div>
+      </div>
+      <div class="hero-ph">
+        <span class="hero-ph-icon">✨</span>
+        [ صورة المنتج الرئيسي ]<br/>
+        <span style="font-size:10px;opacity:.5">600 × 720px — product shot on dark bg</span>
+      </div>
+    </div>
+
+    <div class="float-card">
+      <div class="float-card-icon">🛡️</div>
+      <div>
+        <div class="float-card-title">أصيلة ومضمونة</div>
+        <div class="float-card-sub">إرجاع مجاني خلال 14 يوم</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-band">
+  <div class="marquee-inner">
+    <span class="marquee-item">توصيل لفلسطين والداخل<span class="marquee-dot"></span></span>
+    <span class="marquee-item">منتجات أصلية 100%<span class="marquee-dot"></span></span>
+    <span class="marquee-item">دفع عند الاستلام<span class="marquee-dot"></span></span>
+    <span class="marquee-item">إرجاع مجاني 14 يوم<span class="marquee-dot"></span></span>
+    <span class="marquee-item">+80 ماركة عالمية<span class="marquee-dot"></span></span>
+    <span class="marquee-item">خدمة عملاء عبر واتساب<span class="marquee-dot"></span></span>
+    <!-- duplicate for seamless loop -->
+    <span class="marquee-item">توصيل لفلسطين والداخل<span class="marquee-dot"></span></span>
+    <span class="marquee-item">منتجات أصلية 100%<span class="marquee-dot"></span></span>
+    <span class="marquee-item">دفع عند الاستلام<span class="marquee-dot"></span></span>
+    <span class="marquee-item">إرجاع مجاني 14 يوم<span class="marquee-dot"></span></span>
+    <span class="marquee-item">+80 ماركة عالمية<span class="marquee-dot"></span></span>
+    <span class="marquee-item">خدمة عملاء عبر واتساب<span class="marquee-dot"></span></span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════
+     CATEGORIES
+══════════════════════════════ -->
+<section class="categories-sec">
+  <div class="container">
+    <div class="sec-head-row">
+      <div>
+        <div class="sec-eyebrow">
+          <div class="sec-eyebrow-line"></div>
+          <div class="sec-eyebrow-text">الأقسام</div>
+        </div>
+        <h2 class="sec-h2">تسوّقي حسب القسم</h2>
+      </div>
+      <a class="link-gold" href="#">عرض الكل →</a>
+    </div>
+
+    <div class="cat-grid">
+      <!-- featured 2×2 -->
+      <div class="cat-item cat-featured cp1" style="min-height:480px">
+        <div class="cat-ph-img">💄</div>
+        <div class="cat-overlay"></div>
+        <div class="cat-grad">
+          <div class="cat-name">العناية بالبشرة</div>
+          <div class="cat-count">240+ منتج</div>
+          <div class="cat-reveal">تسوّقي الآن →</div>
+        </div>
+      </div>
+
+      <div class="cat-item cp2">
+        <div class="cat-ph-img">🌸</div>
+        <div class="cat-overlay"></div>
+        <div class="cat-grad">
+          <div class="cat-name">العطور</div>
+          <div class="cat-count">180+ منتج</div>
+          <div class="cat-reveal">تسوّقي →</div>
+        </div>
+      </div>
+      <div class="cat-item cp3">
+        <div class="cat-ph-img">💆‍♀️</div>
+        <div class="cat-overlay"></div>
+        <div class="cat-grad">
+          <div class="cat-name">الشعر</div>
+          <div class="cat-count">95+ منتج</div>
+          <div class="cat-reveal">تسوّقي →</div>
+        </div>
+      </div>
+      <div class="cat-item cp4">
+        <div class="cat-ph-img">👁️</div>
+        <div class="cat-overlay"></div>
+        <div class="cat-grad">
+          <div class="cat-name">المكياج</div>
+          <div class="cat-count">310+ منتج</div>
+          <div class="cat-reveal">تسوّقي →</div>
+        </div>
+      </div>
+      <div class="cat-item cp5">
+        <div class="cat-ph-img">💅</div>
+        <div class="cat-overlay"></div>
+        <div class="cat-grad">
+          <div class="cat-name">الأظافر</div>
+          <div class="cat-count">60+ منتج</div>
+          <div class="cat-reveal">تسوّقي →</div>
+        </div>
+      </div>
+      <div class="cat-item cp6">
+        <div class="cat-ph-img">🧴</div>
+        <div class="cat-overlay"></div>
+        <div class="cat-grad">
+          <div class="cat-name">العناية بالجسم</div>
+          <div class="cat-count">120+ منتج</div>
+          <div class="cat-reveal">تسوّقي →</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     PRODUCTS
+══════════════════════════════ -->
+<section class="products-sec">
+  <div class="container">
+    <div class="sec-head-row">
+      <div>
+        <div class="sec-eyebrow">
+          <div class="sec-eyebrow-line"></div>
+          <div class="sec-eyebrow-text">منتجاتنا</div>
+        </div>
+        <h2 class="sec-h2">الأكثر مبيعاً</h2>
+      </div>
+      <a class="link-gold" href="#">المتجر كاملاً →</a>
+    </div>
+
+    <div class="filter-row">
+      <button class="ftab on">الكل</button>
+      <button class="ftab">عروض اليوم</button>
+      <button class="ftab">وصل حديثاً</button>
+      <button class="ftab">الأعلى تقييماً</button>
+    </div>
+
+    <div class="prod-grid">
+
+      <!-- card 1 -->
+      <div class="pc">
+        <div class="pc-img-wrap">
+          <div class="pc-img">💄</div>
+          <div class="pc-wish">♡</div>
+          <div class="pc-badges"><span class="pb pb-hot">الأكثر مبيعاً</span></div>
+          <div class="pc-add">+ أضيفي للسلة</div>
+        </div>
+        <div class="pc-info">
+          <div class="pc-brand">Maybelline</div>
+          <div class="pc-name">أحمر شفاه SuperStay Vinyl Ink سائل — ثبات 16 ساعة</div>
+          <div class="pc-rating">
+            <span class="pc-stars">★★★★★</span>
+            <span class="pc-rc">(124 تقييم)</span>
+          </div>
+          <div class="pc-price-row">
+            <span class="pc-price">39 ₪</span>
+            <span class="pc-old">55 ₪</span>
+            <span class="pc-save">وفّري 29%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- card 2 -->
+      <div class="pc">
+        <div class="pc-img-wrap">
+          <div class="pc-img">🌸</div>
+          <div class="pc-wish">♡</div>
+          <div class="pc-badges"><span class="pb pb-new">جديد</span></div>
+          <div class="pc-add">+ أضيفي للسلة</div>
+        </div>
+        <div class="pc-info">
+          <div class="pc-brand">La Roche-Posay</div>
+          <div class="pc-name">كريم مرطب للبشرة الحساسة Toleriane Double Repair</div>
+          <div class="pc-rating">
+            <span class="pc-stars">★★★★★</span>
+            <span class="pc-rc">(87 تقييم)</span>
+          </div>
+          <div class="pc-price-row">
+            <span class="pc-price">89 ₪</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- card 3 -->
+      <div class="pc">
+        <div class="pc-img-wrap">
+          <div class="pc-img">✨</div>
+          <div class="pc-wish">♡</div>
+          <div class="pc-badges"><span class="pb pb-off">خصم 30%</span></div>
+          <div class="pc-add">+ أضيفي للسلة</div>
+        </div>
+        <div class="pc-info">
+          <div class="pc-brand">Olay</div>
+          <div class="pc-name">سيروم فيتامين C المضيء لتوحيد لون البشرة 30ml</div>
+          <div class="pc-rating">
+            <span class="pc-stars">★★★★☆</span>
+            <span class="pc-rc">(203 تقييم)</span>
+          </div>
+          <div class="pc-price-row">
+            <span class="pc-price">65 ₪</span>
+            <span class="pc-old">95 ₪</span>
+            <span class="pc-save">وفّري 30%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- card 4 -->
+      <div class="pc">
+        <div class="pc-img-wrap">
+          <div class="pc-img">🌿</div>
+          <div class="pc-wish">♡</div>
+          <div class="pc-add">+ أضيفي للسلة</div>
+        </div>
+        <div class="pc-info">
+          <div class="pc-brand">The Ordinary</div>
+          <div class="pc-name">زيت أرغان المغربي 100% طبيعي وعضوي 30ml</div>
+          <div class="pc-rating">
+            <span class="pc-stars">★★★★★</span>
+            <span class="pc-rc">(56 تقييم)</span>
+          </div>
+          <div class="pc-price-row">
+            <span class="pc-price">48 ₪</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════════════
+     FEATURES
+══════════════════════════════ -->
+<section class="features-sec">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:56px">
+      <div class="sec-eyebrow" style="justify-content:center;margin-bottom:16px">
+        <div class="sec-eyebrow-line"></div>
+        <div class="sec-eyebrow-text">لماذا أبناء الفريد</div>
+        <div class="sec-eyebrow-line"></div>
+      </div>
+      <h2 class="sec-h2">التزامنا بالجودة</h2>
+      <p class="sec-sub">كل منتج يصلكِ يمر بمعايير صارمة قبل أن يغادر مستودعاتنا</p>
+    </div>
+
+    <div class="feat-grid">
+      <div class="feat">
+        <div class="feat-icon">🚚</div>
+        <div>
+          <div class="feat-title">توصيل لفلسطين والداخل</div>
+          <div class="feat-desc">نوصّل لجميع مناطق فلسطين والداخل — سريع وموثوق خلال 24 إلى 48 ساعة</div>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">🛡️</div>
+        <div>
+          <div class="feat-title">منتجات أصلية 100٪</div>
+          <div class="feat-desc">نشتري مباشرة من الموزعين الرسميين المعتمدين — لا تقليد ولا غش</div>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">💳</div>
+        <div>
+          <div class="feat-title">الدفع عند الاستلام</div>
+          <div class="feat-desc">تستلمين طلبكِ أولاً وتدفعين بعدها — راحة البال تأتي في المقام الأول</div>
+        </div>
+      </div>
+      <div class="feat">
+        <div class="feat-icon">↩️</div>
+        <div>
+          <div class="feat-title">إرجاع مجاني 14 يوم</div>
+          <div class="feat-desc">لم يعجبكِ المنتج؟ أرجعيه مجاناً بلا أسئلة وبلا أي تعقيدات</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- NOTES -->
+<div class="notes-bar">
+  <div><strong>نظام الألوان</strong> Black #080808 · Gold #C9A96E · White #F0EDE8 · Surface #111</div>
+  <div><strong>التايبوغرافي</strong> Tajawal — weight 200 للعناوين الكبيرة + 900 للـ Bold</div>
+  <div><strong>ملاحظة</strong> الصور placeholders — تُستبدل بالصور الحقيقية عند التطبيق</div>
+</div>
+
+</body>
+</html>

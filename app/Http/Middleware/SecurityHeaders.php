@@ -40,7 +40,7 @@ class SecurityHeaders
         }
 
         // Cross-Origin policies — modern browsers
-        $response->headers->set('X-XSS-Protection', '1; mode=block'); // legacy, harmless
+        $response->headers->set('X-XSS-Protection', '0'); // disabled — rely on CSP instead
 
         // Content-Security-Policy — restrictive but practical. Adjust if you add CDNs.
         // We allow inline styles/scripts because Filament and our blade views use them.
@@ -56,7 +56,7 @@ class SecurityHeaders
                 "frame-src 'self' https://www.google.com https://maps.google.com",
                 "frame-ancestors 'self'",
                 "base-uri 'self'",
-                "form-action 'self' https://alfared.ps https://alfared.online https://checkout.lahza.io https://wa.me",
+                "form-action 'self' https://alfared.ps https://alfared.online https://checkout.lahza.io",
                 "object-src 'none'",
             ];
             $response->headers->set('Content-Security-Policy', implode('; ', $csp));

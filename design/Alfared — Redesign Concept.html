@@ -1,0 +1,1304 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>أبناء الفريد — مفهوم التصميم الجديد</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800;900&display=swap" rel="stylesheet" />
+
+<style>
+/* ═══════════════════════════════════════════════
+   DESIGN SYSTEM
+   ─────────────────────────────────────────────
+   Navy      #1B3B8C   (primary brand)
+   Navy-dark #122875   (hover states)
+   Orange    #F97316   (accent / CTA)
+   Orange-dk #EA6000   (hover)
+   Warm BG   #FAFAF9   (page background)
+   Surface   #FFFFFF   (cards)
+   Text-1    #0F172A   (headings)
+   Text-2    #475569   (body)
+   Text-3    #94A3B8   (muted)
+   Border    #E8EDF5   (light divider)
+   Shadow    rgba(27,59,140,.08)
+   ═══════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --navy:      #1B3B8C;
+  --navy-dk:   #122875;
+  --orange:    #F97316;
+  --orange-dk: #EA6000;
+  --warm-bg:   #FAFAF9;
+  --surface:   #FFFFFF;
+  --text-1:    #0F172A;
+  --text-2:    #475569;
+  --text-3:    #94A3B8;
+  --border:    #E8EDF5;
+  --shadow-sm: 0 2px 8px rgba(27,59,140,.06);
+  --shadow-md: 0 8px 32px rgba(27,59,140,.10);
+  --shadow-lg: 0 20px 60px rgba(27,59,140,.14);
+  --r-sm: 10px;
+  --r-md: 16px;
+  --r-lg: 24px;
+  --transition: all .28s cubic-bezier(.4,0,.2,1);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Tajawal', sans-serif;
+  background: var(--warm-bg);
+  color: var(--text-1);
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── SECTION WRAPPER ── */
+.section {
+  padding: 80px 0;
+}
+.container {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* ── SECTION LABEL ── */
+.section-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: 16px;
+}
+.section-eyebrow::after {
+  content: '';
+  display: block;
+  width: 32px;
+  height: 2px;
+  background: var(--orange);
+  border-radius: 2px;
+}
+
+.section-title {
+  font-size: clamp(26px, 3.5vw, 42px);
+  font-weight: 800;
+  color: var(--text-1);
+  line-height: 1.25;
+  margin-bottom: 12px;
+}
+.section-sub {
+  font-size: 16px;
+  color: var(--text-2);
+  font-weight: 400;
+  max-width: 520px;
+}
+
+/* ───────────────────────────────────────────
+   SECTION 0 — NAV (for context)
+─────────────────────────────────────────── */
+.nav {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(12px);
+}
+.nav-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  gap: 24px;
+}
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+}
+.nav-logo-mark {
+  width: 38px;
+  height: 38px;
+  background: var(--navy);
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: -.5px;
+}
+.nav-logo-text {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--navy);
+  line-height: 1.1;
+}
+.nav-logo-text span {
+  display: block;
+  font-size: 10px;
+  font-weight: 400;
+  color: var(--text-3);
+  letter-spacing: .06em;
+}
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+}
+.nav-links a {
+  display: block;
+  padding: 8px 14px;
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-2);
+  text-decoration: none;
+  border-radius: 8px;
+  transition: var(--transition);
+}
+.nav-links a:hover { color: var(--navy); background: var(--border); }
+.nav-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nav-icon-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--text-2);
+  font-size: 16px;
+  position: relative;
+  transition: var(--transition);
+}
+.nav-icon-btn:hover { border-color: var(--navy); color: var(--navy); }
+.nav-badge {
+  position: absolute;
+  top: -4px;
+  left: -4px;
+  width: 18px;
+  height: 18px;
+  background: var(--orange);
+  color: #fff;
+  border-radius: 50%;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.btn-nav-cta {
+  background: var(--navy);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: 'Tajawal', sans-serif;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.btn-nav-cta:hover { background: var(--navy-dk); transform: translateY(-1px); }
+
+/* ───────────────────────────────────────────
+   SECTION 1 — HERO
+─────────────────────────────────────────── */
+.hero {
+  background: var(--navy);
+  min-height: 620px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  overflow: hidden;
+  position: relative;
+}
+
+/* Subtle decorative texture */
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 60% 80% at 120% 50%, rgba(249,115,22,.12) 0%, transparent 60%),
+    radial-gradient(ellipse 40% 60% at -20% 30%, rgba(255,255,255,.04) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+/* Geometric accent line */
+.hero::after {
+  content: '';
+  position: absolute;
+  top: 0; bottom: 0;
+  right: 50%;
+  width: 1px;
+  background: linear-gradient(to bottom, transparent 0%, rgba(249,115,22,.3) 50%, transparent 100%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+  padding: 80px 60px 80px 40px;
+}
+.hero-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(249,115,22,.15);
+  border: 1px solid rgba(249,115,22,.3);
+  border-radius: 100px;
+  padding: 6px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #FDBA74;
+  letter-spacing: .06em;
+  margin-bottom: 28px;
+}
+.hero-tag-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--orange);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: .5; transform: scale(.7); }
+}
+
+.hero-headline {
+  font-size: clamp(34px, 4.5vw, 58px);
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.18;
+  margin-bottom: 20px;
+  letter-spacing: -.02em;
+}
+.hero-headline em {
+  font-style: normal;
+  color: var(--orange);
+  position: relative;
+}
+.hero-sub {
+  font-size: 17px;
+  color: rgba(255,255,255,.65);
+  font-weight: 400;
+  line-height: 1.7;
+  max-width: 420px;
+  margin-bottom: 40px;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--orange);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 32px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: 'Tajawal', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition);
+  box-shadow: 0 8px 24px rgba(249,115,22,.35);
+}
+.btn-primary:hover {
+  background: var(--orange-dk);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 32px rgba(249,115,22,.45);
+}
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  color: rgba(255,255,255,.75);
+  border: 1px solid rgba(255,255,255,.2);
+  border-radius: 12px;
+  padding: 15px 28px;
+  font-size: 15px;
+  font-weight: 500;
+  font-family: 'Tajawal', sans-serif;
+  cursor: pointer;
+  text-decoration: none;
+  transition: var(--transition);
+}
+.btn-ghost:hover {
+  color: #fff;
+  border-color: rgba(255,255,255,.4);
+  background: rgba(255,255,255,.06);
+}
+
+.hero-stats {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  margin-top: 48px;
+  padding-top: 32px;
+  border-top: 1px solid rgba(255,255,255,.1);
+}
+.hero-stat-value {
+  font-size: 28px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1;
+}
+.hero-stat-label {
+  font-size: 12px;
+  color: rgba(255,255,255,.5);
+  margin-top: 4px;
+  letter-spacing: .04em;
+}
+.hero-stat-divider {
+  width: 1px;
+  height: 36px;
+  background: rgba(255,255,255,.12);
+}
+
+/* Hero image panel */
+.hero-visual {
+  position: relative;
+  height: 620px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.hero-img-placeholder {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #152d6e 0%, #1B3B8C 40%, #1e3fa0 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+/* Decorative circles */
+.hero-circle-1 {
+  position: absolute;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  border: 1px solid rgba(249,115,22,.2);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.hero-circle-2 {
+  position: absolute;
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  background: rgba(249,115,22,.08);
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.hero-img-label {
+  position: relative;
+  z-index: 1;
+  text-align: center;
+  color: rgba(255,255,255,.3);
+  font-size: 13px;
+  letter-spacing: .06em;
+}
+
+/* Floating badge on hero */
+.hero-badge {
+  position: absolute;
+  bottom: 48px;
+  right: 32px;
+  background: #fff;
+  border-radius: 16px;
+  padding: 16px 20px;
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 200px;
+}
+.hero-badge-icon {
+  width: 44px; height: 44px;
+  background: rgba(249,115,22,.1);
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.hero-badge-text strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-1);
+}
+.hero-badge-text span {
+  font-size: 12px;
+  color: var(--text-3);
+}
+
+/* ───────────────────────────────────────────
+   SECTION 2 — CATEGORIES
+─────────────────────────────────────────── */
+.categories-section {
+  background: var(--warm-bg);
+  padding: 88px 0;
+}
+.categories-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 44px;
+}
+.btn-text-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--navy);
+  text-decoration: none;
+  transition: var(--transition);
+}
+.btn-text-link:hover { color: var(--orange); gap: 12px; }
+
+.categories-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+}
+
+/* Featured (2×2) first card */
+.cat-card-featured {
+  grid-column: span 2;
+  grid-row: span 2;
+}
+
+.cat-card {
+  position: relative;
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  cursor: pointer;
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+  aspect-ratio: 1;
+}
+.cat-card-featured {
+  aspect-ratio: unset;
+}
+.cat-card:hover {
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-lg);
+}
+.cat-card:hover .cat-img { transform: scale(1.06); }
+.cat-card:hover .cat-cta { opacity: 1; transform: translateY(0); }
+
+.cat-img-wrap {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+.cat-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform .5s cubic-bezier(.4,0,.2,1);
+}
+
+/* Placeholder bg for cat images */
+.cat-ph {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(40px, 5vw, 64px);
+  transition: transform .5s cubic-bezier(.4,0,.2,1);
+}
+.cat-ph-1 { background: linear-gradient(145deg, #FFF1F2, #FFE4E6); }
+.cat-ph-2 { background: linear-gradient(145deg, #FFF7ED, #FFEDD5); }
+.cat-ph-3 { background: linear-gradient(145deg, #F0FDF4, #DCFCE7); }
+.cat-ph-4 { background: linear-gradient(145deg, #EFF6FF, #DBEAFE); }
+.cat-ph-5 { background: linear-gradient(145deg, #FDF4FF, #FAE8FF); }
+.cat-ph-6 { background: linear-gradient(145deg, #FEFCE8, #FEF9C3); }
+
+/* Overlay */
+.cat-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(15,23,42,.75) 0%, rgba(15,23,42,.1) 60%, transparent 100%);
+}
+.cat-overlay-featured {
+  background: linear-gradient(to top, rgba(15,23,42,.85) 0%, rgba(15,23,42,.2) 50%, transparent 100%);
+}
+
+/* Category text */
+.cat-content {
+  position: absolute;
+  bottom: 0;
+  left: 0; right: 0;
+  padding: 20px;
+}
+.cat-card-featured .cat-content {
+  padding: 28px;
+}
+.cat-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.cat-card-featured .cat-name {
+  font-size: 22px;
+  margin-bottom: 6px;
+}
+.cat-count {
+  font-size: 12px;
+  color: rgba(255,255,255,.6);
+  font-weight: 400;
+}
+.cat-cta {
+  display: inline-block;
+  margin-top: 14px;
+  background: var(--orange);
+  color: #fff;
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(8px);
+  transition: var(--transition);
+}
+
+/* ───────────────────────────────────────────
+   SECTION 3 — PRODUCTS
+─────────────────────────────────────────── */
+.products-section {
+  background: var(--surface);
+  padding: 88px 0;
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.products-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 44px;
+}
+
+/* Filter tabs */
+.filter-tabs {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--warm-bg);
+  border-radius: 12px;
+  padding: 6px;
+  margin-bottom: 44px;
+  width: fit-content;
+}
+.filter-tab {
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-2);
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  background: transparent;
+  font-family: 'Tajawal', sans-serif;
+}
+.filter-tab.active {
+  background: var(--surface);
+  color: var(--navy);
+  font-weight: 700;
+  box-shadow: var(--shadow-sm);
+}
+.filter-tab:hover:not(.active) { color: var(--navy); }
+
+.products-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+}
+
+/* PRODUCT CARD */
+.prod-card {
+  background: var(--surface);
+  border-radius: var(--r-md);
+  border: 1px solid var(--border);
+  overflow: hidden;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+.prod-card:hover {
+  border-color: transparent;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-4px);
+}
+.prod-card:hover .prod-quick-add {
+  opacity: 1;
+  transform: translateY(0);
+}
+.prod-card:hover .prod-img {
+  transform: scale(1.04);
+}
+
+/* Image zone */
+.prod-img-wrap {
+  position: relative;
+  aspect-ratio: 1;
+  overflow: hidden;
+  background: var(--warm-bg);
+}
+.prod-img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 16px;
+  transition: transform .4s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 56px;
+}
+
+/* Badges */
+.prod-badges {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.prod-badge {
+  border-radius: 6px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 1;
+}
+.prod-badge-new { background: var(--navy); color: #fff; }
+.prod-badge-sale { background: var(--orange); color: #fff; }
+.prod-badge-hot { background: #EF4444; color: #fff; }
+
+/* Wishlist */
+.prod-wish {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  width: 34px; height: 34px;
+  background: rgba(255,255,255,.9);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  backdrop-filter: blur(8px);
+  transition: var(--transition);
+  cursor: pointer;
+}
+.prod-wish:hover { background: #fff; transform: scale(1.1); }
+
+/* Quick-add overlay */
+.prod-quick-add {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  background: var(--navy);
+  color: #fff;
+  text-align: center;
+  padding: 12px;
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0;
+  transform: translateY(100%);
+  transition: var(--transition);
+}
+
+/* Product info */
+.prod-info {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex: 1;
+}
+.prod-brand {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-3);
+  text-transform: uppercase;
+  letter-spacing: .08em;
+}
+.prod-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-1);
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.prod-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stars {
+  color: #F59E0B;
+  font-size: 12px;
+  letter-spacing: 1px;
+}
+.prod-rating-count {
+  font-size: 11px;
+  color: var(--text-3);
+}
+.prod-price-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;
+}
+.prod-price {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--navy);
+}
+.prod-price-old {
+  font-size: 13px;
+  color: var(--text-3);
+  text-decoration: line-through;
+  font-weight: 400;
+}
+.prod-price-save {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--orange);
+  background: rgba(249,115,22,.1);
+  padding: 2px 8px;
+  border-radius: 100px;
+  margin-right: auto;
+}
+
+/* ───────────────────────────────────────────
+   SECTION 4 — FEATURES / TRUST STRIP
+─────────────────────────────────────────── */
+.features-section {
+  background: var(--warm-bg);
+  padding: 72px 0;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 2px;
+  background: var(--border);
+  border-radius: var(--r-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.feat-item {
+  background: var(--surface);
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 16px;
+  transition: var(--transition);
+  cursor: default;
+  position: relative;
+  overflow: hidden;
+}
+.feat-item::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  height: 3px;
+  background: var(--navy);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform .35s cubic-bezier(.4,0,.2,1);
+}
+.feat-item:hover::before {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.feat-item:hover .feat-icon-wrap {
+  background: var(--navy);
+  color: #fff;
+  transform: scale(1.08);
+}
+
+.feat-icon-wrap {
+  width: 56px; height: 56px;
+  background: rgba(27,59,140,.07);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px;
+  color: var(--navy);
+  transition: var(--transition);
+}
+
+.feat-title {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text-1);
+  line-height: 1.3;
+}
+.feat-desc {
+  font-size: 13px;
+  color: var(--text-2);
+  line-height: 1.6;
+  font-weight: 400;
+}
+
+/* ───────────────────────────────────────────
+   SECTION DIVIDER — design system display
+─────────────────────────────────────────── */
+.design-label {
+  background: var(--navy);
+  color: rgba(255,255,255,.5);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-align: center;
+  padding: 8px;
+  text-transform: uppercase;
+}
+.design-label strong { color: rgba(255,255,255,.8); }
+
+/* ───────────────────────────────────────────
+   PALETTE SWATCH (bottom)
+─────────────────────────────────────────── */
+.palette-bar {
+  display: flex;
+  height: 6px;
+}
+.palette-bar > div { flex: 1; }
+</style>
+</head>
+<body>
+
+<!-- ╔═══════════════════════════════════════╗
+     ║  DESIGN LABEL                         ║
+     ╚═══════════════════════════════════════╝ -->
+<div class="design-label">
+  <strong>مفهوم التصميم — أبناء الفريد</strong> &nbsp;·&nbsp; Alfared Redesign Concept v1
+</div>
+<div class="palette-bar">
+  <div style="background:#1B3B8C"></div>
+  <div style="background:#122875"></div>
+  <div style="background:#F97316"></div>
+  <div style="background:#FDBA74"></div>
+  <div style="background:#FAFAF9"></div>
+  <div style="background:#FFFFFF"></div>
+  <div style="background:#0F172A"></div>
+  <div style="background:#475569"></div>
+</div>
+
+<!-- ╔═══════════════════════════════════════╗
+     ║  NAVBAR                               ║
+     ╚═══════════════════════════════════════╝ -->
+<nav class="nav">
+  <div class="container nav-inner">
+    <a class="nav-logo" href="#">
+      <div class="nav-logo-mark">ف</div>
+      <div class="nav-logo-text">
+        أبناء الفريد
+        <span>Beauty &amp; Cosmetics</span>
+      </div>
+    </a>
+    <ul class="nav-links">
+      <li><a href="#">الرئيسية</a></li>
+      <li><a href="#">المتجر</a></li>
+      <li><a href="#">العروض</a></li>
+      <li><a href="#">الماركات</a></li>
+      <li><a href="#">تواصل معنا</a></li>
+    </ul>
+    <div class="nav-actions">
+      <button class="nav-icon-btn" title="بحث">🔍</button>
+      <button class="nav-icon-btn" title="المفضلة">♡</button>
+      <button class="nav-icon-btn" title="السلة" style="position:relative">
+        🛍
+        <span class="nav-badge">3</span>
+      </button>
+      <button class="btn-nav-cta">دخول</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ╔═══════════════════════════════════════╗
+     ║  SECTION 1 — HERO                     ║
+     ╚═══════════════════════════════════════╝ -->
+<section class="hero">
+  <!-- Content -->
+  <div class="hero-content">
+    <div class="hero-tag">
+      <span class="hero-tag-dot"></span>
+      تشكيلة صيف 2025 — وصلت للتو
+    </div>
+
+    <h1 class="hero-headline">
+      جمالكِ يبدأ<br/>
+      من <em>الأصيل</em>
+    </h1>
+
+    <p class="hero-sub">
+      أفضل ماركات التجميل العالمية والمحلية — أصلية 100٪، توصيل سريع لفلسطين والداخل
+    </p>
+
+    <div class="hero-actions">
+      <a class="btn-primary" href="#">
+        تسوّقي الآن
+        <span style="font-size:18px;line-height:1">←</span>
+      </a>
+      <a class="btn-ghost" href="#">
+        اكتشفي العروض
+      </a>
+    </div>
+
+    <div class="hero-stats">
+      <div>
+        <div class="hero-stat-value">+1200</div>
+        <div class="hero-stat-label">منتج أصيل</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div>
+        <div class="hero-stat-value">+80</div>
+        <div class="hero-stat-label">ماركة عالمية</div>
+      </div>
+      <div class="hero-stat-divider"></div>
+      <div>
+        <div class="hero-stat-value">48h</div>
+        <div class="hero-stat-label">توصيل سريع</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Visual Panel -->
+  <div class="hero-visual">
+    <div class="hero-img-placeholder">
+      <div class="hero-circle-1"></div>
+      <div class="hero-circle-2"></div>
+      <div class="hero-img-label">
+        <div style="font-size:48px;margin-bottom:12px">✨</div>
+        <div>[ صورة المنتج الرئيسي ]</div>
+        <div style="font-size:11px;margin-top:4px;opacity:.5">Hero product shot — 600 × 620px</div>
+      </div>
+    </div>
+
+    <!-- Floating trust badge -->
+    <div class="hero-badge">
+      <div class="hero-badge-icon">🛡️</div>
+      <div class="hero-badge-text">
+        <strong>منتجات أصلية مضمونة</strong>
+        <span>مع إمكانية الإرجاع</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════╗
+     ║  SECTION 2 — CATEGORIES               ║
+     ╚═══════════════════════════════════════╝ -->
+<section class="categories-section">
+  <div class="container">
+    <div class="categories-header">
+      <div>
+        <div class="section-eyebrow">الأقسام</div>
+        <h2 class="section-title">تسوّقي حسب القسم</h2>
+      </div>
+      <a class="btn-text-link" href="#">عرض الكل →</a>
+    </div>
+
+    <div class="categories-grid">
+      <!-- Featured card (2×2) -->
+      <div class="cat-card cat-card-featured" style="aspect-ratio:unset;min-height:340px;">
+        <div class="cat-img-wrap cat-ph cat-ph-1">💄</div>
+        <div class="cat-overlay cat-overlay-featured"></div>
+        <div class="cat-content">
+          <div class="cat-name">العناية بالبشرة</div>
+          <div class="cat-count">+240 منتج</div>
+          <div class="cat-cta">تسوّقي الآن ←</div>
+        </div>
+      </div>
+
+      <!-- Row 1 -->
+      <div class="cat-card">
+        <div class="cat-img-wrap cat-ph cat-ph-2">🌸</div>
+        <div class="cat-overlay"></div>
+        <div class="cat-content">
+          <div class="cat-name">العطور</div>
+          <div class="cat-count">+180 منتج</div>
+        </div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-img-wrap cat-ph cat-ph-3">💆‍♀️</div>
+        <div class="cat-overlay"></div>
+        <div class="cat-content">
+          <div class="cat-name">الشعر</div>
+          <div class="cat-count">+95 منتج</div>
+        </div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-img-wrap cat-ph cat-ph-5">💅</div>
+        <div class="cat-overlay"></div>
+        <div class="cat-content">
+          <div class="cat-name">الأظافر</div>
+          <div class="cat-count">+60 منتج</div>
+        </div>
+      </div>
+
+      <!-- Row 2 (cols 3-5, rows 2) -->
+      <div class="cat-card">
+        <div class="cat-img-wrap cat-ph cat-ph-4">👁️</div>
+        <div class="cat-overlay"></div>
+        <div class="cat-content">
+          <div class="cat-name">المكياج</div>
+          <div class="cat-count">+310 منتج</div>
+        </div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-img-wrap cat-ph cat-ph-6">🧴</div>
+        <div class="cat-overlay"></div>
+        <div class="cat-content">
+          <div class="cat-name">الجسم</div>
+          <div class="cat-count">+120 منتج</div>
+        </div>
+      </div>
+      <div class="cat-card">
+        <div class="cat-img-wrap cat-ph" style="background:linear-gradient(145deg,#F0FDF4,#DCFCE7);">🌿</div>
+        <div class="cat-overlay"></div>
+        <div class="cat-content">
+          <div class="cat-name">الطبيعي</div>
+          <div class="cat-count">+75 منتج</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════╗
+     ║  SECTION 3 — PRODUCTS                 ║
+     ╚═══════════════════════════════════════╝ -->
+<section class="products-section">
+  <div class="container">
+    <div class="products-header">
+      <div>
+        <div class="section-eyebrow">المنتجات</div>
+        <h2 class="section-title">الأكثر مبيعاً</h2>
+      </div>
+      <a class="btn-text-link" href="#">عرض المتجر كاملاً →</a>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="filter-tabs">
+      <button class="filter-tab active">الكل</button>
+      <button class="filter-tab">عروض اليوم</button>
+      <button class="filter-tab">جديدة</button>
+      <button class="filter-tab">الأعلى تقييماً</button>
+    </div>
+
+    <div class="products-grid">
+
+      <!-- Card 1 -->
+      <div class="prod-card">
+        <div class="prod-img-wrap">
+          <div class="prod-img">💄</div>
+          <div class="prod-badges">
+            <span class="prod-badge prod-badge-hot">الأكثر مبيعاً</span>
+          </div>
+          <div class="prod-wish">♡</div>
+          <div class="prod-quick-add">+ إضافة للسلة</div>
+        </div>
+        <div class="prod-info">
+          <div class="prod-brand">Maybelline</div>
+          <div class="prod-name">أحمر شفاه SuperStay Vinyl Ink سائل</div>
+          <div class="prod-rating">
+            <span class="stars">★★★★★</span>
+            <span class="prod-rating-count">(124)</span>
+          </div>
+          <div class="prod-price-row">
+            <span class="prod-price">39 ₪</span>
+            <span class="prod-price-old">55 ₪</span>
+            <span class="prod-price-save">وفّري 16 ₪</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="prod-card">
+        <div class="prod-img-wrap">
+          <div class="prod-img">🌸</div>
+          <div class="prod-badges">
+            <span class="prod-badge prod-badge-new">جديد</span>
+          </div>
+          <div class="prod-wish">♡</div>
+          <div class="prod-quick-add">+ إضافة للسلة</div>
+        </div>
+        <div class="prod-info">
+          <div class="prod-brand">La Roche-Posay</div>
+          <div class="prod-name">كريم مرطب للبشرة الحساسة Toleriane</div>
+          <div class="prod-rating">
+            <span class="stars">★★★★★</span>
+            <span class="prod-rating-count">(87)</span>
+          </div>
+          <div class="prod-price-row">
+            <span class="prod-price">89 ₪</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="prod-card">
+        <div class="prod-img-wrap">
+          <div class="prod-img">✨</div>
+          <div class="prod-badges">
+            <span class="prod-badge prod-badge-sale">خصم 30%</span>
+          </div>
+          <div class="prod-wish">♡</div>
+          <div class="prod-quick-add">+ إضافة للسلة</div>
+        </div>
+        <div class="prod-info">
+          <div class="prod-brand">Olay</div>
+          <div class="prod-name">سيروم فيتامين C المضيء لتوحيد البشرة</div>
+          <div class="prod-rating">
+            <span class="stars">★★★★☆</span>
+            <span class="prod-rating-count">(203)</span>
+          </div>
+          <div class="prod-price-row">
+            <span class="prod-price">65 ₪</span>
+            <span class="prod-price-old">95 ₪</span>
+            <span class="prod-price-save">وفّري 30 ₪</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="prod-card">
+        <div class="prod-img-wrap">
+          <div class="prod-img">🌿</div>
+          <div class="prod-wish">♡</div>
+          <div class="prod-quick-add">+ إضافة للسلة</div>
+        </div>
+        <div class="prod-info">
+          <div class="prod-brand">The Ordinary</div>
+          <div class="prod-name">زيت أرغان المغربي 100% طبيعي 30ml</div>
+          <div class="prod-rating">
+            <span class="stars">★★★★★</span>
+            <span class="prod-rating-count">(56)</span>
+          </div>
+          <div class="prod-price-row">
+            <span class="prod-price">48 ₪</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════╗
+     ║  SECTION 4 — FEATURES / TRUST STRIP   ║
+     ╚═══════════════════════════════════════╝ -->
+<section class="features-section">
+  <div class="container">
+    <div style="text-align:center;margin-bottom:48px;">
+      <div class="section-eyebrow" style="justify-content:center;margin-bottom:12px;">لماذا أبناء الفريد</div>
+      <h2 class="section-title">نلتزم بأعلى معايير الجودة</h2>
+    </div>
+
+    <div class="features-grid">
+
+      <div class="feat-item">
+        <div class="feat-icon-wrap">🚚</div>
+        <div>
+          <div class="feat-title">توصيل لفلسطين والداخل</div>
+          <div class="feat-desc">نوصّل لجميع مناطق فلسطين والداخل — سريع وموثوق خلال 24–48 ساعة</div>
+        </div>
+      </div>
+
+      <div class="feat-item">
+        <div class="feat-icon-wrap">🛡️</div>
+        <div>
+          <div class="feat-title">منتجات أصلية 100٪</div>
+          <div class="feat-desc">نضمن أصالة كل منتج — نشتري مباشرة من الموزعين الرسميين المعتمدين</div>
+        </div>
+      </div>
+
+      <div class="feat-item">
+        <div class="feat-icon-wrap">💳</div>
+        <div>
+          <div class="feat-title">الدفع عند الاستلام</div>
+          <div class="feat-desc">تستلمين طلبك أولاً وتدفعين بعدها — راحة البال أولاً</div>
+        </div>
+      </div>
+
+      <div class="feat-item">
+        <div class="feat-icon-wrap">↩️</div>
+        <div>
+          <div class="feat-title">إرجاع مجاني خلال 14 يوم</div>
+          <div class="feat-desc">لم يعجبكِ المنتج؟ أرجعيه مجاناً — بلا أسئلة وبلا تعقيدات</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ╔═══════════════════════════════════════╗
+     ║  DESIGN NOTES                         ║
+     ╚═══════════════════════════════════════╝ -->
+<div style="background:#0F172A;color:rgba(255,255,255,.5);padding:32px 40px;font-size:12px;line-height:1.8;font-family:'Tajawal',sans-serif;">
+  <div style="max-width:1280px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr 1fr;gap:32px;">
+    <div>
+      <div style="color:rgba(255,255,255,.8);font-weight:700;margin-bottom:8px;">النظام اللوني</div>
+      Navy #1B3B8C · Orange #F97316<br/>
+      Background #FAFAF9 · Surface #fff<br/>
+      Text-1 #0F172A · Text-2 #475569
+    </div>
+    <div>
+      <div style="color:rgba(255,255,255,.8);font-weight:700;margin-bottom:8px;">التايبوغرافي</div>
+      Tajawal — Google Fonts<br/>
+      Weights: 300 400 500 700 800 900<br/>
+      Hero H1: 58px / weight 900
+    </div>
+    <div>
+      <div style="color:rgba(255,255,255,.8);font-weight:700;margin-bottom:8px;">ملاحظات</div>
+      الصور كـ placeholders — تُستبدل بالأصلية<br/>
+      Hover states محددة على كل مكون<br/>
+      RTL كامل — يعمل في Chrome/Safari
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

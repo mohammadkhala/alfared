@@ -204,7 +204,7 @@
       @endphp
       @if($fullDesc)
         <div style="color:#4B5563;line-height:1.9;font-size:15px;">
-          {!! $fullDesc !!}
+          {!! clean($fullDesc, ['HTML.Allowed' => 'p,br,b,strong,i,em,ul,ol,li,h1,h2,h3,h4,span[style]']) !!}
         </div>
       @else
         <p style="color:#9CA3AF;">{{ __('product_no_description') }}</p>

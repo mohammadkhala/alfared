@@ -90,7 +90,7 @@ class AuthController extends Controller
 
     public function sendOtp(Request $request): JsonResponse
     {
-        $request->validate(['phone' => 'required|string']);
+        $request->validate(['phone' => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/']]);
 
         $phone = $request->phone;
         $code  = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);

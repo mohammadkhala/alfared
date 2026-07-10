@@ -34,8 +34,8 @@ Route::prefix('v1')->group(function () {
     Route::get('products/{slug}', [CatalogController::class, 'show']);
 
     Route::get ('delivery-zones',                         [CartController::class,  'deliveryZones']);
-    Route::get ('orders/{orderNumber}/track',             [OrderController::class, 'track']);
-    Route::post('orders/{orderNumber}/verify-payment',    [OrderController::class, 'verifyPayment']);
+    Route::get ('orders/{orderNumber}/track',             [OrderController::class, 'track'])->middleware('throttle:20,1');
+    Route::post('orders/{orderNumber}/verify-payment',    [OrderController::class, 'verifyPayment'])->middleware('throttle:10,1');
 
     // ── Authenticated endpoints ────────────────────────────
     Route::middleware('auth:sanctum')->group(function () {

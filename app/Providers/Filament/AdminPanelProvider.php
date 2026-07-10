@@ -100,7 +100,7 @@ class AdminPanelProvider extends PanelProvider
                     $user   = auth()->user();
                     if (! $user) return '';
                     $initial = mb_strtoupper(mb_substr($user->name, 0, 1));
-                    $role    = $user->role === 'admin' ? 'مدير عام' : 'عميل';
+                    $role    = match($user->role) { 'admin' => 'مدير عام', 'staff' => 'موظف', default => 'عميل' };
                     $name    = e($user->name);
                     return <<<HTML
                     <div style="padding:14px 16px;border-top:1px solid rgba(255,255,255,0.1);flex-shrink:0;">
