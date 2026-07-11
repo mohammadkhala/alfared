@@ -44,7 +44,7 @@ android {
 
     defaultConfig {
         applicationId = "pss.alfared.shop"
-        minSdk = 23  // firebase_auth requires minimum API 23
+        minSdk = flutter.minSdkVersion  // firebase_auth requires minimum API 23
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName

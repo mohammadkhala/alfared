@@ -221,11 +221,22 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   items: images.asMap().entries.map((entry) {
                     final i = entry.key;
                     final u = entry.value;
+                    final img = CachedNetworkImage(
+                      imageUrl: u,
+                      fit: BoxFit.contain,
+                      fadeInDuration: const Duration(milliseconds: 200),
+                      placeholder: (_, __) => const Center(
+                        child: SizedBox(width: 26, height: 26,
+                          child: CircularProgressIndicator(strokeWidth: 2.4, color: AppColors.orange)),
+                      ),
+                      errorWidget: (_, __, ___) => const Center(
+                        child: Icon(Icons.image_not_supported_outlined, color: AppColors.grayLight, size: 40)),
+                    );
                     return Padding(
                       padding: const EdgeInsets.all(24),
                       child: i == 0
-                        ? Hero(tag: 'product-image-${p.id}', child: CachedNetworkImage(imageUrl: u, fit: BoxFit.contain))
-                        : CachedNetworkImage(imageUrl: u, fit: BoxFit.contain),
+                        ? Hero(tag: 'product-image-${p.id}', child: img)
+                        : img,
                     );
                   }).toList(),
                 ),
@@ -265,7 +276,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   AnimatedHeart(isFavorite: _favorite, onToggle: _toggleFavorite),
                 ]),
                 const SizedBox(height: 8),
-                Text(p.name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, fontFamily: 'Cairo', height: 1.3)),
+                Text(p.name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, fontFamily: 'Cairo', height: 1.3, color: AppColors.text)),
                 const SizedBox(height: 8),
 
                 // Rating
@@ -317,7 +328,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 // Quantity row
                 Row(children: [
-                  const Text('الكمية', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+                  const Text('الكمية', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: AppColors.text)),
                   const Spacer(),
                   _QtyButton(icon: Icons.remove, onTap: () => setState(() => _qty = (_qty - 1).clamp(1, 99))),
                   Padding(padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -327,15 +338,15 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 const SizedBox(height: 20),
 
                 if (p.description != null) ...[
-                  const Text('الوصف', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+                  const Text('الوصف', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: AppColors.text)),
                   const SizedBox(height: 6),
-                  Text(p.description!, style: const TextStyle(fontSize: 12, height: 1.7, fontFamily: 'Cairo', color: AppColors.gray)),
+                  Text(p.description!, style: const TextStyle(fontSize: 13, height: 1.7, fontFamily: 'Cairo', color: AppColors.text)),
                   const SizedBox(height: 18),
                 ],
 
                 // Reviews section
                 Row(children: [
-                  const Text('تقييمات العملاء', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+                  const Text('تقييمات العملاء', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: AppColors.text)),
                   const Spacer(),
                   if (!_reviewSubmitted && context.read<AuthProvider>().isLoggedIn)
                     GestureDetector(

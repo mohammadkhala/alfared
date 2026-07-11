@@ -93,7 +93,7 @@
             ?: Str::limit(strip_tags($product->{'description_'.$locale} ?? $product->description_ar ?? ''), 200);
       @endphp
       @if($shortDesc)
-        <p style="color:#4B5563;line-height:1.7;margin-bottom:24px;font-size:15px;">{{ $shortDesc }}</p>
+        <p style="color:#1F2937;line-height:1.7;margin-bottom:24px;font-size:15px;">{{ $shortDesc }}</p>
       @endif
 
       {{-- Add to cart form --}}
@@ -203,7 +203,7 @@
         $fullDesc = $product->{'description_'.$locale} ?: $product->description_ar;
       @endphp
       @if($fullDesc)
-        <div style="color:#4B5563;line-height:1.9;font-size:15px;">
+        <div style="color:#1F2937;line-height:1.9;font-size:15px;">
           {!! strip_tags($fullDesc, '<p><br><b><strong><i><em><ul><ol><li><h1><h2><h3><h4><span>') !!}
         </div>
       @else
