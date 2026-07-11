@@ -101,6 +101,33 @@ class Product {
 
   bool get hasVariants => variantGroups.isNotEmpty;
 
+  /// Strips HTML tags and decodes common HTML entities so the description
+  /// renders as clean plain text (API may return raw HTML from the editor).
+  static String? _cleanHtml(String? html) {
+    if (html == null) return null;
+    var s = html
+        // Block/line-break tags → newlines
+        .replaceAll(RegExp(r'<\s*br\s*/?>', caseSensitive: false), '\n')
+        .replaceAll(RegExp(r'</\s*(p|div|li|h[1-6])\s*>', caseSensitive: false), '\n')
+        // Remove all remaining tags
+        .replaceAll(RegExp(r'<[^>]+>'), '');
+    // Decode common HTML entities
+    const entities = {
+      '&nbsp;': ' ', '&amp;': '&', '&lt;': '<', '&gt;': '>',
+      '&quot;': '"', '&#39;': "'", '&apos;': "'", '&hellip;': '…',
+      '&mdash;': '—', '&ndash;': '–', '&laquo;': '«', '&raquo;': '»',
+    };
+    entities.forEach((k, v) => s = s.replaceAll(k, v));
+    // Numeric entities (e.g. &#1234; and &#x1F600;)
+    s = s.replaceAllMapped(RegExp(r'&#(\d+);'),
+        (m) => String.fromCharCode(int.parse(m.group(1)!)));
+    s = s.replaceAllMapped(RegExp(r'&#x([0-9a-fA-F]+);'),
+        (m) => String.fromCharCode(int.parse(m.group(1)!, radix: 16)));
+    // Collapse 3+ newlines and trim
+    s = s.replaceAll(RegExp(r'\n{3,}'), '\n\n').trim();
+    return s.isEmpty ? null : s;
+  }
+
   /// Returns the best available name for the given locale code.
   String nameFor(String locale) {
     if (locale == 'en') return (nameEn?.isNotEmpty == true) ? nameEn! : name;
@@ -124,9 +151,9 @@ class Product {
     reviewsCount:   (j['reviews_count']  as num?)?.toInt() ?? 0,
     brandName:       j['brand']    is Map ? j['brand']['name']    as String? : null,
     categoryName:    j['category'] is Map ? j['category']['name'] as String? : null,
-    shortDescription: j['short_description'] as String?,
+    shortDescription: _cleanHtml(j['short_description'] as String?),
     stockQuantity:   (j['stock_quantity'] as num?)?.toInt(),
-    description:     j['description'] as String?,
+    description:     _cleanHtml(j['description'] as String?),
     images:          (j['images'] as List?)?.cast<String>().map(ImageHelper.cleanUrl).whereType<String>().toList() ?? const [],
     variantGroups:   (j['variants'] as List?)
         ?.map((v) => VariantGroup.fromJson(v as Map<String, dynamic>))
