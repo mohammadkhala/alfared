@@ -43,9 +43,10 @@ class BannerResource extends Resource
                     ->image()
                     ->directory('banners')
                     ->required()
-                    ->maxSize(3072)
+                    ->maxSize(5120)
                     ->acceptedFileTypes(['image/jpeg','image/png','image/webp'])
-                    ->helperText('📐 الأبعاد المثالية: 1200 × 500 بكسل · 📱 تأكد أن المحتوى في المنتصف (الأطراف قد تُقطع على الموبايل) · 📁 الحجم الأقصى: 3 MB · ✅ الصيغ: JPG، PNG، WebP')
+                    ->saveUploadedFileUsing(fn ($file) => \App\Support\ImageOptimizer::store($file, 'banners'))
+                    ->helperText('📐 الأبعاد المثالية: 1200 × 500 بكسل · 📱 اجعل المحتوى في المنتصف · 🗜️ تُضغط تلقائياً وتُحوّل إلى WebP · 📁 الحد الأقصى: 5 MB')
                     ->columnSpanFull(),
             ]),
 
