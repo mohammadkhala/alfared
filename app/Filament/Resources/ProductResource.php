@@ -203,9 +203,10 @@ class ProductResource extends Resource
                         ->image()
                         ->directory('products')
                         ->imageEditor()
-                        ->maxSize(2048)
+                        ->maxSize(5120)
                         ->acceptedFileTypes(['image/jpeg','image/png','image/webp'])
-                        ->helperText('📐 الأبعاد المثالية: 800 × 800 بكسل (مربع 1:1) · 📁 الحجم الأقصى: 2 MB · ✅ الصيغ المقبولة: JPG، PNG، WebP · 💡 استخدم خلفية بيضاء أو شفافة للحصول على أفضل نتيجة')
+                        ->saveUploadedFileUsing(fn ($file) => \App\Support\ImageOptimizer::store($file, 'products'))
+                        ->helperText('📐 الأبعاد المثالية: 800 × 800 بكسل (مربع 1:1) · 🗜️ تُضغط تلقائياً وتُحوّل إلى WebP · 📁 الحد الأقصى: 5 MB · 💡 استخدم خلفية بيضاء أو شفافة')
                         ->columnSpanFull(),
 
                     Forms\Components\Repeater::make('images')
@@ -215,9 +216,10 @@ class ProductResource extends Resource
                                 ->label('الصورة')
                                 ->image()
                                 ->directory('products')
-                                ->maxSize(2048)
+                                ->maxSize(5120)
                                 ->acceptedFileTypes(['image/jpeg','image/png','image/webp'])
-                                ->helperText('800 × 800 بكسل · أقل من 2 MB')
+                                ->saveUploadedFileUsing(fn ($file) => \App\Support\ImageOptimizer::store($file, 'products'))
+                                ->helperText('800 × 800 بكسل · تُضغط تلقائياً · أقل من 5 MB')
                                 ->required(),
                             Forms\Components\TextInput::make('alt_text')->label('النص البديل'),
                             Forms\Components\TextInput::make('sort_order')->label('الترتيب')->numeric()->default(0),
