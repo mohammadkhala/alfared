@@ -18,10 +18,10 @@ use Livewire\Features\SupportFileUploads\TemporaryUploadedFile;
 class ImageOptimizer
 {
     /** Max longest-side in pixels (never upscales). */
-    public const MAX_SIDE = 1400;
+    public const MAX_SIDE = 2000;
 
-    /** WebP quality (0-100). High enough to keep infographic text crisp. */
-    public const QUALITY = 82;
+    /** WebP quality (0-100). Kept high so infographic Arabic text stays crisp. */
+    public const QUALITY = 92;
 
     /**
      * Filament FileUpload `saveUploadedFileUsing` callback.
