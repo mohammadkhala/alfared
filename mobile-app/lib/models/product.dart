@@ -106,9 +106,13 @@ class Product {
   static String? _cleanHtml(String? html) {
     if (html == null) return null;
     var s = html
-        // Block/line-break tags → newlines
+        // List items → bullet points
+        .replaceAll(RegExp(r'<\s*li[^>]*>', caseSensitive: false), '• ')
+        // Line-break tag → newline
         .replaceAll(RegExp(r'<\s*br\s*/?>', caseSensitive: false), '\n')
-        .replaceAll(RegExp(r'</\s*(p|div|li|h[1-6])\s*>', caseSensitive: false), '\n')
+        // Paragraph/heading/list-item closings → blank line between blocks
+        .replaceAll(RegExp(r'</\s*(p|div|h[1-6])\s*>', caseSensitive: false), '\n\n')
+        .replaceAll(RegExp(r'</\s*li\s*>', caseSensitive: false), '\n')
         // Remove all remaining tags
         .replaceAll(RegExp(r'<[^>]+>'), '');
     // Decode common HTML entities

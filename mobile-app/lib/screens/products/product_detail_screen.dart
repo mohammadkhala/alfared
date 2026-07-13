@@ -339,8 +339,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 if (p.description != null) ...[
                   const Text('الوصف', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: AppColors.text)),
-                  const SizedBox(height: 6),
-                  Text(p.description!, style: const TextStyle(fontSize: 13, height: 1.7, fontFamily: 'Cairo', color: AppColors.text)),
+                  const SizedBox(height: 10),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(14),
+                    decoration: BoxDecoration(
+                      color: AppColors.grayBg,
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                    child: Text(p.description!,
+                      style: const TextStyle(fontSize: 13, height: 1.9, fontFamily: 'Cairo', color: AppColors.text)),
+                  ),
                   const SizedBox(height: 18),
                 ],
 
