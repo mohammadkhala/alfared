@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart' as cs;
 import 'package:flutter/material.dart';
+import 'package:flutter_html/flutter_html.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -337,10 +338,19 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                 ]),
                 const SizedBox(height: 20),
 
-                if (p.description != null) ...[
+                if ((p.descriptionHtml != null && p.descriptionHtml!.isNotEmpty) ||
+                    (p.description != null && p.description!.trim().isNotEmpty)) ...[
                   const Text('الوصف', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: AppColors.text)),
-                  const SizedBox(height: 6),
-                  Text(p.description!, style: const TextStyle(fontSize: 13, height: 1.7, fontFamily: 'Cairo', color: AppColors.text)),
+                  const SizedBox(height: 8),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: AppColors.grayBg,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: _DescriptionBody(product: p),
+                  ),
                   const SizedBox(height: 18),
                 ],
 
@@ -449,6 +459,67 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           ),
         ]),
       ),
+    );
+  }
+}
+
+// ═══════════ DESCRIPTION BODY ═══════════
+// Renders the editor HTML (headings → section titles, lists → bullets, bold),
+// so the description shows as organised sections like the website. Falls back
+// to plain paragraphs when no HTML is available.
+
+class _DescriptionBody extends StatelessWidget {
+  const _DescriptionBody({required this.product});
+  final Product product;
+
+  @override
+  Widget build(BuildContext context) {
+    final html = product.descriptionHtml;
+    if (html != null && html.isNotEmpty) {
+      return Html(
+        data: html,
+        style: {
+          'body': Style(
+            margin: Margins.zero,
+            padding: HtmlPaddings.zero,
+            fontFamily: 'Cairo',
+            fontSize: FontSize(13.5),
+            lineHeight: LineHeight(1.7),
+            color: AppColors.text,
+            textAlign: TextAlign.start,
+          ),
+          // Section headings (الوصف / المميزات / المواصفات …)
+          'h1, h2, h3, h4': Style(
+            fontFamily: 'Cairo',
+            fontWeight: FontWeight.w900,
+            fontSize: FontSize(15),
+            color: AppColors.blue,
+            margin: Margins.only(top: 14, bottom: 6),
+          ),
+          'p': Style(margin: Margins.only(bottom: 8)),
+          'strong, b': Style(fontWeight: FontWeight.w800, color: AppColors.text),
+          'ul, ol': Style(margin: Margins.only(bottom: 8), padding: HtmlPaddings.only(right: 18)),
+          'li': Style(margin: Margins.only(bottom: 4)),
+        },
+      );
+    }
+
+    // Fallback: plain-text paragraphs
+    final text = product.description?.trim() ?? '';
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        for (final para in text.split(RegExp(r'\n{2,}')))
+          if (para.trim().isNotEmpty)
+            Padding(
+              padding: const EdgeInsets.only(bottom: 10),
+              child: Text(
+                para.trim(),
+                textAlign: TextAlign.justify,
+                style: const TextStyle(fontSize: 13, height: 1.8, fontFamily: 'Cairo', color: AppColors.text),
+              ),
+            ),
+      ],
     );
   }
 }

@@ -21,16 +21,16 @@ class ApiService {
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final token = await _storage.read(key: 'auth_token');
-        if (token != null && token.isNotEmpty) {
-          options.headers['Authorization'] = 'Bearer $token';
+        final t = await _readToken();
+        if (t != null && t.isNotEmpty) {
+          options.headers['Authorization'] = 'Bearer $t';
         }
         return handler.next(options);
       },
       onError: (e, handler) {
         // Surface 401 by clearing the token automatically
         if (e.response?.statusCode == 401) {
-          _storage.delete(key: 'auth_token');
+          clearToken();
         }
         return handler.next(e);
       },
@@ -41,16 +41,45 @@ class ApiService {
   late final Dio _dio;
   final _storage = const FlutterSecureStorage();
 
+  // In-memory token cache. Secure storage can be very slow (or hang) on some
+  // devices/first-launch, and it sits on the critical path of every request —
+  // so we read it at most once and never let it block a network call.
+  String? _cachedToken;
+  bool _tokenLoaded = false;
+
   Dio get dio => _dio;
 
-  Future<void> setToken(String token) async {
-    await _storage.write(key: 'auth_token', value: token);
+  /// Reads the token without ever blocking a request: uses the in-memory cache,
+  /// and caps the secure-storage read so a hang can't stall the whole app.
+  Future<String?> _readToken() async {
+    if (_tokenLoaded) return _cachedToken;
+    try {
+      _cachedToken = await _storage
+          .read(key: 'auth_token')
+          .timeout(const Duration(seconds: 3));
+    } catch (_) {
+      _cachedToken = null; // storage slow/unavailable — proceed unauthenticated
+    }
+    _tokenLoaded = true;
+    return _cachedToken;
   }
 
-  Future<String?> token() => _storage.read(key: 'auth_token');
+  Future<void> setToken(String token) async {
+    _cachedToken = token;
+    _tokenLoaded = true;
+    try {
+      await _storage.write(key: 'auth_token', value: token).timeout(const Duration(seconds: 3));
+    } catch (_) {/* keep in-memory token even if persistence fails */}
+  }
+
+  Future<String?> token() => _readToken();
 
   Future<void> clearToken() async {
-    await _storage.delete(key: 'auth_token');
+    _cachedToken = null;
+    _tokenLoaded = true;
+    try {
+      await _storage.delete(key: 'auth_token').timeout(const Duration(seconds: 3));
+    } catch (_) {/* ignore */}
   }
 
   /// Returns the data part of a successful response, or throws a friendly ApiException.

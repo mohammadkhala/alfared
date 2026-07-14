@@ -71,6 +71,8 @@ class Product {
 
   // Detail-only
   final String? description;
+  /// Raw HTML from the editor (headings, lists, bold) — rendered as sections.
+  final String? descriptionHtml;
   final List<String> images;
   final List<VariantGroup> variantGroups;
   final List<Map<String, dynamic>> reviews;
@@ -94,6 +96,7 @@ class Product {
     this.shortDescription,
     this.stockQuantity,
     this.description,
+    this.descriptionHtml,
     this.images = const [],
     this.variantGroups = const [],
     this.reviews = const [],
@@ -106,9 +109,15 @@ class Product {
   static String? _cleanHtml(String? html) {
     if (html == null) return null;
     var s = html
-        // Block/line-break tags → newlines
+        // Line breaks
         .replaceAll(RegExp(r'<\s*br\s*/?>', caseSensitive: false), '\n')
-        .replaceAll(RegExp(r'</\s*(p|div|li|h[1-6])\s*>', caseSensitive: false), '\n')
+        // List items → bullet on a new line
+        .replaceAll(RegExp(r'<\s*li[^>]*>', caseSensitive: false), '\n• ')
+        // Opening block tags → paragraph break (handles missing closing tags)
+        .replaceAll(RegExp(r'<\s*(p|div|h[1-6]|ul|ol)[^>]*>', caseSensitive: false), '\n\n')
+        // Closing block tags → paragraph break
+        .replaceAll(RegExp(r'</\s*(p|div|h[1-6]|ul|ol)\s*>', caseSensitive: false), '\n\n')
+        .replaceAll(RegExp(r'</\s*li\s*>', caseSensitive: false), '')
         // Remove all remaining tags
         .replaceAll(RegExp(r'<[^>]+>'), '');
     // Decode common HTML entities
@@ -154,6 +163,7 @@ class Product {
     shortDescription: _cleanHtml(j['short_description'] as String?),
     stockQuantity:   (j['stock_quantity'] as num?)?.toInt(),
     description:     _cleanHtml(j['description'] as String?),
+    descriptionHtml: (j['description_html'] as String?)?.trim(),
     images:          (j['images'] as List?)?.cast<String>().map(ImageHelper.cleanUrl).whereType<String>().toList() ?? const [],
     variantGroups:   (j['variants'] as List?)
         ?.map((v) => VariantGroup.fromJson(v as Map<String, dynamic>))

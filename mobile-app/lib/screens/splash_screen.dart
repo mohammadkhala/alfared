@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -29,12 +30,24 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   Future<void> _boot() async {
     final auth = context.read<AuthProvider>();
     final cart = context.read<CartProvider>();
-    final prefs = await SharedPreferences.getInstance();
-    await auth.bootstrap();
-    if (auth.isLoggedIn) await cart.load();
-    await Future.delayed(const Duration(milliseconds: 1400));
+
+    // Restore the session in the background — this must NEVER block navigation,
+    // otherwise a slow/failed network call would freeze the splash forever.
+    // The store is fully usable for guests, and logged-in state updates via
+    // providers once bootstrap finishes.
+    unawaited(() async {
+      try {
+        await auth.bootstrap();
+        if (auth.isLoggedIn) await cart.load();
+      } catch (_) {}
+    }());
+
+    // Fixed, network-independent splash duration.
+    await Future.delayed(const Duration(milliseconds: 1600));
     if (!mounted) return;
 
+    final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     final onboardingSeen = prefs.getBool('onboarding_seen') ?? false;
     const dest = MainNavigation(); // guests go straight to the store
     if (!onboardingSeen) {

@@ -53,12 +53,18 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
-    await Firebase.initializeApp();
+    // Cap init so a stalled Firebase handshake can't freeze the native splash.
+    await Firebase.initializeApp()
+        .timeout(const Duration(seconds: 5));
     // Register background handler BEFORE FcmService.init()
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-    await FcmService.init();
   } catch (_) {}
+
+  // Show the UI immediately — never block the first frame on network-bound
+  // FCM setup (getToken can hang for a long time on a bad connection, which
+  // would otherwise freeze the app on the native splash screen).
   runApp(const AlfaredApp());
+  FcmService.init(); // fire-and-forget
 }
 
 class AlfaredApp extends StatelessWidget {

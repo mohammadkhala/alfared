@@ -15,6 +15,6 @@ class ApiConfig {
   /// Custom UA header so the backend tracker can classify visits as the app.
   static const String appUaToken = 'AlfaredApp/1.0';
 
-  static const Duration connectTimeout = Duration(seconds: 60);
-  static const Duration receiveTimeout = Duration(seconds: 60);
+  static const Duration connectTimeout = Duration(seconds: 20);
+  static const Duration receiveTimeout = Duration(seconds: 20);
 }
