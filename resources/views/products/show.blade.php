@@ -203,7 +203,7 @@
         $fullDesc = $product->{'description_'.$locale} ?: $product->description_ar;
       @endphp
       @if($fullDesc)
-        <div style="color:#1F2937;line-height:1.9;font-size:15px;">
+        <div style="color:#1F2937;line-height:1.9;font-size:15px;background:#F9FAFB;border-radius:14px;padding:20px 18px;">
           {!! strip_tags($fullDesc, '<p><br><b><strong><i><em><ul><ol><li><h1><h2><h3><h4><span>') !!}
         </div>
       @else
