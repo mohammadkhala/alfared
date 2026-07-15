@@ -4,7 +4,7 @@
 @section('description', strip_tags($product->{'description_'.app()->getLocale()} ?? $product->description_ar ?? $product->name))
 
 @section('content')
-<div class="container" style="padding:32px 0;">
+<div class="container" style="padding-top:32px;padding-bottom:32px;">
 
   {{-- Breadcrumb --}}
   <nav class="breadcrumb" style="margin-bottom:24px;font-size:14px;color:#6B7280;display:flex;align-items:center;gap:8px;flex-wrap:wrap;">
