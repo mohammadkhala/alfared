@@ -232,7 +232,7 @@
     {{-- Right: Form --}}
     <div class="contact-form-card">
       <h2>أرسل لنا رسالة</h2>
-      <p class="subtitle">املأ النموذج وسيتم إرسال رسالتك مباشرة عبر واتساب</p>
+      <p class="subtitle">املأ النموذج وسيتم إرسال رسالتك مباشرة الينا</p>
 
       <form action="{{ route('contact.send') }}" method="POST">
         @csrf
@@ -262,7 +262,7 @@
         </div>
 
         <button type="submit" class="btn-submit">
-          💬 إرسال عبر واتساب
+          ارسال
         </button>
       </form>
     </div>
