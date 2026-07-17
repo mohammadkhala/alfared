@@ -277,7 +277,7 @@
       <div class="footer-bottom-right">
         <span>© {{ date('Y') }} {{ __('footer_copyright') }}</span>
         <span class="footer-sep">·</span>
-        <span class="made-with-love">{{ __('made_with_love') }} <a href="https://mohammad-khallaf.vercel.app/" target="_blank" rel="noopener">mohammad khallaf</a></span>
+        <span class="made-with-love">{{ __('made_with_love') }} <a href="https://wa.me/972594513978" target="_blank" rel="noopener">mohammad khallaf</a></span>
       </div>
       <div class="payment-icons">
         <span class="pay-icon">{{ __('payment_cod') }}</span>
