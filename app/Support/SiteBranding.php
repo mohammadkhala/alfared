@@ -37,12 +37,18 @@ class SiteBranding
 
     private static function values(): array
     {
-        return Cache::remember(self::CACHE_KEY, self::TTL, fn () =>
-            Setting::whereIn('key', ['store_logo', 'store_favicon'])
-                ->pluck('value', 'key')
-                ->filter()
-                ->toArray()
-        );
+        try {
+            return Cache::remember(self::CACHE_KEY, self::TTL, fn () =>
+                Setting::whereIn('key', ['store_logo', 'store_favicon'])
+                    ->pluck('value', 'key')
+                    ->filter()
+                    ->toArray()
+            );
+        } catch (\Throwable) {
+            // DB/cache unavailable — fall back to the bundled logo rather than
+            // breaking every page (error pages use this layout too).
+            return [];
+        }
     }
 
     private static function url(?string $path): string
