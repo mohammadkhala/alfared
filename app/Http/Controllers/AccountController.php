@@ -156,13 +156,9 @@ class AccountController extends Controller
             'privacy_policy.accepted' => 'يجب الموافقة على سياسة الخصوصية وشروط الاستخدام للمتابعة.',
         ]);
 
-        // Rate limit OTP sending
-        $recentCount = OtpCode::where('phone', $request->phone)
-            ->where('created_at', '>=', now()->subMinutes(10))
-            ->count();
-
-        if ($recentCount >= 3) {
-            return back()->withErrors(['phone' => 'تم إرسال عدة رموز لهذا الرقم مؤخراً، انتظر 10 دقائق.'])->withInput();
+        // Per-phone limit — protects the sender WhatsApp number from spam bans.
+        if ($wait = \App\Support\OtpThrottle::retryAfter($request->phone)) {
+            return back()->withErrors(['phone' => \App\Support\OtpThrottle::message($wait)])->withInput();
         }
 
         // Save form data in session, send OTP
@@ -177,6 +173,8 @@ class AccountController extends Controller
         OtpCode::where('phone', $request->phone)->delete();
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         OtpCode::create(['phone' => $request->phone, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
+
+        \App\Support\OtpThrottle::record($request->phone);
 
         $sent = app(WaSenderService::class)->sendOtp($request->phone, $code);
 
@@ -269,17 +267,18 @@ class AccountController extends Controller
             return response()->json(['error' => 'انتهت الجلسة'], 422);
         }
 
-        $recentCount = OtpCode::where('phone', $phone)
-            ->where('created_at', '>=', now()->subMinutes(10))
-            ->count();
-
-        if ($recentCount >= 3) {
-            return response()->json(['error' => 'تجاوزت الحد المسموح، انتظر قليلاً'], 429);
+        if ($wait = \App\Support\OtpThrottle::retryAfter($phone)) {
+            return response()->json([
+                'error'       => \App\Support\OtpThrottle::message($wait),
+                'retry_after' => $wait,
+            ], 429);
         }
 
         OtpCode::where('phone', $phone)->delete();
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         OtpCode::create(['phone' => $phone, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
+
+        \App\Support\OtpThrottle::record($phone);
 
         $sent = app(WaSenderService::class)->sendOtp($phone, $code);
         if (! $sent) {

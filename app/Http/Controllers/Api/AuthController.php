@@ -93,7 +93,16 @@ class AuthController extends Controller
         $request->validate(['phone' => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/']]);
 
         $phone = $request->phone;
-        $code  = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+
+        // Per-phone limit — protects the sender WhatsApp number from spam bans.
+        if ($wait = \App\Support\OtpThrottle::retryAfter($phone)) {
+            return response()->json([
+                'message'     => \App\Support\OtpThrottle::message($wait),
+                'retry_after' => $wait,
+            ], 429);
+        }
+
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
 
         // Delete previous OTPs for this phone
         OtpCode::where('phone', $phone)->delete();
@@ -103,6 +112,8 @@ class AuthController extends Controller
             'code'       => $code,
             'expires_at' => now()->addMinutes(5),
         ]);
+
+        \App\Support\OtpThrottle::record($phone);
 
         $sent = app(WaSenderService::class)->sendOtp($phone, $code);
 

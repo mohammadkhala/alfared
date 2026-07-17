@@ -32,13 +32,9 @@ class PhoneAuthController extends Controller
 
         $phone = $request->phone;
 
-        // Rate limit: max 3 OTPs per phone per 10 minutes
-        $recentCount = OtpCode::where('phone', $phone)
-            ->where('created_at', '>=', now()->subMinutes(10))
-            ->count();
-
-        if ($recentCount >= 3) {
-            return back()->withErrors(['phone' => 'تم إرسال عدة رموز مؤخراً، انتظر 10 دقائق وحاول مجدداً.'])->withInput();
+        // Per-phone limit — protects the sender WhatsApp number from spam bans.
+        if ($wait = \App\Support\OtpThrottle::retryAfter($phone)) {
+            return back()->withErrors(['phone' => \App\Support\OtpThrottle::message($wait)])->withInput();
         }
 
         // Delete old OTPs for this phone
@@ -51,6 +47,8 @@ class PhoneAuthController extends Controller
             'code'       => $code,
             'expires_at' => now()->addMinutes(5),
         ]);
+
+        \App\Support\OtpThrottle::record($phone);
 
         $sent = app(WaSenderService::class)->sendOtp($phone, $code);
 
@@ -187,17 +185,18 @@ class PhoneAuthController extends Controller
             return response()->json(['error' => 'انتهت الجلسة'], 422);
         }
 
-        $recentCount = OtpCode::where('phone', $phone)
-            ->where('created_at', '>=', now()->subMinutes(10))
-            ->count();
-
-        if ($recentCount >= 3) {
-            return response()->json(['error' => 'حد الإرسال وصل 3 مرات، انتظر قليلاً'], 429);
+        if ($wait = \App\Support\OtpThrottle::retryAfter($phone)) {
+            return response()->json([
+                'error'       => \App\Support\OtpThrottle::message($wait),
+                'retry_after' => $wait,
+            ], 429);
         }
 
         OtpCode::where('phone', $phone)->delete();
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         OtpCode::create(['phone' => $phone, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
+
+        \App\Support\OtpThrottle::record($phone);
 
         $sent = app(WaSenderService::class)->sendOtp($phone, $code);
 
