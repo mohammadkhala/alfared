@@ -42,7 +42,7 @@ img { display:block; width:100%; object-fit:cover; }
 .navbar { background:white; box-shadow:0 2px 16px rgba(27,59,140,0.08); min-height:72px; position:sticky; top:0; z-index:200; border-top:3px solid var(--orange); }
 .navbar .inner { display:flex; align-items:center; justify-content:space-between; min-height:72px; padding:8px 0; gap:14px; flex-wrap:nowrap; }
 .logo { display:flex; align-items:center; gap:10px; align-self:center; }
-.logo-img { height:56px; width:auto; object-fit:contain; display:block; flex-shrink:0; }
+.logo-img { height:64px; width:auto; object-fit:contain; display:block; flex-shrink:0; }
 .logo-text { padding-top:8px; }
 .logo-text h1 { font-size:17px; font-weight:900; color:var(--blue); line-height:1.2; }
 .logo-text span { font-size:10px; color:var(--orange); font-weight:700; letter-spacing:1.5px; }
@@ -813,7 +813,7 @@ footer { background:var(--blue-dk); color:#CBD5E1; padding:60px 0 0; }
   .search-bar input { font-size:12px; }
 
   /* — Logo text smaller — */
-  .logo-img { height:48px; }
+  .logo-img { height:55px; }
   .logo-text h1 { font-size:14px; }
   .logo-text span { font-size:9px; }
 }
@@ -871,7 +871,7 @@ footer { background:var(--blue-dk); color:#CBD5E1; padding:60px 0 0; }
     justify-content:center;
     gap:8px;
   }
-  .logo-img { height:46px; }
+  .logo-img { height:53px; }
   .logo-text { padding-top:0; }
   .logo-text h1 { font-size:13px; line-height:1.2; }
   .logo-text span { font-size:9px; letter-spacing:1px; }
@@ -931,7 +931,7 @@ footer { background:var(--blue-dk); color:#CBD5E1; padding:60px 0 0; }
   .topbar-inner { justify-content:center; }
 
   /* navbar — compact: keep logo image + small text */
-  .logo-img { height:40px; }
+  .logo-img { height:46px; }
   .logo-text h1 { font-size:11px; }
   .logo-text span { display:none; }
   .nav-actions { gap:2px; }

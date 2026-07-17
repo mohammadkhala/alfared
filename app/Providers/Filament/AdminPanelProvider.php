@@ -33,9 +33,9 @@ class AdminPanelProvider extends PanelProvider
             ->path('admin')
             ->login()
             ->brandName('أبناء الفريد')
-            ->brandLogo(asset('images/logo.png'))
+            ->brandLogo(fn () => \App\Support\SiteBranding::logo())
             ->brandLogoHeight('2.5rem')
-            ->favicon(asset('images/logo.png'))
+            ->favicon(fn () => \App\Support\SiteBranding::favicon())
             ->colors([
                 'primary' => Color::hex('#1B3B8C'),
                 'warning' => Color::hex('#E8711A'),
