@@ -16,7 +16,7 @@
   <meta property="og:url"         content="{{ url()->current() }}"/>
   <meta property="og:title"       content="@yield('title', __('company_name'))"/>
   <meta property="og:description" content="@yield('description', __('tagline'))"/>
-  <meta property="og:image"       content="{{ asset('images/logo.png') }}"/>
+  <meta property="og:image"       content="{{ \App\Support\SiteBranding::logo() }}"/>
   <meta property="og:locale"      content="ar_PS"/>
   <meta property="og:site_name"   content="شركة أبناء الفريد"/>
 
@@ -24,13 +24,13 @@
   <meta name="twitter:card"        content="summary"/>
   <meta name="twitter:title"       content="@yield('title', __('company_name'))"/>
   <meta name="twitter:description" content="@yield('description', __('tagline'))"/>
-  <meta name="twitter:image"       content="{{ asset('images/logo.png') }}"/>
+  <meta name="twitter:image"       content="{{ \App\Support\SiteBranding::logo() }}"/>
 
   {{-- Robots --}}
   <meta name="robots" content="index, follow"/>
 
-  <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}"/>
-  <link rel="shortcut icon" href="{{ asset('images/logo.png') }}"/>
+  <link rel="icon" href="{{ \App\Support\SiteBranding::favicon() }}"/>
+  <link rel="shortcut icon" href="{{ \App\Support\SiteBranding::favicon() }}"/>
   <link rel="sitemap" type="application/xml" href="{{ url('/sitemap.xml') }}"/>
 
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;900&display=swap" rel="stylesheet"/>
@@ -95,7 +95,7 @@
 
       {{-- Logo --}}
       <a href="{{ route('home') }}" class="logo">
-        <img src="{{ asset('images/logo.png') }}" alt="{{ __('company_name') }}" class="logo-img"/>
+        <img src="{{ \App\Support\SiteBranding::logo() }}" alt="{{ __('company_name') }}" class="logo-img"/>
         <div class="logo-text">
           <h1>{{ __('company_name') }}</h1>
           <span>ALFARED SONS COMPANY</span>

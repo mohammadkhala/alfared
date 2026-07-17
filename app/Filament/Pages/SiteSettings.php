@@ -550,6 +550,9 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
         // Bust mobile app config cache
         \Illuminate\Support\Facades\Cache::forget('api:app_config');
 
+        // Bust the site logo/favicon cache so the change shows immediately
+        \App\Support\SiteBranding::forget();
+
         $isOn = ($data['maintenance_mode'] ?? false) == true;
 
         Notification::make()

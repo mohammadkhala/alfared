@@ -344,7 +344,7 @@
           </defs>
         </svg>
         <div class="logo-inner">
-          <img src="/images/logo.png" alt="أبناء الفريد"
+          <img src="{{ \App\Support\SiteBranding::logo() }}" alt="أبناء الفريد"
                onerror="this.outerHTML='<span style=\'font-size:26px\'>🛍️</span>'" />
         </div>
       </div>
