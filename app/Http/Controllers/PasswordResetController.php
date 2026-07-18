@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\PasswordResetCodeMail;
 use App\Models\OtpCode;
 use App\Models\User;
 use App\Services\WaSenderService;
@@ -9,6 +10,7 @@ use App\Support\OtpThrottle;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 /**
  * Password recovery via a WhatsApp one-time code.
@@ -22,52 +24,86 @@ class PasswordResetController extends Controller
         return view('auth.forgot-password');
     }
 
-    /** Step 1 — send the code to a registered phone. */
+    /** Step 1 — send the code over WhatsApp or e-mail. */
     public function sendCode(Request $request)
     {
-        $request->validate(['phone' => self::PHONE_RULE], [
-            'phone.required' => 'رقم الهاتف مطلوب',
-            'phone.regex'    => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972',
-        ]);
+        $method = $request->input('method') === 'email' ? 'email' : 'whatsapp';
 
-        $phone = $request->phone;
-        $user  = User::where('phone', $phone)->first();
+        if ($method === 'email') {
+            $request->validate(['email' => ['required', 'email', 'max:191']], [
+                'email.required' => 'البريد الإلكتروني مطلوب',
+                'email.email'    => 'صيغة البريد الإلكتروني غير صحيحة',
+            ]);
+            $identifier = $request->email;
+            $user       = User::where('email', $identifier)->first();
+        } else {
+            $request->validate(['phone' => self::PHONE_RULE], [
+                'phone.required' => 'رقم الهاتف مطلوب',
+                'phone.regex'    => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972',
+            ]);
+            $identifier = $request->phone;
+            $user       = User::where('phone', $identifier)->first();
+        }
 
-        // Don't reveal whether the number is registered, and don't spend an
-        // OTP on an unknown number — just show the same confirmation screen.
+        // Same response whether or not the account exists, so this page can't
+        // be used to discover which phones/e-mails are registered. No code is
+        // generated for an unknown account.
         if (! $user) {
-            session(['reset_phone' => $phone]);
+            session(['reset_phone' => null, 'reset_label' => $identifier, 'reset_method' => $method]);
             return redirect()->route('password.verify');
         }
 
-        if ($wait = OtpThrottle::retryAfter($phone)) {
-            return back()->withErrors(['phone' => OtpThrottle::message($wait)])->withInput();
+        // OTPs are always keyed by the account's phone, whichever channel
+        // delivers them, so verification stays identical for both.
+        $key = $user->phone;
+
+        if ($wait = OtpThrottle::retryAfter($key)) {
+            $field = $method === 'email' ? 'email' : 'phone';
+            return back()->withErrors([$field => OtpThrottle::message($wait)])->withInput();
         }
 
-        OtpCode::where('phone', $phone)->delete();
+        OtpCode::where('phone', $key)->delete();
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        OtpCode::create(['phone' => $phone, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
+        OtpCode::create(['phone' => $key, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
 
-        OtpThrottle::record($phone);
+        OtpThrottle::record($key);
 
-        if (! app(WaSenderService::class)->sendOtp($phone, $code)) {
+        if ($method === 'email') {
+            try {
+                Mail::to($user->email)->send(new PasswordResetCodeMail($code, $user->name ?? ''));
+            } catch (\Throwable $e) {
+                report($e);
+                return back()->withErrors([
+                    'email' => 'تعذّر إرسال البريد الآن. جرّب الاستعادة عبر واتساب.',
+                ])->withInput();
+            }
+        } elseif (! app(WaSenderService::class)->sendOtp($key, $code)) {
             return back()->withErrors([
                 'phone' => 'تعذّر إرسال الرمز عبر واتساب. تأكد أن رقمك مسجّل على واتساب وحاول مجدداً.',
             ])->withInput();
         }
 
-        session(['reset_phone' => $phone]);
+        session([
+            'reset_phone'  => $key,
+            'reset_label'  => $identifier,
+            'reset_method' => $method,
+        ]);
 
         return redirect()->route('password.verify');
     }
 
     public function verifyForm()
     {
-        if (! session('reset_phone')) {
+        // reset_phone is null for unknown accounts — the form still shows so
+        // we don't leak whether the identifier exists.
+        if (! session()->has('reset_label')) {
             return redirect()->route('password.request');
         }
 
-        return view('auth.reset-password', ['phone' => session('reset_phone')]);
+        return view('auth.reset-password', [
+            'label'  => session('reset_label'),
+            'method' => session('reset_method', 'whatsapp'),
+        ]);
     }
 
     /** Step 2 — check the code and set the new password. */
@@ -75,8 +111,8 @@ class PasswordResetController extends Controller
     {
         $phone = session('reset_phone');
         if (! $phone) {
-            return redirect()->route('password.request')
-                ->withErrors(['phone' => 'انتهت الجلسة، ابدأ من جديد.']);
+            // Unknown account, or the session expired — same generic error.
+            return back()->withErrors(['code' => 'الرمز غير صحيح أو منتهي الصلاحية.']);
         }
 
         $request->validate([
@@ -113,7 +149,7 @@ class PasswordResetController extends Controller
         // Old sessions/tokens should not survive a password reset.
         $user->tokens()->delete();
 
-        session()->forget('reset_phone');
+        session()->forget(['reset_phone', 'reset_label', 'reset_method']);
         OtpThrottle::clear($phone);
 
         Auth::login($user, true);

@@ -19,13 +19,36 @@
       </div>
     @endif
 
+    @php $method = old('method', 'whatsapp'); @endphp
+
+    {{-- Delivery method --}}
+    <div style="display:flex;gap:8px;background:#F3F4F6;padding:5px;border-radius:12px;margin-bottom:20px;">
+      <button type="button" id="tabWa" onclick="pickMethod('whatsapp')"
+        style="flex:1;padding:10px;border:none;border-radius:9px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;">
+        واتساب
+      </button>
+      <button type="button" id="tabEmail" onclick="pickMethod('email')"
+        style="flex:1;padding:10px;border:none;border-radius:9px;cursor:pointer;font-family:inherit;font-size:13px;font-weight:700;">
+        البريد الإلكتروني
+      </button>
+    </div>
+
     <form action="{{ route('password.send') }}" method="POST">
       @csrf
+      <input type="hidden" name="method" id="methodField" value="{{ $method }}"/>
 
-      <div style="margin-bottom:24px;">
+      <div id="waBlock" style="margin-bottom:24px;">
         <label style="display:block;font-size:14px;font-weight:600;color:#374151;margin-bottom:6px;">رقم الهاتف</label>
-        <x-phone-input name="phone" :value="old('phone')" :required="true"/>
+        <x-phone-input name="phone" :value="old('phone')"/>
         <p style="color:#9CA3AF;font-size:12px;margin:6px 0 0;">الرقم المسجّل في حسابك</p>
+      </div>
+
+      <div id="emailBlock" style="margin-bottom:24px;display:none;">
+        <label style="display:block;font-size:14px;font-weight:600;color:#374151;margin-bottom:6px;">البريد الإلكتروني</label>
+        <input type="email" name="email" value="{{ old('email') }}" dir="ltr" placeholder="name@example.com"
+          style="width:100%;padding:13px 16px;border:1.5px solid #E5E7EB;border-radius:12px;font-family:inherit;font-size:15px;box-sizing:border-box;"
+          onfocus="this.style.borderColor='#1B3B8C'" onblur="this.style.borderColor='#E5E7EB'"/>
+        <p style="color:#9CA3AF;font-size:12px;margin:6px 0 0;">البريد المسجّل في حسابك</p>
       </div>
 
       <button type="submit"
@@ -41,4 +64,21 @@
 
   </div>
 </div>
+
+@push('scripts')
+<script>
+function pickMethod(m) {
+  var isWa = m === 'whatsapp';
+  document.getElementById('methodField').value = m;
+  document.getElementById('waBlock').style.display    = isWa ? 'block' : 'none';
+  document.getElementById('emailBlock').style.display = isWa ? 'none'  : 'block';
+
+  var on  = 'background:#fff;color:#1B3B8C;box-shadow:0 1px 4px rgba(0,0,0,.08);';
+  var off = 'background:transparent;color:#6B7280;';
+  document.getElementById('tabWa').style.cssText    = document.getElementById('tabWa').style.cssText.replace(/background:[^;]*;|color:[^;]*;|box-shadow:[^;]*;/g,'') + (isWa ? on : off);
+  document.getElementById('tabEmail').style.cssText = document.getElementById('tabEmail').style.cssText.replace(/background:[^;]*;|color:[^;]*;|box-shadow:[^;]*;/g,'') + (isWa ? off : on);
+}
+pickMethod(document.getElementById('methodField').value || 'whatsapp');
+</script>
+@endpush
 @endsection

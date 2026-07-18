@@ -18,11 +18,13 @@ class ForgotPasswordScreen extends StatefulWidget {
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   final _phone   = TextEditingController();
+  final _email   = TextEditingController();
   final _code    = TextEditingController();
   final _pass    = TextEditingController();
   final _confirm = TextEditingController();
 
   String _prefix = '+970';
+  bool _useEmail = false;
   bool _codeSent = false;
   bool _busy     = false;
   bool _obscure  = true;
@@ -32,9 +34,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     return '$_prefix${num.startsWith('0') ? num.substring(1) : num}';
   }
 
+  /// What the user typed — shown back to them on the code step.
+  String get _label => _useEmail ? _email.text.trim() : _fullPhone;
+
+  /// Identifies the account on both requests; the backend never returns the
+  /// account's phone, so we keep sending whatever the user identified with.
+  Map<String, dynamic> get _identity =>
+      _useEmail ? {'email': _email.text.trim()} : {'phone': _fullPhone};
+
   @override
   void dispose() {
-    _phone.dispose(); _code.dispose();
+    _phone.dispose(); _email.dispose(); _code.dispose();
     _pass.dispose(); _confirm.dispose();
     super.dispose();
   }
@@ -49,16 +59,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> _sendCode() async {
-    if (_phone.text.trim().isEmpty) {
+    if (_useEmail) {
+      final e = _email.text.trim();
+      if (e.isEmpty || !e.contains('@')) {
+        _toast('أدخل بريداً إلكترونياً صحيحاً');
+        return;
+      }
+    } else if (_phone.text.trim().isEmpty) {
       _toast('أدخل رقم هاتفك');
       return;
     }
+
     setState(() => _busy = true);
     try {
-      await ApiService.instance.post('/auth/forgot-password', data: {'phone': _fullPhone});
+      await ApiService.instance.post('/auth/forgot-password', data: {
+        ..._identity,
+        'method': _useEmail ? 'email' : 'whatsapp',
+      });
       if (!mounted) return;
       setState(() { _busy = false; _codeSent = true; });
-      _toast('إذا كان الرقم مسجّلاً فستصلك رسالة بالرمز', error: false);
+      _toast('إذا كان الحساب مسجّلاً فستصلك رسالة بالرمز', error: false);
     } on ApiException catch (e) {
       if (!mounted) return;
       setState(() => _busy = false);
@@ -87,7 +107,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     setState(() => _busy = true);
     try {
       final res = await ApiService.instance.post('/auth/reset-password', data: {
-        'phone':    _fullPhone,
+        ..._identity,
         'code':     _code.text.trim(),
         'password': _pass.text,
       });
@@ -142,7 +162,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 child: Icon(
-                  _codeSent ? Icons.chat_bubble_outline : Icons.lock_reset,
+                  _codeSent
+                      ? (_useEmail ? Icons.mark_email_read_outlined : Icons.chat_bubble_outline)
+                      : Icons.lock_reset,
                   size: 34,
                   color: _codeSent ? AppColors.success : AppColors.blue,
                 ),
@@ -150,7 +172,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              _codeSent ? 'أدخل الرمز وكلمة المرور الجديدة' : 'أدخل رقم هاتفك المسجّل',
+              _codeSent ? 'أدخل الرمز وكلمة المرور الجديدة' : 'استعادة كلمة المرور',
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontFamily: 'Cairo', fontWeight: FontWeight.w900,
@@ -160,15 +182,45 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             const SizedBox(height: 6),
             Text(
               _codeSent
-                  ? 'أرسلنا رمزاً عبر واتساب إلى $_fullPhone'
-                  : 'سنرسل لك رمز تحقق عبر واتساب',
+                  ? (_useEmail
+                      ? 'إذا كان الحساب مسجّلاً فستصلك رسالة على $_label'
+                      : 'إذا كان الحساب مسجّلاً فستصلك رسالة واتساب على $_label')
+                  : 'اختر طريقة استلام رمز التحقق',
               textAlign: TextAlign.center,
               style: const TextStyle(fontFamily: 'Cairo', fontSize: 12, color: AppColors.gray, height: 1.6),
             ),
             const SizedBox(height: 24),
 
             if (!_codeSent) ...[
-              _label('رقم الهاتف'),
+              // ── Delivery channel ──
+              Container(
+                padding: const EdgeInsets.all(4),
+                decoration: BoxDecoration(
+                  color: AppColors.grayBg,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Row(children: [
+                  Expanded(child: _methodTab('واتساب', !_useEmail, () => setState(() => _useEmail = false))),
+                  Expanded(child: _methodTab('البريد الإلكتروني', _useEmail, () => setState(() => _useEmail = true))),
+                ]),
+              ),
+              const SizedBox(height: 20),
+            ],
+
+            if (!_codeSent && _useEmail) ...[
+              _fieldLabel('البريد الإلكتروني'),
+              TextField(
+                controller: _email,
+                keyboardType: TextInputType.emailAddress,
+                textDirection: TextDirection.ltr,
+                style: const TextStyle(fontFamily: 'Cairo'),
+                decoration: const InputDecoration(hintText: 'name@example.com'),
+              ),
+              const SizedBox(height: 24),
+              _primaryButton('إرسال الرمز', _sendCode),
+            ] else if (!_codeSent) ...[
+              _fieldLabel('رقم الهاتف'),
               Row(children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -202,7 +254,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               const SizedBox(height: 24),
               _primaryButton('إرسال الرمز', _sendCode),
             ] else ...[
-              _label('رمز التحقق'),
+              _fieldLabel('رمز التحقق'),
               TextField(
                 controller: _code,
                 keyboardType: TextInputType.number,
@@ -214,7 +266,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               const SizedBox(height: 16),
 
-              _label('كلمة المرور الجديدة'),
+              _fieldLabel('كلمة المرور الجديدة'),
               TextField(
                 controller: _pass,
                 obscureText: _obscure,
@@ -229,7 +281,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               const SizedBox(height: 16),
 
-              _label('تأكيد كلمة المرور'),
+              _fieldLabel('تأكيد كلمة المرور'),
               TextField(
                 controller: _confirm,
                 obscureText: _obscure,
@@ -252,7 +304,30 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  Widget _label(String text) => Padding(
+  /// Segmented control option for choosing the delivery channel.
+  Widget _methodTab(String text, bool active, VoidCallback onTap) => GestureDetector(
+    onTap: _busy ? null : onTap,
+    behavior: HitTestBehavior.opaque,
+    child: AnimatedContainer(
+      duration: const Duration(milliseconds: 180),
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      decoration: BoxDecoration(
+        color: active ? Colors.white : Colors.transparent,
+        borderRadius: BorderRadius.circular(9),
+        boxShadow: active
+            ? [BoxShadow(color: Colors.black.withValues(alpha: 0.06), blurRadius: 6, offset: const Offset(0, 2))]
+            : null,
+      ),
+      alignment: Alignment.center,
+      child: Text(text,
+        style: TextStyle(
+          fontFamily: 'Cairo', fontSize: 13, fontWeight: FontWeight.w800,
+          color: active ? AppColors.blue : AppColors.gray,
+        )),
+    ),
+  );
+
+  Widget _fieldLabel(String text) => Padding(
     padding: const EdgeInsets.only(bottom: 8),
     child: Text(text,
       style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800, fontSize: 13, color: AppColors.text)),
