@@ -35,8 +35,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   String _phonePrefix = '+970';
   String _payment    = 'cod';
 
+  /// Main regions, each carrying its cities under `children`.
   List<Map<String, dynamic>> _zones = [];
+  int? _mainZoneId;
+  /// Selected city — this is the id sent to the backend.
   int? _zoneId;
+
+  /// Cities of the selected region.
+  List<Map<String, dynamic>> get _subZones {
+    if (_mainZoneId == null) return const [];
+    final main = _zones.firstWhere((z) => z['id'] == _mainZoneId, orElse: () => {});
+    return List<Map<String, dynamic>>.from((main['children'] as List?) ?? const []);
+  }
+
+  void _onMainZone(int? id) {
+    setState(() {
+      _mainZoneId = id;
+      final subs = _subZones;
+      // A region with no cities (older server) is itself the delivery zone.
+      _zoneId = subs.isEmpty ? id : null;
+      if (subs.isEmpty) {
+        final main = _zones.firstWhere((z) => z['id'] == id, orElse: () => {});
+        _city.text = main['name']?.toString() ?? '';
+      } else {
+        _city.clear();
+      }
+    });
+    _preview();
+  }
   Map<String, dynamic> _totals = {};
   bool _loading = false;
   bool _placing = false;
@@ -81,14 +107,34 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
     try {
       final zonesRes = await ApiService.instance.get('/delivery-zones');
-      final list = ((zonesRes as Map)['zones'] as List?) ?? [];
-      _zones = list.map((z) {
-        final m = z as Map<String, dynamic>;
-        return {
-          ...m,
-          'id': m['id'] is int ? m['id'] : int.tryParse(m['id'].toString()) ?? 0,
-        };
-      }).where((z) => (z['id'] as int) > 0).toList();
+      final map = zonesRes as Map;
+
+      int toId(dynamic v) => v is int ? v : int.tryParse('$v') ?? 0;
+
+      // `tree` gives main regions with their cities. Older servers only send
+      // the flat `zones` list, which still works as a single-level picker.
+      final tree = (map['tree'] as List?) ?? [];
+      if (tree.isNotEmpty) {
+        _zones = tree.map<Map<String, dynamic>>((z) {
+          final m = z as Map<String, dynamic>;
+          return {
+            ...m,
+            'id': toId(m['id']),
+            'children': ((m['children'] as List?) ?? [])
+                .map<Map<String, dynamic>>((c) {
+                  final cm = c as Map<String, dynamic>;
+                  return {...cm, 'id': toId(cm['id'])};
+                })
+                .where((c) => (c['id'] as int) > 0)
+                .toList(),
+          };
+        }).where((z) => (z['id'] as int) > 0).toList();
+      } else {
+        _zones = ((map['zones'] as List?) ?? []).map<Map<String, dynamic>>((z) {
+          final m = z as Map<String, dynamic>;
+          return {...m, 'id': toId(m['id']), 'children': <Map<String, dynamic>>[]};
+        }).where((z) => (z['id'] as int) > 0).toList();
+      }
     } catch (e) {
       Fluttertoast.showToast(msg: 'تعذر تحميل مناطق التوصيل');
     }
@@ -289,6 +335,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                         ? zid
                         : int.tryParse(zid?.toString() ?? '');
 
+                    // A saved address stores the city zone, so walk back up to
+                    // its region to fill the first dropdown too.
+                    _mainZoneId = null;
+                    for (final m in _zones) {
+                      if (m['id'] == _zoneId) { _mainZoneId = m['id'] as int; break; }
+                      final kids = (m['children'] as List?) ?? const [];
+                      if (kids.any((c) => c['id'] == _zoneId)) {
+                        _mainZoneId = m['id'] as int;
+                        break;
+                      }
+                    }
+                    if (_mainZoneId == null) _zoneId = null;
+
                     _city.text     = a['city']?.toString() ?? '';
                     _area.text     = a['area']?.toString() ?? '';
                     _address.text  = a['address_line']?.toString() ?? '';
@@ -313,10 +372,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             const SizedBox(height: 12),
 
+            // Region — this is what sets the delivery fee.
             DropdownButtonFormField<int>(
-              value: _zoneId,
+              value: _mainZoneId,
               isExpanded: true,
-              decoration: InputDecoration(labelText: '${s.deliveryZone} *'),
+              decoration: InputDecoration(labelText: 'المنطقة *'),
               items: _zones.map((z) => DropdownMenuItem<int>(
                 value: z['id'] as int,
                 child: Text(
@@ -324,13 +384,33 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   style: const TextStyle(fontFamily: 'Cairo'),
                 ),
               )).toList(),
-              onChanged: (v) { setState(() => _zoneId = v); _preview(); },
+              onChanged: _onMainZone,
             ),
             const SizedBox(height: 10),
-            TextFormField(
-              controller: _city,
-              decoration: InputDecoration(labelText: '${s.city} *'),
-              validator: (v) => v == null || v.isEmpty ? s.required : null,
+
+            // City within that region.
+            DropdownButtonFormField<int>(
+              value: _zoneId,
+              isExpanded: true,
+              decoration: InputDecoration(
+                labelText: 'المدينة / المحافظة *',
+                hintText: _mainZoneId == null ? 'اختر المنطقة أولاً' : null,
+              ),
+              items: _subZones.map((z) => DropdownMenuItem<int>(
+                value: z['id'] as int,
+                child: Text('${z['name']}', style: const TextStyle(fontFamily: 'Cairo')),
+              )).toList(),
+              onChanged: _subZones.isEmpty ? null : (v) {
+                setState(() {
+                  _zoneId = v;
+                  // City is derived from the picked zone so it can never
+                  // disagree with the fee.
+                  _city.text = _subZones
+                      .firstWhere((z) => z['id'] == v, orElse: () => {})['name']?.toString() ?? '';
+                });
+                _preview();
+              },
+              validator: (v) => v == null ? s.required : null,
             ),
             const SizedBox(height: 10),
             TextFormField(
