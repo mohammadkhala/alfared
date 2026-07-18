@@ -569,22 +569,13 @@ class OrderResource extends Resource
                         "https://wa.me/970{$record->customer_phone}?text={$record->whatsapp_message}"
                     )
                     ->openUrlInNewTab(),
-                ])
-                    ->label('إجراءات')
-                    ->icon('heroicon-m-ellipsis-vertical')
-                    ->color('gray')
-                    ->button()
-                    ->size('sm'),
-
                 // Shown once dispatched: pulls the courier's current state without
                 // waiting for the scheduled sync, so a cancellation at RoadFN
                 // reaches the admin and the customer immediately.
                 Tables\Actions\Action::make('refreshRoadFn')
                     ->label('تحديث الحالة')
                     ->tooltip('جلب حالة الشحنة الحالية من RoadFN')
-                    ->iconButton()
-                    ->size('sm')
-                    ->icon('heroicon-o-arrow-path')
+                                        ->icon('heroicon-o-arrow-path')
                     ->color('gray')
                     ->visible(fn (Order $record) => filled($record->roadfn_tracking_number))
                     ->action(function (Order $record) {
@@ -617,11 +608,17 @@ class OrderResource extends Resource
                                 ->send();
                         }
                     }),
+                ])
+                    ->label('إجراءات')
+                    ->icon('heroicon-m-ellipsis-vertical')
+                    ->color('gray')
+                    ->button()
+                    ->size('sm'),
 
                 // The one action with real-world consequences, so it reads as a
                 // button with words on it rather than a fifth grey icon.
                 Tables\Actions\Action::make('sendToRoadFn')
-                    ->label('إرسال للتوصيل')
+                    ->label('إرسال')
                     ->tooltip(fn (Order $record) => $record->deliveryZone?->roadfn_city_id
                         ? 'إنشاء شحنة فعلية لدى RoadFN'
                         : 'منطقة هذا الطلب غير مربوطة بـ RoadFN — شغّل roadfn:sync-zones')
