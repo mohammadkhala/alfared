@@ -296,10 +296,12 @@ class ProductResource extends Resource
                 Tables\Filters\Filter::make('out_of_stock')->label('نفد المخزون')
                     ->query(fn(Builder $q) => $q->where('stock_quantity', 0)),
             ])
+            // Actions first in the row so they stay visible without scrolling
+            // the wide products table sideways.
             ->actions([
                 Tables\Actions\EditAction::make()->label('تعديل'),
                 Tables\Actions\DeleteAction::make()->label('حذف'),
-            ])
+            ], position: Tables\Enums\ActionsPosition::BeforeCells)
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()->label('حذف المحدد'),
