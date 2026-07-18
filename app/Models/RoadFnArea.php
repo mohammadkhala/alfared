@@ -13,6 +13,10 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class RoadFnArea extends Model
 {
+    // Eloquent would guess `road_fn_areas` from the class name; the migration
+    // created `roadfn_areas`.
+    protected $table = 'roadfn_areas';
+
     protected $fillable = [
         'delivery_zone_id',
         'roadfn_area_id',
