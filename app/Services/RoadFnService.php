@@ -163,12 +163,25 @@ class RoadFnService
         // to capture the internal id + current status for future polling.
         $record = $this->findShipmentByTracking($tracking) ?? ['ShipmentTrackingNo' => $tracking];
 
-        $order->update([
+        $update = [
             'roadfn_tracking_number' => $tracking,
             'roadfn_shipment_id'     => $record['ID'] ?? null,
             'roadfn_sent_at'         => now(),
-        ]);
+        ];
 
+        // Move the order ourselves rather than waiting for RoadFN to report a
+        // status. A shipment RoadFN hasn't indexed yet comes back with no
+        // StatusId, so applyShipmentRecord leaves the status alone and the
+        // customer keeps seeing "بانتظار التأكيد" for an order already handed
+        // to the courier. Only advance — never drag a further-along order back.
+        if (in_array($order->status, ['pending', 'confirmed', 'processing'], true)) {
+            $update['status'] = 'sent_to_delivery';
+        }
+
+        $order->update($update);
+
+        // RoadFN's own status wins from here; it can only move the order forward
+        // through the mapped states.
         $this->applyShipmentRecord($order, $record);
     }
 
