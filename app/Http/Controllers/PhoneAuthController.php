@@ -113,7 +113,7 @@ class PhoneAuthController extends Controller
             Auth::login($user, true);
             session()->forget(['otp_phone', 'otp_sent_at']);
 
-            return redirect()->intended(route('account.dashboard'))->with('success', 'مرحباً بعودتك ' . $user->name . ' 👋');
+            return redirect()->intended(route('account.index'))->with('success', 'مرحباً بعودتك ' . $user->name . ' 👋');
         }
 
         // New user → store phone_verified in session, show quick register form
@@ -172,7 +172,7 @@ class PhoneAuthController extends Controller
         Auth::login($user, true);
         session()->forget(['otp_phone', 'otp_phone_verified', 'otp_sent_at']);
 
-        return redirect()->route('account.dashboard')->with('success', 'أهلاً وسهلاً ' . $user->name . ' 🎉');
+        return redirect()->route('account.index')->with('success', 'أهلاً وسهلاً ' . $user->name . ' 🎉');
     }
 
     // ── Resend OTP (AJAX / POST) ──────────────────────────────────────────────
