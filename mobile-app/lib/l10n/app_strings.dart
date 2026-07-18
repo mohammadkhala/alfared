@@ -599,8 +599,8 @@ class AppStrings {
     'registerPassLbl':{'ar': 'كلمة المرور',                'he': 'סיסמה',                      'en': 'Password'},
     'registerPassHelp':{'ar':'8 أحرف على الأقل',           'he': 'לפחות 8 תווים',              'en': 'At least 8 characters'},
     'registerPassErr':{'ar': '8 أحرف على الأقل',           'he': 'לפחות 8 תווים',              'en': 'At least 8 characters'},
-    'registerBtn':    {'ar': 'إرسال رمز التحقق عبر واتساب','he': 'שלח קוד אימות בוואטסאפ',    'en': 'Send OTP via WhatsApp'},
-    'registerWaNote':     {'ar': 'سيتم إرسال رمز التحقق عبر واتساب إلى رقم هاتفك', 'he': 'קוד האימות יישלח בוואטסאפ למספר הטלפון שלך', 'en': 'OTP will be sent via WhatsApp to your phone number'},
+    'registerBtn':    {'ar': 'إرسال رمز التأكيد',          'he': 'שלח קוד אימות',              'en': 'Send verification code'},
+    'registerWaNote':     {'ar': 'سيتم إرسال رمز التأكيد إلى بريدك الإلكتروني', 'he': 'קוד האימות יישלח לדואר האלקטרוני שלך', 'en': 'A verification code will be sent to your email'},
     'registerDuplicate':  {'ar': 'هذا الرقم أو البريد مسجل مسبقاً',               'he': 'מספר זה או הדואר כבר רשומים',                'en': 'This phone or email is already registered'},
     'registerOtpFailed':  {'ar': 'فشل إرسال رمز التحقق',                          'he': 'שליחת קוד האימות נכשלה',                   'en': 'Failed to send OTP'},
 

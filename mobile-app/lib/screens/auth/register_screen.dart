@@ -274,22 +274,22 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
                 const SizedBox(height: 14),
 
-                // ── WhatsApp note ───────────────────────────────
+                // ── E-mail verification note ────────────────────
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
                   decoration: BoxDecoration(
-                    color: const Color(0xFFE7F5EC),
+                    color: AppColors.blueLight,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFF25D366).withValues(alpha: 0.4)),
+                    border: Border.all(color: AppColors.blue.withValues(alpha: 0.25)),
                   ),
                   child: Row(children: [
-                    const Text('💬', style: TextStyle(fontSize: 18)),
+                    const Icon(Icons.mark_email_unread_outlined, size: 18, color: AppColors.blue),
                     const SizedBox(width: 10),
                     Expanded(
                       child: Text(
                         s.registerWaNote,
                         style: const TextStyle(fontFamily: 'Cairo', fontSize: 11,
-                            color: Color(0xFF1A6B35), height: 1.5),
+                            color: AppColors.blue, height: 1.5),
                       ),
                     ),
                   ]),
