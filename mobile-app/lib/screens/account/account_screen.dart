@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../../l10n/app_strings.dart';
@@ -27,11 +28,26 @@ class _AccountScreenState extends State<AccountScreen> {
   int _ordersCount = 0;
   int _wishlistCount = 0;
   Map<String, dynamic>? _loyalty;
+  String _version = '';
 
   @override
   void initState() {
     super.initState();
     _fetchStats();
+    _loadVersion();
+  }
+
+  /// Reads the version from the build itself instead of a hard-coded string,
+  /// so it stays correct after every release.
+  Future<void> _loadVersion() async {
+    try {
+      final info = await PackageInfo.fromPlatform();
+      if (mounted) {
+        setState(() => _version = 'الإصدار ${info.version} (${info.buildNumber})');
+      }
+    } catch (_) {
+      // Plugin unavailable — leave the line empty rather than showing a lie.
+    }
   }
 
   Future<void> _fetchStats() async {
@@ -389,10 +405,9 @@ class _AccountScreenState extends State<AccountScreen> {
             ]),
           ),
 
-          const SizedBox(height: 18),
-          Center(child: Text(s.appVersion, style: const TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 11))),
+          const SizedBox(height: 14),
 
-          const SizedBox(height: 6),
+          // ── Developer credit ────────────────────────────────
           Center(
             child: GestureDetector(
               onTap: () => launchUrl(
@@ -400,24 +415,34 @@ class _AccountScreenState extends State<AccountScreen> {
                 mode: LaunchMode.externalApplication,
               ),
               behavior: HitTestBehavior.opaque,
-              child: Padding(
-                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
-                child: Text.rich(TextSpan(children: [
-                  const TextSpan(text: 'صُنع بواسطة '),
-                  TextSpan(
-                    text: 'mohammad khallaf',
-                    style: const TextStyle(
-                      color: AppColors.orange,
-                      fontWeight: FontWeight.w800,
-                    ),
-                  ),
-                ]),
-                  style: const TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 11),
+              child: Container(
+                padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 18),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(color: AppColors.border),
                 ),
+                child: Row(mainAxisSize: MainAxisSize.min, children: [
+                  const Text('صُنع بواسطة ',
+                    style: TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 12)),
+                  const Text('mohammad khallaf',
+                    style: TextStyle(
+                      color: AppColors.orange, fontFamily: 'Cairo',
+                      fontSize: 13, fontWeight: FontWeight.w900,
+                    )),
+                  const SizedBox(width: 6),
+                  Icon(Icons.chat_bubble, size: 13, color: AppColors.success.withValues(alpha: 0.9)),
+                ]),
               ),
             ),
           ),
-          const SizedBox(height: 8),
+
+          const SizedBox(height: 10),
+          // Real build number, so it never drifts from pubspec like the old
+          // hard-coded string did.
+          Center(child: Text(_version,
+            style: const TextStyle(color: AppColors.grayLight, fontFamily: 'Cairo', fontSize: 11))),
+          const SizedBox(height: 10),
         ]),
       ),
     );
