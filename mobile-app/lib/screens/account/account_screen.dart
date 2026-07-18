@@ -391,6 +391,33 @@ class _AccountScreenState extends State<AccountScreen> {
 
           const SizedBox(height: 18),
           Center(child: Text(s.appVersion, style: const TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 11))),
+
+          const SizedBox(height: 6),
+          Center(
+            child: GestureDetector(
+              onTap: () => launchUrl(
+                Uri.parse('https://wa.me/972594513978'),
+                mode: LaunchMode.externalApplication,
+              ),
+              behavior: HitTestBehavior.opaque,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+                child: Text.rich(TextSpan(children: [
+                  const TextSpan(text: 'صُنع بواسطة '),
+                  TextSpan(
+                    text: 'mohammad khallaf',
+                    style: const TextStyle(
+                      color: AppColors.orange,
+                      fontWeight: FontWeight.w800,
+                    ),
+                  ),
+                ]),
+                  style: const TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 11),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 8),
         ]),
       ),
     );
