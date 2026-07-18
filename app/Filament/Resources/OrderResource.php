@@ -397,7 +397,7 @@ class OrderResource extends Resource
                         return new HtmlString(
                             '<div style="display:flex;align-items:center;gap:8px;">'
                             . '<div style="width:30px;height:30px;border-radius:50%;background:#E8F0FF;color:#122870;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0;">'.$initial.'</div>'
-                            . '<div style="min-width:0;max-width:150px;">'
+                            . '<div style="min-width:0;max-width:118px;">'
                             . '<div title="'.$name.'" style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'.$name.'</div>'
                             . '<div style="font-size:11px;color:#64748B;white-space:nowrap;">'.$phone.'</div>'
                             . '</div></div>'
@@ -495,9 +495,11 @@ class OrderResource extends Resource
                     ->state(fn (Order $record) => $record->roadfn_tracking_number ? 'تم الإرسال' : 'لم يُرسَل')
                     ->color(fn (Order $record) => $record->roadfn_tracking_number ? 'success' : 'gray')
                     ->icon(fn (Order $record) => $record->roadfn_tracking_number ? 'heroicon-o-truck' : 'heroicon-o-clock')
-                    ->description(fn (Order $record) => $record->roadfn_tracking_number
-                        ? $record->roadfn_tracking_number . ($record->roadfn_status ? ' • ' . $record->roadfn_status : '')
-                        : null),
+                    // The tracking number plus the Arabic courier status made this
+                    // the widest cell in the row; it lives in the tooltip now.
+                    ->description(fn (Order $record) => $record->roadfn_status ?: null)
+                    ->tooltip(fn (Order $record) => $record->roadfn_tracking_number)
+                    ->width('110px'),
 
                 // ── الحالة (select مباشر) ─────────────────────────────
                 Tables\Columns\SelectColumn::make('status')
@@ -505,8 +507,8 @@ class OrderResource extends Resource
                     ->options(Order::$statusLabels)
                     // Otherwise it stretches to the longest label ("بانتظار
                     // التأكيد") and eats width the rest of the row needs.
-                    ->width('130px')
-                    ->extraAttributes(['style' => 'font-size:12px;']),
+                    ->width('110px')
+                    ->extraAttributes(['style' => 'font-size:11px;']),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('city')->label('المنطقة')
@@ -576,7 +578,7 @@ class OrderResource extends Resource
                 Tables\Actions\Action::make('refreshRoadFn')
                     ->label('تحديث الحالة')
                     ->tooltip('جلب حالة الشحنة الحالية من RoadFN')
-                    ->button()
+                    ->iconButton()
                     ->size('sm')
                     ->icon('heroicon-o-arrow-path')
                     ->color('gray')
