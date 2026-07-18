@@ -507,8 +507,12 @@ class OrderResource extends Resource
                     ->options(Order::$statusLabels)
                     // Otherwise it stretches to the longest label ("بانتظار
                     // التأكيد") and eats width the rest of the row needs.
-                    ->width('110px')
-                    ->extraAttributes(['style' => 'font-size:11px;']),
+                    // width() only sizes the cell — the <select> inside carries its
+                    // own min-width and stays wide, so it has to be styled too.
+                    ->width('1%')
+                    ->extraAttributes([
+                        'style' => 'font-size:11px;width:118px;min-width:118px;max-width:118px;padding-inline:8px;',
+                    ]),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('city')->label('المنطقة')
