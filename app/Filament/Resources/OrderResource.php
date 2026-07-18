@@ -511,7 +511,7 @@ class OrderResource extends Resource
                     // own min-width and stays wide, so it has to be styled too.
                     ->width('1%')
                     ->extraAttributes([
-                        'style' => 'font-size:11px;width:118px;min-width:118px;max-width:118px;padding-inline:8px;',
+                        'style' => 'font-size:11px;width:96px;min-width:96px;max-width:96px;padding-inline:6px;',
                     ]),
             ])
             ->filters([
