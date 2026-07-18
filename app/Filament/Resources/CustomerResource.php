@@ -30,7 +30,14 @@ class CustomerResource extends Resource
 
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
-        return parent::getEloquentQuery()->where('role', User::ROLE_CUSTOMER);
+        // Sum spend in the main query so the tier/total columns don't each fire
+        // their own SUM per row (was 3 extra queries per customer).
+        return parent::getEloquentQuery()
+            ->where('role', User::ROLE_CUSTOMER)
+            ->withSum(
+                ['orders as spent_sum' => fn ($q) => $q->whereNotIn('status', ['cancelled', 'returned'])],
+                'total'
+            );
     }
 
     public static function getNavigationBadge(): ?string
@@ -196,29 +203,27 @@ class CustomerResource extends Resource
                 Tables\Columns\TextColumn::make('tier')
                     ->label('التصنيف')
                     ->getStateUsing(function ($record) {
-                        $spent = TierService::totalSpent($record);
-                        $tier  = TierService::tierForAmount($spent);
+                        $tier = TierService::tierForAmount((float) ($record->spent_sum ?? 0));
                         return $tier['emoji'] . ' ' . $tier['label'];
                     })
                     ->badge()
-                    ->color(function ($record) {
-                        $spent = TierService::totalSpent($record);
-                        return TierService::tierForAmount($spent)['color'];
-                    }),
+                    ->color(fn ($record) => TierService::tierForAmount((float) ($record->spent_sum ?? 0))['color']),
 
                 Tables\Columns\TextColumn::make('total_spent')
-                    ->label('إجمالي الإنفاق')
-                    ->getStateUsing(fn($record) => TierService::totalSpent($record))
+                    ->label('الإنفاق')
+                    ->getStateUsing(fn($record) => (float) ($record->spent_sum ?? 0))
+                    ->sortable(query: fn ($query, string $direction) => $query->orderBy('spent_sum', $direction))
                     ->money('ILS')
                     ->weight('bold')->color('success'),
 
                 Tables\Columns\TextColumn::make('loyalty_points')
-                    ->label('نقاط الولاء')
+                    ->label('النقاط')
                     ->sortable()->badge()->color('warning'),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('تاريخ التسجيل')
-                    ->dateTime('d/m/Y')->sortable(),
+                    ->dateTime('d/m/Y')->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
             ])
             ->filters([
                 Tables\Filters\Filter::make('has_orders')
@@ -256,13 +261,16 @@ class CustomerResource extends Resource
                         });
                     }),
             ])
+            // Compact icon buttons so the table fits without sideways scroll.
             ->actions([
-                Tables\Actions\ViewAction::make()->label('الملف'),
-                Tables\Actions\EditAction::make()->label('تعديل'),
+                Tables\Actions\ViewAction::make()->label('الملف')->iconButton()->tooltip('الملف'),
+                Tables\Actions\EditAction::make()->label('تعديل')->iconButton()->tooltip('تعديل'),
                 Tables\Actions\Action::make('whatsapp')
                     ->label('واتساب')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->color('success')
+                    ->iconButton()
+                    ->tooltip('واتساب')
                     ->url(fn(User $record) => $record->phone
                         ? 'https://wa.me/' . preg_replace('/\D/', '', $record->phone)
                         : null)
@@ -272,6 +280,8 @@ class CustomerResource extends Resource
                     ->label('حذف الحساب')
                     ->icon('heroicon-o-trash')
                     ->color('danger')
+                    ->iconButton()
+                    ->tooltip('حذف الحساب')
                     ->requiresConfirmation()
                     ->modalHeading('حذف حساب العميل نهائياً')
                     ->modalDescription(fn(User $record) =>
