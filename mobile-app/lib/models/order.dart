@@ -23,6 +23,8 @@ class AppOrder {
   final String? paymentMethod;
   final List<OrderItem> items;
   final DateTime? returnRequestedAt;
+  final String? roadfnTrackingNumber;
+  final String? roadfnStatus;
 
   AppOrder({
     required this.orderNumber,
@@ -45,6 +47,8 @@ class AppOrder {
     this.paymentMethod,
     this.items = const [],
     this.returnRequestedAt,
+    this.roadfnTrackingNumber,
+    this.roadfnStatus,
   });
 
   factory AppOrder.fromJson(Map<String, dynamic> j) => AppOrder(
@@ -68,6 +72,8 @@ class AppOrder {
     paymentMethod:      j['payment_method']       as String?,
     returnRequestedAt:  j['return_requested_at'] != null
         ? DateTime.tryParse(j['return_requested_at']) : null,
+    roadfnTrackingNumber: j['roadfn_tracking_number'] as String?,
+    roadfnStatus:         j['roadfn_status'] as String?,
     items: ((j['items'] as List?) ?? const [])
         .map((e) => OrderItem.fromJson(e as Map<String, dynamic>))
         .toList(),

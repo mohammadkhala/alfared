@@ -171,6 +171,29 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
 
               const SizedBox(height: 14),
 
+              // RoadFN shipment tracking (shown once the order has been sent to the courier)
+              if (o.roadfnTrackingNumber != null && o.roadfnTrackingNumber!.isNotEmpty)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 14),
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(AppRadius.lg), boxShadow: AppShadows.card),
+                  child: Row(children: [
+                    Container(
+                      width: 44, height: 44,
+                      decoration: BoxDecoration(color: AppColors.blueLight, borderRadius: BorderRadius.circular(14)),
+                      alignment: Alignment.center,
+                      child: const Text('🚚', style: TextStyle(fontSize: 22)),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+                      Text(s.trackingNumberLabel, style: const TextStyle(color: AppColors.gray, fontSize: 10, fontFamily: 'Cairo')),
+                      Text(o.roadfnTrackingNumber!, style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, fontFamily: 'Cairo', color: AppColors.text)),
+                      if (o.roadfnStatus != null && o.roadfnStatus!.isNotEmpty)
+                        Text(o.roadfnStatus!, style: const TextStyle(fontSize: 11, fontFamily: 'Cairo', color: AppColors.blue)),
+                    ])),
+                  ]),
+                ),
+
               // Driver card (only when shipped)
               if (o.status == 'shipped')
                 Container(

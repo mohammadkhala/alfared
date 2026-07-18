@@ -51,4 +51,42 @@ return [
         'currency'   => env('LAHZA_CURRENCY', 'ILS'),
     ],
 
+    'roadfn' => [
+        'base_url'    => env('ROADFN_BASE_URL', 'https://api.roadfn.com/'),
+        'username'    => env('ROADFN_USERNAME'),
+        'password'    => env('ROADFN_PASSWORD'),
+        'device_token' => env('ROADFN_DEVICE_TOKEN'),
+
+        // Shipment type sent on creation (RoadFN /ShipmentsTypes). 29 = "اخرى" (other).
+        'default_shipment_type' => (int) env('ROADFN_DEFAULT_SHIPMENT_TYPE', 29),
+
+        // RoadFN StatusId => our Order status. Built from the real /ListStatus
+        // catalogue (2026-07-18). Any StatusId not listed here leaves our order
+        // status untouched and is logged, so an unknown state never mislabels an
+        // order. Adjust freely — this is the single source of truth for the map.
+        // Admin owns pending→confirmed→processing→sent_to_delivery. Once the
+        // shipment is with RoadFN, RoadFN drives the rest. So the early RoadFN
+        // states (received at office/branch) keep the order at sent_to_delivery,
+        // and only a driver pickup moves it to "shipped" (مع المندوب).
+        'status_map' => [
+            2  => 'sent_to_delivery', // مؤكدة (Submitted)
+            4  => 'sent_to_delivery', // في المكتب (Picked Up Office)
+            5  => 'sent_to_delivery', // بحاجة متابعة (On Hold)
+            12 => 'sent_to_delivery', // نقل بين الفروع (Transfer Branch)
+            13 => 'sent_to_delivery', // متابعة قبل الإرجاع (Ready for pickup)
+            18 => 'sent_to_delivery', // إرسال الشحنات للشركة (need to follow)
+            19 => 'sent_to_delivery', // تأجيلات (postponed)
+            22 => 'sent_to_delivery', // تحويل بين المكاتب
+            14 => 'shipped',          // مع السائق / مع المندوب (With Driver)
+            8  => 'delivered',        // تحصيلات مع السائقين — COD collected
+            9  => 'delivered',        // في المحاسبة (In Accounting)
+            10 => 'delivered',        // مغلق (Closed)
+            11 => 'cancelled',        // ملغي (Cancelled)
+            3  => 'returned',         // بانتظار الإرجاع من السائق
+            7  => 'returned',         // مرتجع للمرسل (Returned)
+            17 => 'returned',         // تحويل فرع للطرود المرتجعة
+            23 => 'returned',         // طرود مرتجعة مغلقة (Closed Returned)
+        ],
+    ],
+
 ];

@@ -139,6 +139,7 @@ class S {
   String get returnRequested   => _t('returnRequested');
   String get deliveryTeam      => _t('deliveryTeam');
   String get driver            => _t('driver');
+  String get trackingNumberLabel => _t('trackingNumberLabel');
   String get returnReason      => _t('returnReason');
   String get returnHint        => _t('returnHint');
   String get returnSend        => _t('returnSend');
@@ -448,7 +449,7 @@ class AppStrings {
     'trackOrder':         {'ar': 'تتبع الطلب',        'he': 'מעקב הזמנה',     'en': 'Track Order'},
     'orderConfirmed':     {'ar': 'تم تأكيد الطلب',   'he': 'ההזמנה אושרה',   'en': 'Order Confirmed'},
     'orderProcessing':    {'ar': 'جاري تجهيز الطلب', 'he': 'ההזמנה בהכנה',   'en': 'Order Processing'},
-    'orderShipped':       {'ar': 'في الطريق إليك',   'he': 'בדרך אליך',      'en': 'On the Way'},
+    'orderShipped':       {'ar': 'مع المندوب',       'he': 'עם השליח',       'en': 'With Courier'},
     'orderDelivered':     {'ar': 'تم التوصيل',        'he': 'נמסר',           'en': 'Delivered'},
     'orderCancelled':     {'ar': '❌ تم إلغاء هذا الطلب', 'he': '❌ ההזמנה בוטלה', 'en': '❌ This order was cancelled'},
     'subtotalLabel':      {'ar': 'المجموع الفرعي',   'he': 'סכום ביניים',    'en': 'Subtotal'},
@@ -461,6 +462,7 @@ class AppStrings {
     'returnRequested':    {'ar': 'تم إرسال طلب الإرجاع — قيد المراجعة', 'he': 'בקשת ההחזרה נשלחה — בבדיקה', 'en': 'Return request sent — under review'},
     'deliveryTeam':       {'ar': 'فريق التوصيل',      'he': 'צוות המשלוחים',  'en': 'Delivery Team'},
     'driver':             {'ar': 'المندوب',            'he': 'שליח',           'en': 'Courier'},
+    'trackingNumberLabel':{'ar': 'رقم تتبّع الشحنة',    'he': 'מספר מעקב משלוח', 'en': 'Shipment tracking number'},
     'returnReason':       {'ar': 'يرجى ذكر سبب طلب الإرجاع:', 'he': 'נא לציין את סיבת הבקשה:', 'en': 'Please state the reason:'},
     'returnHint':         {'ar': 'مثال: المنتج لا يطابق الوصف...', 'he': 'לדוגמה: המוצר לא תואם לתיאור...', 'en': 'e.g. Product doesn\'t match description...'},
     'returnSend':         {'ar': 'إرسال الطلب',       'he': 'שלח בקשה',       'en': 'Submit Request'},

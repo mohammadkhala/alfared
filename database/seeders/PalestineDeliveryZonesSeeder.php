@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use App\Models\DeliveryZone;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schema;
 
 /**
  * Builds the two-level delivery zone tree from /palestine-locations.
@@ -20,9 +21,9 @@ class PalestineDeliveryZonesSeeder extends Seeder
 {
     /** Main zones and their default pricing (adjust from the admin panel). */
     private const MAIN = [
-        'west_bank' => ['ar' => 'الضفة الغربية', 'en' => 'West Bank',  'fee' => 20, 'free' => 300, 'days' => 2],
-        'jerusalem' => ['ar' => 'القدس',          'en' => 'Jerusalem',  'fee' => 30, 'free' => 400, 'days' => 2],
-        'inside_48' => ['ar' => 'الداخل',         'en' => 'Inside',     'fee' => 40, 'free' => 500, 'days' => 3],
+        'west_bank' => ['ar' => 'الضفة الغربية', 'en' => 'West Bank', 'fee' => 20, 'days' => 2],
+        'jerusalem' => ['ar' => 'القدس',          'en' => 'Jerusalem', 'fee' => 25, 'days' => 2],
+        'inside_48' => ['ar' => 'الداخل',         'en' => 'Inside',    'fee' => 70, 'days' => 3],
     ];
 
     public function run(): void
@@ -43,27 +44,31 @@ class PalestineDeliveryZonesSeeder extends Seeder
         $created = 0;
 
         foreach (self::MAIN as $region => $cfg) {
-            $main = DeliveryZone::updateOrCreate(
-                ['name_ar' => $cfg['ar'], 'parent_id' => null],
-                [
-                    'name_en'             => $cfg['en'],
-                    'delivery_fee'        => $cfg['fee'],
-                    'free_shipping_above' => $cfg['free'],
-                    'estimated_days'      => $cfg['days'],
-                    'is_active'           => true,
-                ]
-            );
+            $main = DeliveryZone::firstOrNew(['name_ar' => $cfg['ar'], 'parent_id' => null]);
+
+            // Fee is authoritative — it is what the store owner asked for.
+            $main->name_en   = $cfg['en'];
+            $main->is_active = true;
+            $this->setFee($main, $cfg['fee']);
+
+            // Delivery days only seed a new row, so a value tuned in the admin
+            // panel survives re-running this seeder.
+            if (! $main->exists) {
+                $main->estimated_days = $cfg['days'];
+            }
+
+            $main->save();
 
             foreach ($this->subsFor($region, $locations, $governorates, $insideCities) as $i => $sub) {
-                DeliveryZone::updateOrCreate(
-                    ['name_ar' => $sub['ar'], 'parent_id' => $main->id],
-                    [
-                        'name_en'    => $sub['en'] ?? null,
-                        // Fee lives on the main zone; sub zones inherit it.
-                        'is_active'  => true,
-                        'sort_order' => $i,
-                    ]
-                );
+                $city = DeliveryZone::firstOrNew(['name_ar' => $sub['ar'], 'parent_id' => $main->id]);
+                $city->name_en    = $sub['en'] ?? null;
+                // Fee lives on the main zone; sub zones inherit it.
+                $city->is_active  = true;
+                $city->sort_order = $i;
+
+                $this->inheritRoadFnMapping($city);
+
+                $city->save();
                 $created++;
             }
 
@@ -73,6 +78,47 @@ class PalestineDeliveryZonesSeeder extends Seeder
         $this->retireLegacyZones();
 
         $this->command?->info("اكتمل: 3 مناطق رئيسية و{$created} منطقة فرعية.");
+    }
+
+    /**
+     * Carries a legacy flat zone's RoadFN ids onto the matching new city.
+     *
+     * Those ids were looked up against the live RoadFN account, so losing them
+     * when the old rows are retired would mean redoing that mapping by hand.
+     * An id already set on the city always wins.
+     */
+    private function inheritRoadFnMapping(DeliveryZone $city): void
+    {
+        if (! Schema::hasColumn('delivery_zones', 'roadfn_city_id')) {
+            return;
+        }
+        if (filled($city->roadfn_city_id)) {
+            return;
+        }
+
+        // Exact name first, then the legacy naming variants — the old rows
+        // used "الخليل المدينة" / "محافظة الخليل" where the governorate list
+        // simply says "الخليل".
+        $legacy = DeliveryZone::query()
+            ->whereNull('parent_id')
+            ->whereNotNull('roadfn_city_id')
+            ->where(function ($q) use ($city) {
+                $q->where('name_ar', $city->name_ar)
+                  ->orWhere('name_ar', "محافظة {$city->name_ar}")
+                  ->orWhere('name_ar', "{$city->name_ar} المدينة");
+            })
+            // Prefer the exact match when several variants exist.
+            ->orderByRaw('CASE WHEN name_ar = ? THEN 0 ELSE 1 END', [$city->name_ar])
+            ->first();
+
+        if (! $legacy) {
+            return;
+        }
+
+        $city->roadfn_city_id = $legacy->roadfn_city_id;
+        $city->roadfn_area_id = $legacy->roadfn_area_id;
+
+        $this->command?->line("  ↳ نُقل ربط RoadFN إلى: {$city->name_ar}");
     }
 
     /**
@@ -100,6 +146,19 @@ class PalestineDeliveryZonesSeeder extends Seeder
 
         $names = $legacy->pluck('name_ar')->implode('، ');
         $this->command?->warn("عُطّلت مناطق قديمة (لم تُحذف، والطلبات السابقة سليمة): {$names}");
+    }
+
+    /**
+     * The table carries both `base_fee` (admin panel) and `delivery_fee`
+     * (original migration). Writing both keeps them from drifting apart.
+     */
+    private function setFee(DeliveryZone $zone, float $fee): void
+    {
+        foreach (['base_fee', 'delivery_fee'] as $col) {
+            if (Schema::hasColumn('delivery_zones', $col)) {
+                $zone->{$col} = $fee;
+            }
+        }
     }
 
     /** Picks the right sub level for each region. */

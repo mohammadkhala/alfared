@@ -64,6 +64,20 @@
     @endif
   </div>
 
+  {{-- Courier (RoadFN) card — shown once the shipment has been dispatched --}}
+  @if($order->roadfn_tracking_number)
+    <div style="background:#fff;border-radius:16px;padding:20px 24px;box-shadow:0 4px 20px rgba(27,59,140,.08);margin-bottom:24px;display:flex;align-items:center;gap:16px;">
+      <div style="width:52px;height:52px;border-radius:14px;background:#EFF6FF;display:flex;align-items:center;justify-content:center;font-size:26px;flex-shrink:0;">🚚</div>
+      <div style="flex:1;min-width:0;">
+        <div style="font-size:15px;font-weight:700;color:#1B3B8C;">{{ __('tracking_courier_title') }}</div>
+        <div style="font-size:13px;color:#6B7280;margin-top:3px;">{{ __('tracking_number_label') }}: <strong style="color:#374151;">{{ $order->roadfn_tracking_number }}</strong></div>
+        @if($order->roadfn_status)
+          <div style="font-size:13px;color:#1B3B8C;margin-top:2px;font-weight:600;">{{ $order->roadfn_status }}</div>
+        @endif
+      </div>
+    </div>
+  @endif
+
   {{-- Order info cards --}}
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:24px;">
     <div style="background:#fff;border-radius:16px;padding:24px;box-shadow:0 4px 20px rgba(27,59,140,.08);">

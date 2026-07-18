@@ -10,13 +10,14 @@ class Order extends Model
 {
     protected $fillable = [
         'order_number', 'user_id', 'customer_name', 'customer_phone', 'customer_email',
-        'city', 'area', 'address_line', 'building', 'delivery_notes', 'delivery_zone_id',
+        'city', 'area', 'roadfn_area_id', 'address_line', 'building', 'delivery_notes', 'delivery_zone_id',
         'subtotal', 'delivery_fee', 'discount_amount', 'total',
         'coupon_code', 'coupon_id', 'status', 'payment_method', 'payment_status', 'payment_ref',
         'admin_notes', 'confirmed_at', 'shipped_at', 'delivered_at',
         'last_edited_by', 'last_edited_at',
         'loyalty_points_redeemed', 'loyalty_discount',
         'return_requested_at', 'return_reason', 'return_status', 'return_reject_reason',
+        'roadfn_tracking_number', 'roadfn_shipment_id', 'roadfn_status', 'roadfn_status_id', 'roadfn_sent_at',
     ];
 
     protected $casts = [
@@ -28,27 +29,30 @@ class Order extends Model
         'shipped_at'           => 'datetime',
         'delivered_at'         => 'datetime',
         'last_edited_at'       => 'datetime',
+        'roadfn_sent_at'       => 'datetime',
         'return_requested_at'  => 'datetime',
     ];
 
     public static $statusLabels = [
-        'pending'    => 'بانتظار التأكيد',
-        'confirmed'  => 'تم التأكيد',
-        'processing' => 'قيد التجهيز',
-        'shipped'    => 'في الطريق',
-        'delivered'  => 'تم التوصيل',
-        'cancelled'  => 'ملغي',
-        'returned'   => 'مُرجَّع',
+        'pending'          => 'بانتظار التأكيد',
+        'confirmed'        => 'تم التأكيد',
+        'processing'       => 'قيد التجهيز',
+        'sent_to_delivery' => 'مرسل للتوصيل',
+        'shipped'          => 'مع المندوب',
+        'delivered'        => 'تم التوصيل',
+        'cancelled'        => 'ملغي',
+        'returned'         => 'مُرجَّع',
     ];
 
     public static $statusColors = [
-        'pending'    => 'warning',
-        'confirmed'  => 'info',
-        'processing' => 'info',
-        'shipped'    => 'primary',
-        'delivered'  => 'success',
-        'cancelled'  => 'danger',
-        'returned'   => 'danger',
+        'pending'          => 'warning',
+        'confirmed'        => 'info',
+        'processing'       => 'info',
+        'sent_to_delivery' => 'primary',
+        'shipped'          => 'primary',
+        'delivered'        => 'success',
+        'cancelled'        => 'danger',
+        'returned'         => 'danger',
     ];
 
     protected static function boot(): void

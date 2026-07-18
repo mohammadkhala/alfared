@@ -12,6 +12,7 @@ class DeliveryZone extends Model
         'base_fee', 'free_above',           // seeder column names
         'delivery_fee', 'free_shipping_above', // migration column names (alias support)
         'estimated_days', 'is_active', 'sort_order',
+        'roadfn_city_id', 'roadfn_area_id',
     ];
 
     protected $casts = [

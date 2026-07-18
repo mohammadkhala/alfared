@@ -221,6 +221,8 @@ class OrderController extends Controller
             'return_reason'        => $order->return_reason,
             'return_status'        => $order->return_status,
             'return_reject_reason' => $order->return_reject_reason,
+            'roadfn_tracking_number' => $order->roadfn_tracking_number,
+            'roadfn_status'          => $order->roadfn_status,
             'items'          => $order->items->map(fn ($i) => [
                 'id'           => (int) $i->id,
                 'product_id'   => (int) $i->product_id,

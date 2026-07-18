@@ -65,14 +65,13 @@
             {{ __('checkout_step_address') }}
           </h3>
           <div class="form-grid">
-            {{-- Main region decides the delivery fee --}}
+            {{-- Region sets the delivery fee --}}
             <div class="form-group">
               <label>المنطقة <span style="color:red;">{{ __('checkout_required') }}</span></label>
               <select id="mainZone" onchange="onMainZone(this.value)">
                 <option value="">اختر المنطقة</option>
                 @foreach($zones as $zone)
-                  <option value="{{ $zone->id }}" data-fee="{{ $zone->base_fee ?? $zone->delivery_fee ?? 0 }}"
-                    {{ old('main_zone_id') == $zone->id ? 'selected' : '' }}>
+                  <option value="{{ $zone->id }}" {{ old('main_zone_id') == $zone->id ? 'selected' : '' }}>
                     {{ $zone->name_ar }} — {{ ($zone->base_fee ?? $zone->delivery_fee) > 0 ? number_format($zone->base_fee ?? $zone->delivery_fee, 2).' ₪' : __('free') }}
                   </option>
                 @endforeach
@@ -80,7 +79,7 @@
               <input type="hidden" name="main_zone_id" id="mainZoneHidden" value="{{ old('main_zone_id', '') }}">
             </div>
 
-            {{-- Sub zone (city / governorate) filtered by the region above --}}
+            {{-- City within that region — this is what maps to RoadFN --}}
             <div class="form-group">
               <label>المدينة / المحافظة <span style="color:red;">{{ __('checkout_required') }}</span></label>
               <input type="hidden" name="delivery_zone_id" id="deliveryZoneHidden" value="{{ old('delivery_zone_id', '') }}">
@@ -276,7 +275,7 @@ const ZONE_LABEL  = @json(__('checkout_choose_zone_short'));
 let deliveryFee   = 0;
 let loyaltyDiscount = 0;
 
-// Sub zones grouped by their main zone id.
+// Cities grouped by their region id.
 const SUB_ZONES = @json($subZones);
 
 // Sync select UI value → hidden input (called on change + on submit)
@@ -288,10 +287,10 @@ function syncZone(val) {
 function onMainZone(mainId, preselect) {
   document.getElementById('mainZoneHidden').value = mainId || '';
 
-  const sub = document.getElementById('subZone');
+  const sub  = document.getElementById('subZone');
+  const list = SUB_ZONES[mainId] || [];
   sub.innerHTML = '';
 
-  const list = SUB_ZONES[mainId] || [];
   if (!mainId || list.length === 0) {
     sub.disabled = true;
     sub.innerHTML = '<option value="">اختر المنطقة أولاً</option>';

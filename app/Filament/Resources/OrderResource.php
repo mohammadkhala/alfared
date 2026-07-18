@@ -486,6 +486,17 @@ class OrderResource extends Resource
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
 
+                // ── حالة الإرسال إلى RoadFN (ظاهر دائماً) ─────────────
+                Tables\Columns\TextColumn::make('roadfn_tracking_number')
+                    ->label('التوصيل')
+                    ->badge()
+                    ->state(fn (Order $record) => $record->roadfn_tracking_number ? 'تم الإرسال' : 'لم يُرسَل')
+                    ->color(fn (Order $record) => $record->roadfn_tracking_number ? 'success' : 'gray')
+                    ->icon(fn (Order $record) => $record->roadfn_tracking_number ? 'heroicon-o-truck' : 'heroicon-o-clock')
+                    ->description(fn (Order $record) => $record->roadfn_tracking_number
+                        ? $record->roadfn_tracking_number . ($record->roadfn_status ? ' • ' . $record->roadfn_status : '')
+                        : null),
+
                 // ── الحالة (select مباشر) ─────────────────────────────
                 Tables\Columns\SelectColumn::make('status')
                     ->label('الحالة')
@@ -498,6 +509,16 @@ class OrderResource extends Resource
                         ->distinct()
                         ->pluck('city', 'city')
                         ->toArray()),
+                Tables\Filters\TernaryFilter::make('roadfn_sent')
+                    ->label('الإرسال إلى RoadFN')
+                    ->placeholder('الكل')
+                    ->trueLabel('تم الإرسال')
+                    ->falseLabel('لم يُرسَل')
+                    ->queries(
+                        true: fn ($query) => $query->whereNotNull('roadfn_tracking_number'),
+                        false: fn ($query) => $query->whereNull('roadfn_tracking_number'),
+                        blank: fn ($query) => $query,
+                    ),
             ])
             ->actions([
                 Tables\Actions\ViewAction::make()->label('')->tooltip('عرض')
@@ -536,6 +557,36 @@ class OrderResource extends Resource
                         "https://wa.me/970{$record->customer_phone}?text={$record->whatsapp_message}"
                     )
                     ->openUrlInNewTab(),
+                Tables\Actions\Action::make('sendToRoadFn')
+                    ->label('')
+                    ->tooltip(fn (Order $record) => $record->deliveryZone?->roadfn_city_id
+                        ? 'إرسال إلى RoadFN'
+                        : 'المنطقة غير مربوطة بـ RoadFN بعد')
+                    ->iconButton()
+                    ->icon('heroicon-o-truck')
+                    ->color('gray')
+                    ->visible(fn (Order $record) => blank($record->roadfn_tracking_number))
+                    ->disabled(fn (Order $record) => blank($record->deliveryZone?->roadfn_city_id) || blank($record->deliveryZone?->roadfn_area_id))
+                    ->requiresConfirmation()
+                    ->modalHeading('إرسال الطلب كشحنة إلى RoadFN')
+                    ->modalDescription('سيتم إنشاء شحنة حقيقية لدى RoadFN لهذا الطلب.')
+                    ->action(function (Order $record) {
+                        try {
+                            app(\App\Services\RoadFnService::class)->createShipment($record);
+
+                            \Filament\Notifications\Notification::make()
+                                ->title('تم إرسال الشحنة إلى RoadFN')
+                                ->body("رقم التتبّع: {$record->roadfn_tracking_number} • الحالة: {$record->roadfn_status}")
+                                ->success()
+                                ->send();
+                        } catch (\Throwable $e) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('فشل إرسال الشحنة إلى RoadFN')
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
@@ -593,7 +644,7 @@ class OrderResource extends Resource
     public static function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
     {
         return parent::getEloquentQuery()
-            ->with(['items', 'items.product:id,name_ar,main_image,category_id', 'items.product.category:id,name_ar']);
+            ->with(['items', 'items.product:id,name_ar,main_image,category_id', 'items.product.category:id,name_ar', 'deliveryZone']);
     }
 
     public static function getPages(): array

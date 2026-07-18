@@ -10,3 +10,6 @@ Artisan::command('inspire', function () {
 
 // Prune expired OTP codes every hour
 Schedule::command('model:prune', ['--model' => [\App\Models\OtpCode::class]])->hourly();
+
+// Pull RoadFN shipment status back onto open orders
+Schedule::command('roadfn:sync-shipments')->everyFifteenMinutes();

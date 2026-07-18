@@ -28,16 +28,6 @@ class DeliveryZoneResource extends Resource
     public static function form(Form $form): Form
     {
         return $form->schema([
-            Forms\Components\Section::make('النوع')->schema([
-                Forms\Components\Select::make('parent_id')
-                    ->label('تابعة لمنطقة رئيسية')
-                    ->placeholder('— منطقة رئيسية (تحدّد سعر التوصيل) —')
-                    ->options(fn () => \App\Models\DeliveryZone::main()->pluck('name_ar', 'id'))
-                    ->searchable()
-                    ->live()
-                    ->helperText('اتركه فارغاً لإنشاء منطقة رئيسية مثل: الضفة / القدس / الداخل. أو اختر منطقة رئيسية لإضافة مدينة تابعة لها.'),
-            ]),
-
             Forms\Components\Section::make('الأسماء')->schema([
                 Forms\Components\Grid::make(3)->schema([
                     Forms\Components\TextInput::make('name_ar')->label('الاسم (عربي)')->required()->maxLength(255),
@@ -46,11 +36,8 @@ class DeliveryZoneResource extends Resource
                 ]),
             ]),
 
-            // Only main zones price anything — a sub zone inherits its parent's
-            // fee, so showing these fields on a city would be misleading.
             Forms\Components\Section::make('رسوم الشحن')
-                ->description('تُطبَّق على كل المدن التابعة لهذه المنطقة')
-                ->visible(fn (Forms\Get $get) => blank($get('parent_id')))
+                ->description('السعر يُزامَن من RoadFN. "شحن مجاني فوق" عرض اختياري يضبطه المتجر.')
                 ->schema([
                     Forms\Components\Grid::make(3)->schema([
                         Forms\Components\TextInput::make('base_fee')->label('رسوم التوصيل (₪)')
@@ -69,6 +56,15 @@ class DeliveryZoneResource extends Resource
                     Forms\Components\TextInput::make('sort_order')->label('الترتيب')->numeric()->default(0),
                 ]),
             ]),
+
+            Forms\Components\Section::make('ربط RoadFN')
+                ->description('تُملأ تلقائياً بأمر "مزامنة من RoadFN". City ID = مدينة الوجهة، Area ID = المنطقة الافتراضية للشحنة.')
+                ->schema([
+                    Forms\Components\Grid::make(2)->schema([
+                        Forms\Components\TextInput::make('roadfn_city_id')->label('RoadFN City ID'),
+                        Forms\Components\TextInput::make('roadfn_area_id')->label('RoadFN Area ID'),
+                    ]),
+                ]),
         ]);
     }
 
@@ -76,29 +72,51 @@ class DeliveryZoneResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name_ar')->label('المنطقة')->searchable()->sortable()->weight('bold'),
-                Tables\Columns\TextColumn::make('parent.name_ar')->label('تابعة لـ')
-                    ->placeholder('— رئيسية —')->badge()->color('primary')->searchable(),
-                Tables\Columns\TextColumn::make('children_count')->label('المدن')
-                    ->counts('children')->badge()->color('gray')
-                    ->formatStateUsing(fn ($state) => $state > 0 ? $state : '—'),
+                Tables\Columns\TextColumn::make('name_ar')->label('المدينة')->searchable()->sortable()->weight('bold'),
                 Tables\Columns\TextColumn::make('name_en')->label('EN')->searchable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                // Sub zones inherit their parent's pricing, so show a dash
-                // instead of a misleading 0 ₪.
                 Tables\Columns\TextColumn::make('base_fee')->label('رسوم التوصيل')
-                    ->formatStateUsing(fn ($state, $record) => $record->parent_id ? 'حسب الرئيسية' : $state . ' ₪')
-                    ->sortable(),
+                    ->formatStateUsing(fn ($state) => $state . ' ₪')->sortable(),
                 Tables\Columns\TextColumn::make('free_above')->label('شحن مجاني فوق')
-                    ->formatStateUsing(fn ($state, $record) => $record->parent_id ? '—' : ($state ? $state . ' ₪' : '—')),
+                    ->formatStateUsing(fn ($state) => $state ? $state . ' ₪' : '—'),
+                Tables\Columns\TextColumn::make('roadfn_city_id')->label('RoadFN City')
+                    ->badge()->color('info')->placeholder('—'),
+                Tables\Columns\TextColumn::make('roadfn_area_id')->label('RoadFN Area')
+                    ->badge()->color('gray')->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('estimated_days')->label('أيام التوصيل')
-                    ->formatStateUsing(fn ($state, $record) => $record->parent_id ? '—' : $state . ' يوم')
+                    ->formatStateUsing(fn ($state) => $state . ' يوم')
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\ToggleColumn::make('is_active')->label('فعال'),
             ])
-            ->defaultSort('parent_id')
+            ->defaultSort('sort_order')
             ->filters([
                 Tables\Filters\TernaryFilter::make('is_active')->label('الفعالة'),
+            ])
+            ->headerActions([
+                Tables\Actions\Action::make('syncRoadFn')
+                    ->label('مزامنة من RoadFN')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('info')
+                    ->requiresConfirmation()
+                    ->modalHeading('مزامنة مناطق التوصيل من RoadFN')
+                    ->modalDescription('سيتم بناء المناطق وأسعارها من قائمة أسعار RoadFN، وتعطيل ما لا يخدمه RoadFN.')
+                    ->action(function () {
+                        try {
+                            \Illuminate\Support\Facades\Artisan::call('roadfn:sync-zones');
+                            \Filament\Notifications\Notification::make()
+                                ->title('تمت مزامنة المناطق من RoadFN')
+                                ->body(trim(\Illuminate\Support\Facades\Artisan::output()))
+                                ->success()
+                                ->send();
+                        } catch (\Throwable $e) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('فشلت المزامنة')
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
             ])
             ->actions([
                 Tables\Actions\EditAction::make()->label('تعديل'),

@@ -23,8 +23,8 @@ class CheckoutController extends Controller
         $cart = session('cart', []);
         if (empty($cart)) return redirect()->route('cart.index');
 
-        // Main zones carry the fee; sub zones are grouped under them for the
-        // cascading city dropdown.
+        // Region sets the fee (الضفة/القدس/الداخل); the city under it is what
+        // maps to RoadFN for the actual shipment.
         $zones = DeliveryZone::main()->where('is_active', true)
             ->orderBy('sort_order')->get();
 
@@ -83,8 +83,8 @@ class CheckoutController extends Controller
 
         $zone = DeliveryZone::with('parent')->findOrFail($request->delivery_zone_id);
 
-        // The customer must land on a city, not a region — otherwise the
-        // address would only say "الضفة الغربية".
+        // Must land on a city, not a region — a shipment needs a real
+        // destination, and RoadFN is mapped at city level.
         if ($zone->isMain() && $zone->children()->exists()) {
             return back()->withErrors([
                 'delivery_zone_id' => 'يرجى اختيار المدينة داخل المنطقة.',
@@ -112,7 +112,7 @@ class CheckoutController extends Controller
 
         $paymentMethod = $request->input('payment_method', 'cod');
 
-        DB::transaction(function () use ($request, $cart, $zone, $coupon, $subtotal, $discount, $delivery, $total, $pointsToRedeem, $loyaltyDiscount, $paymentMethod) {
+        DB::transaction(function () use ($request, $cart, $zone, $cityName, $coupon, $subtotal, $discount, $delivery, $total, $pointsToRedeem, $loyaltyDiscount, $paymentMethod) {
             $order = Order::create([
                 'customer_name'    => $request->first_name . ' ' . $request->last_name,
                 'customer_phone'   => $request->phone,
