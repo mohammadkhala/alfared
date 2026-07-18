@@ -142,14 +142,14 @@ class CustomerResource extends Resource
                     Infolists\Components\TextEntry::make('total_spent')
                         ->label('إجمالي الإنفاق')
                         ->state(fn($record) =>
-                            number_format($record->orders()->where('status', '!=', 'cancelled')->sum('total'), 0) . ' ₪'
+                            number_format($record->orders()->whereNotIn('status', ['cancelled', 'returned'])->sum('total'), 0) . ' ₪'
                         )
                         ->weight('bold'),
                     Infolists\Components\TextEntry::make('avg_order')
                         ->label('متوسط الطلب')
                         ->state(function ($record) {
-                            $count = $record->orders()->where('status', '!=', 'cancelled')->count();
-                            $total = $record->orders()->where('status', '!=', 'cancelled')->sum('total');
+                            $count = $record->orders()->whereNotIn('status', ['cancelled', 'returned'])->count();
+                            $total = $record->orders()->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
                             return $count > 0 ? number_format($total / $count, 0) . ' ₪' : '—';
                         }),
                 ]),

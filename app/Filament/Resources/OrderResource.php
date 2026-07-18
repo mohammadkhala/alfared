@@ -431,7 +431,9 @@ class OrderResource extends Resource
                         $html .= '</div>';
                         return new HtmlString($html);
                     })
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    // Decorative — hidden by default so the table fits without
+                    // sideways scrolling. Toggle it on from the columns menu.
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 // ── الإجمالي ─────────────────────────────────────────
                 Tables\Columns\TextColumn::make('total')
@@ -521,13 +523,15 @@ class OrderResource extends Resource
                     ),
             ])
             ->actions([
-                Tables\Actions\ViewAction::make()->label('')->tooltip('عرض')
-                    ->iconButton()->icon('heroicon-o-eye'),
-                Tables\Actions\EditAction::make()->label('')->tooltip('تعديل')
-                    ->iconButton()->icon('heroicon-o-pencil-square'),
+                // Everything routine lives behind one menu; five loose icon
+                // buttons per row were most of the horizontal overflow.
+                Tables\Actions\ActionGroup::make([
+                Tables\Actions\ViewAction::make()->label('عرض')
+                    ->icon('heroicon-o-eye'),
+                Tables\Actions\EditAction::make()->label('تعديل')
+                    ->icon('heroicon-o-pencil-square'),
                 Tables\Actions\Action::make('invoice')
-                    ->label('فاتورة')->tooltip('فاتورة')
-                    ->iconButton()
+                    ->label('فاتورة')
                     ->icon('heroicon-o-printer')
                     ->color('warning')
                     ->form([
@@ -548,28 +552,87 @@ class OrderResource extends Resource
                         ]));
                     }),
                 Tables\Actions\Action::make('whatsapp')
-                    ->label('')
-                    ->tooltip('واتساب')
-                    ->iconButton()
+                    ->label('واتساب')
                     ->icon('heroicon-o-chat-bubble-left-right')
                     ->color('success')
                     ->url(fn(Order $record) =>
                         "https://wa.me/970{$record->customer_phone}?text={$record->whatsapp_message}"
                     )
                     ->openUrlInNewTab(),
-                Tables\Actions\Action::make('sendToRoadFn')
-                    ->label('')
-                    ->tooltip(fn (Order $record) => $record->deliveryZone?->roadfn_city_id
-                        ? 'إرسال إلى RoadFN'
-                        : 'المنطقة غير مربوطة بـ RoadFN بعد')
-                    ->iconButton()
-                    ->icon('heroicon-o-truck')
+                ])
+                    ->label('إجراءات')
+                    ->icon('heroicon-m-ellipsis-vertical')
                     ->color('gray')
+                    ->button()
+                    ->size('sm'),
+
+                // Shown once dispatched: pulls the courier's current state without
+                // waiting for the scheduled sync, so a cancellation at RoadFN
+                // reaches the admin and the customer immediately.
+                Tables\Actions\Action::make('refreshRoadFn')
+                    ->label('تحديث الحالة')
+                    ->tooltip('جلب حالة الشحنة الحالية من RoadFN')
+                    ->button()
+                    ->size('sm')
+                    ->icon('heroicon-o-arrow-path')
+                    ->color('gray')
+                    ->visible(fn (Order $record) => filled($record->roadfn_tracking_number))
+                    ->action(function (Order $record) {
+                        try {
+                            $before = $record->status;
+                            $found  = app(\App\Services\RoadFnService::class)->refreshOrder($record);
+
+                            if (! $found) {
+                                \Filament\Notifications\Notification::make()
+                                    ->title('لم تُرجع RoadFN هذه الشحنة')
+                                    ->body('تأكد أن رقم التتبّع ما زال قائماً لدى RoadFN.')
+                                    ->warning()
+                                    ->send();
+                                return;
+                            }
+
+                            $record->refresh();
+                            $changed = $before !== $record->status;
+
+                            \Filament\Notifications\Notification::make()
+                                ->title($changed ? 'تغيّرت حالة الطلب' : 'الحالة محدّثة أصلاً')
+                                ->body('RoadFN: ' . ($record->roadfn_status ?: '—') . ' • الطلب: ' . $record->status_label)
+                                ->success()
+                                ->send();
+                        } catch (\Throwable $e) {
+                            \Filament\Notifications\Notification::make()
+                                ->title('تعذّر جلب الحالة من RoadFN')
+                                ->body($e->getMessage())
+                                ->danger()
+                                ->send();
+                        }
+                    }),
+
+                // The one action with real-world consequences, so it reads as a
+                // button with words on it rather than a fifth grey icon.
+                Tables\Actions\Action::make('sendToRoadFn')
+                    ->label('إرسال للتوصيل')
+                    ->tooltip(fn (Order $record) => $record->deliveryZone?->roadfn_city_id
+                        ? 'إنشاء شحنة فعلية لدى RoadFN'
+                        : 'منطقة هذا الطلب غير مربوطة بـ RoadFN — شغّل roadfn:sync-zones')
+                    ->button()
+                    ->size('sm')
+                    ->icon('heroicon-o-truck')
+                    ->color('warning')
                     ->visible(fn (Order $record) => blank($record->roadfn_tracking_number))
                     ->disabled(fn (Order $record) => blank($record->deliveryZone?->roadfn_city_id) || blank($record->deliveryZone?->roadfn_area_id))
                     ->requiresConfirmation()
+                    ->modalIcon('heroicon-o-truck')
                     ->modalHeading('إرسال الطلب كشحنة إلى RoadFN')
-                    ->modalDescription('سيتم إنشاء شحنة حقيقية لدى RoadFN لهذا الطلب.')
+                    ->modalDescription(fn (Order $record) => new HtmlString(
+                        '<div style="line-height:1.9;font-size:13px;">'
+                        . '<div><strong>الزبون:</strong> ' . e($record->customer_name) . ' — ' . e($record->customer_phone) . '</div>'
+                        . '<div><strong>الوجهة:</strong> ' . e($record->deliveryZone?->full_name ?? '—') . '</div>'
+                        . '<div><strong>يُحصّل المندوب:</strong> ' . number_format((float) $record->total, 2) . ' ₪ نقداً</div>'
+                        . '<div style="margin-top:8px;color:#B45309;">شحنة فعلية لدى RoadFN — لا يمكن التراجع عنها من هنا.</div>'
+                        . '</div>'
+                    ))
+                    ->modalSubmitActionLabel('نعم، أنشئ الشحنة')
                     ->action(function (Order $record) {
                         try {
                             app(\App\Services\RoadFnService::class)->createShipment($record);

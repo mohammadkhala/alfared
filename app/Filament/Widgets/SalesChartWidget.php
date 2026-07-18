@@ -19,7 +19,7 @@ class SalesChartWidget extends Widget
         $daily = [];
         for ($i = 6; $i >= 0; $i--) {
             $date    = now()->subDays($i);
-            $revenue = (float) Order::whereDate('created_at', $date)->where('status', '!=', 'cancelled')->sum('total');
+            $revenue = (float) Order::whereDate('created_at', $date)->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
             $daily[] = ['label' => $arabicDays[$date->dayOfWeek], 'value' => $revenue];
         }
 
@@ -35,7 +35,7 @@ class SalesChartWidget extends Widget
             ->join('products',   'order_items.product_id',   '=', 'products.id')
             ->join('categories', 'products.category_id',     '=', 'categories.id')
             ->join('orders',     'order_items.order_id',     '=', 'orders.id')
-            ->where('orders.status', '!=', 'cancelled')
+            ->whereNotIn('orders.status', ['cancelled', 'returned'])
             ->select('categories.name_ar', DB::raw('SUM(order_items.total) as total'))
             ->groupBy('categories.id', 'categories.name_ar')
             ->orderByDesc('total')

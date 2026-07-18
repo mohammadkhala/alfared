@@ -35,7 +35,7 @@ class SalesReport extends Page
             default => [now()->startOfMonth(), now(), now()->subMonth()->startOfMonth(), now()->subMonth()->endOfMonth(), 'هذا الشهر'],
         };
 
-        $base = Order::where('status', '!=', 'cancelled');
+        $base = Order::whereNotIn('status', ['cancelled', 'returned']);
 
         // Current period stats
         $revenue      = (float) (clone $base)->whereBetween('created_at', [$from, $to])->sum('total');
@@ -43,7 +43,7 @@ class SalesReport extends Page
         $avgOrder     = $ordersCount > 0 ? round($revenue / $ordersCount, 2) : 0;
         $itemsSold    = (int) DB::table('order_items')
             ->join('orders', 'order_items.order_id', '=', 'orders.id')
-            ->where('orders.status', '!=', 'cancelled')
+            ->whereNotIn('orders.status', ['cancelled', 'returned'])
             ->whereBetween('orders.created_at', [$from, $to])
             ->sum('order_items.quantity');
 
@@ -69,7 +69,7 @@ class SalesReport extends Page
         $topProducts = DB::table('order_items')
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders',   'order_items.order_id',   '=', 'orders.id')
-            ->where('orders.status', '!=', 'cancelled')
+            ->whereNotIn('orders.status', ['cancelled', 'returned'])
             ->whereBetween('orders.created_at', [$from, $to])
             ->select(
                 'products.name_ar',
@@ -87,7 +87,7 @@ class SalesReport extends Page
             ->join('products',   'order_items.product_id',   '=', 'products.id')
             ->join('categories', 'products.category_id',     '=', 'categories.id')
             ->join('orders',     'order_items.order_id',     '=', 'orders.id')
-            ->where('orders.status', '!=', 'cancelled')
+            ->whereNotIn('orders.status', ['cancelled', 'returned'])
             ->whereBetween('orders.created_at', [$from, $to])
             ->select('categories.name_ar', DB::raw('SUM(order_items.total) as total'), DB::raw('COUNT(DISTINCT orders.id) as orders'))
             ->groupBy('categories.id', 'categories.name_ar')
@@ -96,7 +96,7 @@ class SalesReport extends Page
 
         // Top cities
         $topCities = Order::whereBetween('created_at', [$from, $to])
-            ->where('status', '!=', 'cancelled')
+            ->whereNotIn('status', ['cancelled', 'returned'])
             ->select('city', DB::raw('COUNT(*) as count'), DB::raw('SUM(total) as revenue'))
             ->groupBy('city')
             ->orderByDesc('revenue')
@@ -118,7 +118,7 @@ class SalesReport extends Page
         $result = [];
         for ($i = $days - 1; $i >= 0; $i--) {
             $date    = now()->subDays($i);
-            $revenue = (float) Order::whereDate('created_at', $date)->where('status', '!=', 'cancelled')->sum('total');
+            $revenue = (float) Order::whereDate('created_at', $date)->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
             $result[] = [
                 'label' => $days <= 7 ? $arabicDays[$date->dayOfWeek] : $date->format('d/m'),
                 'value' => $revenue,
@@ -137,7 +137,7 @@ class SalesReport extends Page
         $arabicMonths = ['', 'يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
         $result = [];
         for ($m = 1; $m <= 12; $m++) {
-            $revenue = (float) Order::whereYear('created_at', now()->year)->whereMonth('created_at', $m)->where('status', '!=', 'cancelled')->sum('total');
+            $revenue = (float) Order::whereYear('created_at', now()->year)->whereMonth('created_at', $m)->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
             $result[] = ['label' => $arabicMonths[$m], 'value' => $revenue];
         }
         $max = max(array_column($result, 'value')) ?: 1;
@@ -154,7 +154,7 @@ class SalesReport extends Page
         for ($h = 0; $h <= 23; $h++) {
             $revenue = (float) Order::whereDate('created_at', today())
                 ->whereRaw('HOUR(created_at) = ?', [$h])
-                ->where('status', '!=', 'cancelled')->sum('total');
+                ->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
             $result[] = ['label' => $h . ':00', 'value' => $revenue];
         }
         $max = max(array_column($result, 'value')) ?: 1;

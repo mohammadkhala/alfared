@@ -15,8 +15,8 @@ class Dashboard extends BaseDashboard
     protected function getViewData(): array
     {
         // ── KPI ──
-        $monthRevenue     = (float) Order::whereMonth('created_at', now()->month)->where('status', '!=', 'cancelled')->sum('total');
-        $prevRevenue      = (float) Order::whereMonth('created_at', now()->subMonth()->month)->where('status', '!=', 'cancelled')->sum('total');
+        $monthRevenue     = (float) Order::whereMonth('created_at', now()->month)->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
+        $prevRevenue      = (float) Order::whereMonth('created_at', now()->subMonth()->month)->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
         $revenueChange    = $prevRevenue > 0 ? round((($monthRevenue - $prevRevenue) / $prevRevenue) * 100) : 0;
 
         $todayOrders      = Order::whereDate('created_at', today())->count();
@@ -34,7 +34,7 @@ class Dashboard extends BaseDashboard
         $daily = [];
         for ($i = 6; $i >= 0; $i--) {
             $date    = now()->subDays($i);
-            $revenue = (float) Order::whereDate('created_at', $date)->where('status', '!=', 'cancelled')->sum('total');
+            $revenue = (float) Order::whereDate('created_at', $date)->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
             $daily[] = ['label' => $arabicDays[$date->dayOfWeek], 'value' => $revenue];
         }
         $maxVal = max(array_column($daily, 'value')) ?: 1;
@@ -49,7 +49,7 @@ class Dashboard extends BaseDashboard
             ->join('products',   'order_items.product_id',   '=', 'products.id')
             ->join('categories', 'products.category_id',     '=', 'categories.id')
             ->join('orders',     'order_items.order_id',     '=', 'orders.id')
-            ->where('orders.status', '!=', 'cancelled')
+            ->whereNotIn('orders.status', ['cancelled', 'returned'])
             ->select('categories.name_ar', DB::raw('SUM(order_items.total) as total'))
             ->groupBy('categories.id', 'categories.name_ar')
             ->orderByDesc('total')

@@ -220,6 +220,43 @@ class RoadFnService
         return collect($this->listShipments())->firstWhere('ShipmentTrackingNo', $tracking);
     }
 
+    /**
+     * Pulls one order's current state from RoadFN, on demand.
+     *
+     * The scheduled sync only runs if cron is actually calling schedule:run,
+     * which isn't a given on shared hosting — and until it does, a shipment
+     * cancelled at RoadFN keeps showing as on its way to both the admin and the
+     * customer. This gives the admin a button that doesn't depend on cron.
+     */
+    public function refreshOrder(Order $order): bool
+    {
+        if (blank($order->roadfn_tracking_number)) {
+            return false;
+        }
+
+        $record = null;
+
+        if (filled($order->roadfn_shipment_id)) {
+            $record = collect($this->shipmentsByIds([$order->roadfn_shipment_id]))->first();
+        }
+
+        // Falls back to the tracking number for shipments whose internal id was
+        // never captured at creation time.
+        $record ??= $this->findShipmentByTracking($order->roadfn_tracking_number);
+
+        if (! $record) {
+            return false;
+        }
+
+        if (blank($order->roadfn_shipment_id) && isset($record['ID'])) {
+            $order->update(['roadfn_shipment_id' => $record['ID']]);
+        }
+
+        $this->applyShipmentRecord($order, $record);
+
+        return true;
+    }
+
     /** RoadFN StatusId => our order status, or null when unmapped. */
     public function mapStatusId(?int $statusId): ?string
     {

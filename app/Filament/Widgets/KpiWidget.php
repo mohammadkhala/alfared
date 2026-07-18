@@ -15,8 +15,8 @@ class KpiWidget extends Widget
 
     protected function getViewData(): array
     {
-        $monthRevenue     = Order::whereMonth('created_at', now()->month)->where('status', '!=', 'cancelled')->sum('total');
-        $prevMonthRevenue = Order::whereMonth('created_at', now()->subMonth()->month)->where('status', '!=', 'cancelled')->sum('total');
+        $monthRevenue     = Order::whereMonth('created_at', now()->month)->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
+        $prevMonthRevenue = Order::whereMonth('created_at', now()->subMonth()->month)->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
         $monthChange      = $prevMonthRevenue > 0 ? round((($monthRevenue - $prevMonthRevenue) / $prevMonthRevenue) * 100) : 0;
 
         $todayOrders      = Order::whereDate('created_at', today())->count();

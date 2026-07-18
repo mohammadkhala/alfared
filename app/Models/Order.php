@@ -107,6 +107,17 @@ class Order extends Model
                 \App\Services\LoyaltyService::awardForOrder($order);
             }
 
+            // ── Take them back if the order is cancelled or returned ──
+            // RoadFN maps four of its states onto "returned", so this is a
+            // normal outcome now, not an edge case.
+            if (
+                $order->wasChanged('status')
+                && in_array($order->status, ['cancelled', 'returned'], true)
+                && $order->user_id
+            ) {
+                \App\Services\LoyaltyService::revokeForOrder($order);
+            }
+
             // ── Push notification to customer on status change ──
             if ($order->wasChanged('status') && $order->user_id) {
                 $customer = User::find($order->user_id);

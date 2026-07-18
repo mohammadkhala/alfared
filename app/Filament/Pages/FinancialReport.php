@@ -35,10 +35,10 @@ class FinancialReport extends Page
                          'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
 
         // Year summary
-        $yearRevenue   = (float) Order::whereYear('created_at', $year)->where('status', '!=', 'cancelled')->sum('total');
-        $yearOrders    = Order::whereYear('created_at', $year)->where('status', '!=', 'cancelled')->count();
-        $yearDelivery  = (float) Order::whereYear('created_at', $year)->where('status', '!=', 'cancelled')->sum('delivery_fee');
-        $yearDiscounts = (float) Order::whereYear('created_at', $year)->where('status', '!=', 'cancelled')->sum('discount_amount');
+        $yearRevenue   = (float) Order::whereYear('created_at', $year)->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
+        $yearOrders    = Order::whereYear('created_at', $year)->whereNotIn('status', ['cancelled', 'returned'])->count();
+        $yearDelivery  = (float) Order::whereYear('created_at', $year)->whereNotIn('status', ['cancelled', 'returned'])->sum('delivery_fee');
+        $yearDiscounts = (float) Order::whereYear('created_at', $year)->whereNotIn('status', ['cancelled', 'returned'])->sum('discount_amount');
         $yearCancelled = (float) Order::whereYear('created_at', $year)->where('status', 'cancelled')->sum('total');
 
         // Cost & gross profit (if products have cost_price)
@@ -46,7 +46,7 @@ class FinancialReport extends Page
             ->join('products', 'order_items.product_id', '=', 'products.id')
             ->join('orders',   'order_items.order_id',   '=', 'orders.id')
             ->whereYear('orders.created_at', $year)
-            ->where('orders.status', '!=', 'cancelled')
+            ->whereNotIn('orders.status', ['cancelled', 'returned'])
             ->selectRaw('SUM(products.cost_price * order_items.quantity) as cost')
             ->value('cost') ?? 0;
         $grossProfit = $yearRevenue - $yearCost;
@@ -55,10 +55,10 @@ class FinancialReport extends Page
         // Monthly breakdown
         $monthly = [];
         for ($m = 1; $m <= 12; $m++) {
-            $rev  = (float) Order::whereYear('created_at', $year)->whereMonth('created_at', $m)->where('status', '!=', 'cancelled')->sum('total');
-            $cnt  = Order::whereYear('created_at', $year)->whereMonth('created_at', $m)->where('status', '!=', 'cancelled')->count();
-            $disc = (float) Order::whereYear('created_at', $year)->whereMonth('created_at', $m)->where('status', '!=', 'cancelled')->sum('discount_amount');
-            $del  = (float) Order::whereYear('created_at', $year)->whereMonth('created_at', $m)->where('status', '!=', 'cancelled')->sum('delivery_fee');
+            $rev  = (float) Order::whereYear('created_at', $year)->whereMonth('created_at', $m)->whereNotIn('status', ['cancelled', 'returned'])->sum('total');
+            $cnt  = Order::whereYear('created_at', $year)->whereMonth('created_at', $m)->whereNotIn('status', ['cancelled', 'returned'])->count();
+            $disc = (float) Order::whereYear('created_at', $year)->whereMonth('created_at', $m)->whereNotIn('status', ['cancelled', 'returned'])->sum('discount_amount');
+            $del  = (float) Order::whereYear('created_at', $year)->whereMonth('created_at', $m)->whereNotIn('status', ['cancelled', 'returned'])->sum('delivery_fee');
             $monthly[] = [
                 'month'    => $arabicMonths[$m],
                 'num'      => $m,

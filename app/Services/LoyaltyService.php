@@ -145,6 +145,51 @@ class LoyaltyService
         });
     }
 
+    /**
+     * Takes back the points earned on an order that was later cancelled or
+     * returned.
+     *
+     * Points were awarded the moment the order reached the earning status, but
+     * nothing ever undid that — so a customer who returned a parcel through
+     * RoadFN kept the points for it, and could spend them on the next order.
+     * Redeemed points are deliberately left alone: the customer already gave up
+     * that discount, and the refund settles it.
+     */
+    public static function revokeForOrder(Order $order): ?LoyaltyTransaction
+    {
+        if (! $order->user_id) return null;
+
+        $earned = LoyaltyTransaction::where('order_id', $order->id)
+            ->where('action', 'earned')->sum('points');
+
+        if ($earned <= 0) return null;
+
+        // Already clawed back — don't charge the customer twice for one return.
+        $revoked = LoyaltyTransaction::where('order_id', $order->id)
+            ->where('action', 'revoked')->exists();
+        if ($revoked) return null;
+
+        return DB::transaction(function () use ($order, $earned) {
+            $user = User::find($order->user_id);
+            if (! $user) return null;
+
+            // Never push a balance negative: the customer may have already spent
+            // these points, and a negative balance breaks redemption maths.
+            $take = min((int) $earned, (int) $user->loyalty_points);
+            if ($take > 0) {
+                $user->decrement('loyalty_points', $take);
+            }
+
+            return LoyaltyTransaction::create([
+                'user_id'  => $user->id,
+                'order_id' => $order->id,
+                'points'   => -$take,
+                'action'   => 'revoked',
+                'note'     => 'Order #' . $order->order_number . ' — ' . $order->status,
+            ]);
+        });
+    }
+
     /** Deduct points used as redemption on an order. */
     public static function redeemForOrder(User $user, Order $order, int $points): ?LoyaltyTransaction
     {
