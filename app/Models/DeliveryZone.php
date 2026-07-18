@@ -23,6 +23,20 @@ class DeliveryZone extends Model
         'is_active'           => 'boolean',
     ];
 
+    /**
+     * A zone must never be its own parent. One legacy row reached that state
+     * and it broke pricing silently: pricingZone() returned the zone itself,
+     * so it charged its own stale fee instead of the region's.
+     */
+    protected static function booted(): void
+    {
+        static::saving(function (self $zone) {
+            if ($zone->parent_id !== null && (int) $zone->parent_id === (int) $zone->id) {
+                $zone->parent_id = null;
+            }
+        });
+    }
+
     // ── Hierarchy ────────────────────────────────────────────────────────
     // Main zones (الضفة / القدس / الداخل) hold the pricing; sub zones are the
     // governorates/cities the customer actually picks.
