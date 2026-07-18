@@ -124,6 +124,81 @@ class AuthController extends Controller
         return response()->json(['message' => 'تم إرسال رمز التحقق عبر واتساب']);
     }
 
+    /**
+     * Password recovery step 1 — send a reset code to a registered phone.
+     * Responds the same way for unknown numbers so the endpoint can't be used
+     * to discover which phones have accounts.
+     */
+    public function forgotPassword(Request $request): JsonResponse
+    {
+        $request->validate(['phone' => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/']]);
+
+        $phone   = $request->phone;
+        $generic = ['message' => 'إذا كان الرقم مسجّلاً فستصلك رسالة بالرمز.'];
+
+        if (! User::where('phone', $phone)->exists()) {
+            return response()->json($generic);
+        }
+
+        if ($wait = \App\Support\OtpThrottle::retryAfter($phone)) {
+            return response()->json([
+                'message'     => \App\Support\OtpThrottle::message($wait),
+                'retry_after' => $wait,
+            ], 429);
+        }
+
+        OtpCode::where('phone', $phone)->delete();
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        OtpCode::create(['phone' => $phone, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
+
+        \App\Support\OtpThrottle::record($phone);
+
+        if (! app(WaSenderService::class)->sendOtp($phone, $code)) {
+            return response()->json(['message' => 'تعذّر إرسال الرمز عبر واتساب، حاول مجدداً'], 500);
+        }
+
+        return response()->json($generic);
+    }
+
+    /** Password recovery step 2 — verify the code and set a new password. */
+    public function resetPassword(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'phone'    => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/'],
+            'code'     => ['required', 'string', 'size:6'],
+            'password' => ['required', 'string', 'min:8'],
+        ]);
+
+        $otp = OtpCode::where('phone', $data['phone'])
+            ->where('code', $data['code'])
+            ->where('used', false)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (! $otp) {
+            return response()->json(['message' => 'الرمز غير صحيح أو منتهي الصلاحية'], 422);
+        }
+
+        $user = User::where('phone', $data['phone'])->first();
+        if (! $user) {
+            return response()->json(['message' => 'لا يوجد حساب بهذا الرقم'], 404);
+        }
+
+        $otp->update(['used' => true]);
+        $user->forceFill(['password' => Hash::make($data['password'])])->save();
+
+        // Invalidate every existing session/token, then issue a fresh one.
+        $user->tokens()->delete();
+        \App\Support\OtpThrottle::clear($data['phone']);
+
+        $token = $user->createToken('mobile-app', ['*'], now()->addMonths(6))->plainTextToken;
+
+        return response()->json([
+            'token' => $token,
+            'user'  => $this->formatUser($user),
+        ]);
+    }
+
     public function verifyOtp(Request $request): JsonResponse
     {
         $request->validate([

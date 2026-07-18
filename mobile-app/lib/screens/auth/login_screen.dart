@@ -8,6 +8,7 @@ import '../../providers/cart_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../theme/app_theme.dart';
 import '../home/main_navigation.dart';
+import 'forgot_password_screen.dart';
 import 'register_screen.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -248,7 +249,19 @@ class _LoginScreenState extends State<LoginScreen> {
                       ),
                       validator: (v) => (v == null || v.length < 6) ? s.loginPassErr : null,
                     ),
-                    const SizedBox(height: 24),
+
+                    // ── Forgot password ──────────────────────────────────
+                    Align(
+                      alignment: AlignmentDirectional.centerStart,
+                      child: TextButton(
+                        onPressed: () => Navigator.of(context).push(
+                          MaterialPageRoute(builder: (_) => const ForgotPasswordScreen())),
+                        child: const Text('نسيت كلمة المرور؟',
+                          style: TextStyle(fontFamily: 'Cairo', fontSize: 13,
+                              fontWeight: FontWeight.w700, color: AppColors.blue)),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
 
                     // ── Login button ─────────────────────────────────────
                     ElevatedButton(

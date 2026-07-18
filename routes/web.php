@@ -12,6 +12,7 @@ use App\Http\Controllers\InvoiceController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\LahzaWebhookController;
 use App\Http\Controllers\PhoneAuthController;
+use App\Http\Controllers\PasswordResetController;
 
 // ── Language Switch ──
 Route::get('lang/{locale}', [LanguageController::class, 'switch'])->name('lang.switch');
@@ -152,6 +153,12 @@ Route::middleware('guest')->group(function () {
     Route::get('/register/verify',   [AccountController::class, 'registerVerifyForm'])->name('register.verify');
     Route::post('/register/verify',  [AccountController::class, 'registerVerify'])->middleware('throttle:10,5')->name('register.verify.submit');
     Route::post('/register/resend',  [AccountController::class, 'registerResendOtp'])->middleware('throttle:3,10')->name('register.resend');
+
+    // ── Password recovery (WhatsApp code) ──
+    Route::get('/forgot-password',   [PasswordResetController::class, 'requestForm'])->name('password.request');
+    Route::post('/forgot-password',  [PasswordResetController::class, 'sendCode'])->middleware('throttle:5,10')->name('password.send');
+    Route::get('/reset-password',    [PasswordResetController::class, 'verifyForm'])->name('password.verify');
+    Route::post('/reset-password',   [PasswordResetController::class, 'reset'])->middleware('throttle:10,10')->name('password.update');
 });
 
 // ── Auth (phone OTP) ──

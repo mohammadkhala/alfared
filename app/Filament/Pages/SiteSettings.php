@@ -46,7 +46,7 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
             'store_favicon'  => $s['store_favicon']  ?? null,
             'phone_verification_enabled' => isset($s['phone_verification_enabled'])
                 ? ($s['phone_verification_enabled'] === '1' || $s['phone_verification_enabled'] === 'true')
-                : true,
+                : false,
 
             // ── Social ──
             'social_whatsapp'   => $s['social_whatsapp']   ?? '+970598191312',
@@ -170,7 +170,7 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
                             Forms\Components\Section::make('التحقق من الهاتف')->schema([
                                 Forms\Components\Toggle::make('phone_verification_enabled')
                                     ->label('طلب رمز تحقق واتساب عند التسجيل')
-                                    ->default(true),
+                                    ->default(false),
                             ]),
                         ]),
 

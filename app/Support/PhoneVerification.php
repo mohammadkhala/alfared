@@ -13,10 +13,14 @@ use App\Models\Setting;
  */
 class PhoneVerification
 {
+    /**
+     * Off by default: the WhatsApp code is reserved for password recovery,
+     * so signups don't burn sends on the (ban-prone) sender number.
+     */
     public static function enabled(): bool
     {
         try {
-            return Setting::get('phone_verification_enabled', '1') === '1';
+            return Setting::get('phone_verification_enabled', '0') === '1';
         } catch (\Throwable) {
             // Settings unavailable — fail open so registration keeps working.
             return false;

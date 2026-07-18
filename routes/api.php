@@ -24,6 +24,8 @@ Route::prefix('v1')->group(function () {
     Route::post('auth/check-availability', [AuthController::class, 'checkAvailability'])->middleware('throttle:10,1');
     Route::post('auth/send-otp',           [AuthController::class, 'sendOtp'])->middleware('throttle:3,1');
     Route::post('auth/verify-otp',         [AuthController::class, 'verifyOtp'])->middleware('throttle:5,1');
+    Route::post('auth/forgot-password',    [AuthController::class, 'forgotPassword'])->middleware('throttle:5,10');
+    Route::post('auth/reset-password',     [AuthController::class, 'resetPassword'])->middleware('throttle:10,10');
 
     Route::get('app-config',      [CatalogController::class, 'appConfig']);
     Route::get('home',            [CatalogController::class, 'home']);

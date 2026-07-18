@@ -326,7 +326,7 @@ class CatalogController extends Controller
                 // When false the app skips the WhatsApp OTP step on signup —
                 // lets us disable verification instantly if the sender number
                 // gets banned, without shipping a new build.
-                'phone_verification_enabled' => ($s->get('phone_verification_enabled', '1') === '1'),
+                'phone_verification_enabled' => ($s->get('phone_verification_enabled', '0') === '1'),
                 'min_order_amount'      => (float) ($s->get('min_order_amount', '0')),
                 'free_shipping_above'   => (float) ($s->get('free_shipping_above', '0')),
                 'store_phone'           => $s->get('store_phone', ''),

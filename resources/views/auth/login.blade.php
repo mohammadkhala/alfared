@@ -45,10 +45,11 @@
         </div>
       </div>
 
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:24px;">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:14px;color:#4B5563;">
           <input type="checkbox" name="remember" style="accent-color:#1B3B8C;width:16px;height:16px;"/> تذكرني
         </label>
+        <a href="{{ route('password.request') }}" style="font-size:14px;color:#1B3B8C;font-weight:600;">نسيت كلمة المرور؟</a>
       </div>
 
       <button type="submit" class="btn btn-blue" style="width:100%;padding:15px;font-size:16px;font-weight:700;border-radius:12px;">

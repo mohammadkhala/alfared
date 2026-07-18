@@ -1,0 +1,125 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\OtpCode;
+use App\Models\User;
+use App\Services\WaSenderService;
+use App\Support\OtpThrottle;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
+
+/**
+ * Password recovery via a WhatsApp one-time code.
+ */
+class PasswordResetController extends Controller
+{
+    private const PHONE_RULE = ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/'];
+
+    public function requestForm()
+    {
+        return view('auth.forgot-password');
+    }
+
+    /** Step 1 — send the code to a registered phone. */
+    public function sendCode(Request $request)
+    {
+        $request->validate(['phone' => self::PHONE_RULE], [
+            'phone.required' => 'رقم الهاتف مطلوب',
+            'phone.regex'    => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972',
+        ]);
+
+        $phone = $request->phone;
+        $user  = User::where('phone', $phone)->first();
+
+        // Don't reveal whether the number is registered, and don't spend an
+        // OTP on an unknown number — just show the same confirmation screen.
+        if (! $user) {
+            session(['reset_phone' => $phone]);
+            return redirect()->route('password.verify');
+        }
+
+        if ($wait = OtpThrottle::retryAfter($phone)) {
+            return back()->withErrors(['phone' => OtpThrottle::message($wait)])->withInput();
+        }
+
+        OtpCode::where('phone', $phone)->delete();
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        OtpCode::create(['phone' => $phone, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
+
+        OtpThrottle::record($phone);
+
+        if (! app(WaSenderService::class)->sendOtp($phone, $code)) {
+            return back()->withErrors([
+                'phone' => 'تعذّر إرسال الرمز عبر واتساب. تأكد أن رقمك مسجّل على واتساب وحاول مجدداً.',
+            ])->withInput();
+        }
+
+        session(['reset_phone' => $phone]);
+
+        return redirect()->route('password.verify');
+    }
+
+    public function verifyForm()
+    {
+        if (! session('reset_phone')) {
+            return redirect()->route('password.request');
+        }
+
+        return view('auth.reset-password', ['phone' => session('reset_phone')]);
+    }
+
+    /** Step 2 — check the code and set the new password. */
+    public function reset(Request $request)
+    {
+        $phone = session('reset_phone');
+        if (! $phone) {
+            return redirect()->route('password.request')
+                ->withErrors(['phone' => 'انتهت الجلسة، ابدأ من جديد.']);
+        }
+
+        $request->validate([
+            'code'     => ['required', 'string', 'size:6'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
+        ], [
+            'code.required'      => 'أدخل رمز التحقق',
+            'code.size'          => 'الرمز يجب أن يكون 6 أرقام',
+            'password.required'  => 'كلمة المرور مطلوبة',
+            'password.min'       => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
+            'password.confirmed' => 'كلمة المرور وتأكيدها غير متطابقتين',
+        ]);
+
+        $otp = OtpCode::where('phone', $phone)
+            ->where('code', $request->code)
+            ->where('used', false)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (! $otp) {
+            return back()->withErrors(['code' => 'الرمز غير صحيح أو منتهي الصلاحية.']);
+        }
+
+        $user = User::where('phone', $phone)->first();
+        if (! $user) {
+            return redirect()->route('password.request')
+                ->withErrors(['phone' => 'لا يوجد حساب بهذا الرقم.']);
+        }
+
+        $otp->update(['used' => true]);
+
+        $user->forceFill(['password' => Hash::make($request->password)])->save();
+
+        // Old sessions/tokens should not survive a password reset.
+        $user->tokens()->delete();
+
+        session()->forget('reset_phone');
+        OtpThrottle::clear($phone);
+
+        Auth::login($user, true);
+        $request->session()->regenerate();
+
+        return redirect()->route('account.index')
+            ->with('success', 'تم تغيير كلمة المرور بنجاح ✓');
+    }
+}
