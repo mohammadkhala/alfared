@@ -37,6 +37,12 @@ class DeliveryZone extends Model
         return $this->hasMany(self::class, 'parent_id')->orderBy('sort_order')->orderBy('name_ar');
     }
 
+    /** RoadFN neighbourhoods inside this city (sub zones only). */
+    public function roadfnAreas()
+    {
+        return $this->hasMany(RoadFnArea::class)->ordered();
+    }
+
     /** Top-level zones only. */
     public function scopeMain($q)
     {
