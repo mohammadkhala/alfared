@@ -30,6 +30,33 @@ class TranslationService
             ?: $this->callMyMemory($text, $from, $to);
     }
 
+    /**
+     * Translates many short strings in one request by sending them newline
+     * separated — thousands of place names one-by-one would take far too long.
+     * Falls back to per-item translation if the reply doesn't line up, so a
+     * mangled batch can never shift names onto the wrong rows.
+     *
+     * @param  array<int,string>  $texts
+     * @return array<int,string>  same order as $texts
+     */
+    public function translateBatch(array $texts, string $from = 'ar', string $to = 'en'): array
+    {
+        if (empty($texts)) return [];
+
+        $clean = array_map(fn ($t) => trim(str_replace("\n", ' ', (string) $t)), $texts);
+
+        $result = $this->callGoogle(implode("\n", $clean), $from, $to);
+
+        if ($result !== '') {
+            $lines = array_map('trim', explode("\n", trim($result)));
+            if (count($lines) === count($clean)) {
+                return $lines;
+            }
+        }
+
+        return array_map(fn ($t) => $this->translate($t, $from, $to), $clean);
+    }
+
     public function translateHtml(string $html, string $from = 'ar', string $to = 'en'): string
     {
         $plain = trim(strip_tags($html));

@@ -356,5 +356,11 @@
   "track_submit": "הצג סטטוס הזמנה",
   "track_not_found": "לא נמצאה הזמנה עם המספר והטלפון הללו. בדקו את שניהם.",
   "track_login_hint": "יש לכם חשבון?",
-  "track_login_link": "התחברו כדי לראות את כל ההזמנות"
+  "track_login_link": "התחברו כדי לראות את כל ההזמנות",
+  "checkout_region": "אזור",
+  "checkout_pick_region": "בחרו אזור",
+  "checkout_city": "עיר / מחוז",
+  "checkout_pick_region_first": "בחרו אזור תחילה",
+  "checkout_pick_city": "בחרו עיר",
+  "checkout_region_city_required": "יש לבחור אזור ועיר"
 }

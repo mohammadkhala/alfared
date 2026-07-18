@@ -21,8 +21,20 @@ class RoadFnArea extends Model
         'delivery_zone_id',
         'roadfn_area_id',
         'name_ar',
+        'name_he',
+        'name_en',
         'sort_order',
     ];
+
+    /** Name in the active locale, falling back to Arabic (RoadFN's own). */
+    public function getNameAttribute(): string
+    {
+        return match (app()->getLocale()) {
+            'he' => $this->name_he ?: $this->name_ar,
+            'en' => $this->name_en ?: $this->name_ar,
+            default => $this->name_ar,
+        };
+    }
 
     public function deliveryZone(): BelongsTo
     {

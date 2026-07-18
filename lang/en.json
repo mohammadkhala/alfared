@@ -356,5 +356,11 @@
   "track_submit": "Show Order Status",
   "track_not_found": "No order matches that number and phone. Please check both.",
   "track_login_hint": "Have an account?",
-  "track_login_link": "Sign in to see all your orders"
+  "track_login_link": "Sign in to see all your orders",
+  "checkout_region": "Region",
+  "checkout_pick_region": "Select a region",
+  "checkout_city": "City / Governorate",
+  "checkout_pick_region_first": "Select a region first",
+  "checkout_pick_city": "Select a city",
+  "checkout_region_city_required": "Please select a region and a city"
 }

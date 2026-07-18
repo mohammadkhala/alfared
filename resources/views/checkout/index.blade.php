@@ -67,12 +67,12 @@
           <div class="form-grid">
             {{-- Region sets the delivery fee --}}
             <div class="form-group">
-              <label>المنطقة <span style="color:red;">{{ __('checkout_required') }}</span></label>
+              <label>{{ __('checkout_region') }} <span style="color:red;">{{ __('checkout_required') }}</span></label>
               <select id="mainZone" onchange="onMainZone(this.value)">
-                <option value="">اختر المنطقة</option>
+                <option value="">{{ __('checkout_pick_region') }}</option>
                 @foreach($zones as $zone)
                   <option value="{{ $zone->id }}" {{ old('main_zone_id') == $zone->id ? 'selected' : '' }}>
-                    {{ $zone->name_ar }} — {{ ($zone->base_fee ?? $zone->delivery_fee) > 0 ? number_format($zone->base_fee ?? $zone->delivery_fee, 2).' ₪' : __('free') }}
+                    {{ $zone->name }} — {{ ($zone->base_fee ?? $zone->delivery_fee) > 0 ? number_format($zone->base_fee ?? $zone->delivery_fee, 2).' ₪' : __('free') }}
                   </option>
                 @endforeach
               </select>
@@ -81,10 +81,10 @@
 
             {{-- City within that region — this is what maps to RoadFN --}}
             <div class="form-group">
-              <label>المدينة / المحافظة <span style="color:red;">{{ __('checkout_required') }}</span></label>
+              <label>{{ __('checkout_city') }} <span style="color:red;">{{ __('checkout_required') }}</span></label>
               <input type="hidden" name="delivery_zone_id" id="deliveryZoneHidden" value="{{ old('delivery_zone_id', '') }}">
               <select id="subZone" onchange="syncZone(this.value); updateDeliveryFee();" disabled>
-                <option value="">اختر المنطقة أولاً</option>
+                <option value="">{{ __('checkout_pick_region_first') }}</option>
               </select>
               @error('delivery_zone_id')<span class="form-error">{{ $message }}</span>@enderror
             </div>
@@ -277,6 +277,10 @@ let loyaltyDiscount = 0;
 
 // Cities grouped by their region id.
 const SUB_ZONES = @json($subZones);
+// Option labels follow the visitor's language; they're built in JS, so they
+// can't use __() inline.
+const PICK_CITY = @js(__('checkout_pick_city'));
+const PICK_REGION_FIRST = @js(__('checkout_pick_region_first'));
 
 // Sync select UI value → hidden input (called on change + on submit)
 function syncZone(val) {
@@ -293,13 +297,13 @@ function onMainZone(mainId, preselect) {
 
   if (!mainId || list.length === 0) {
     sub.disabled = true;
-    sub.innerHTML = '<option value="">اختر المنطقة أولاً</option>';
+    sub.innerHTML = '<option value="">' + PICK_REGION_FIRST + '</option>';
     syncZone('');
     return;
   }
 
   sub.disabled = false;
-  sub.innerHTML = '<option value="">اختر المدينة</option>';
+  sub.innerHTML = '<option value="">' + PICK_CITY + '</option>';
   list.forEach(function (z) {
     const opt = document.createElement('option');
     opt.value = z.id;
@@ -325,7 +329,7 @@ document.addEventListener('DOMContentLoaded', function () {
     syncZone(sub ? sub.value : '');
     if (!document.getElementById('deliveryZoneHidden').value) {
       e.preventDefault();
-      alert('يرجى اختيار المنطقة والمدينة');
+      alert(@js(__('checkout_region_city_required')));
       (main && !main.value ? main : sub).focus();
     }
   });

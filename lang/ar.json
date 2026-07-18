@@ -356,5 +356,11 @@
   "track_submit": "عرض حالة الطلب",
   "track_not_found": "لم نجد طلباً بهذا الرقم مع هذا الهاتف. تأكّد من الرقمين.",
   "track_login_hint": "لديك حساب؟",
-  "track_login_link": "سجّل دخولك لرؤية كل طلباتك"
+  "track_login_link": "سجّل دخولك لرؤية كل طلباتك",
+  "checkout_region": "المنطقة",
+  "checkout_pick_region": "اختر المنطقة",
+  "checkout_city": "المدينة / المحافظة",
+  "checkout_pick_region_first": "اختر المنطقة أولاً",
+  "checkout_pick_city": "اختر المدينة",
+  "checkout_region_city_required": "يرجى اختيار المنطقة والمدينة"
 }
