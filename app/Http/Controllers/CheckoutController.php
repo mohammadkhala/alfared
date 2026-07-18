@@ -6,6 +6,7 @@ use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Product;
 use App\Models\DeliveryZone;
+use App\Models\RoadFnArea;
 use App\Models\Coupon;
 use App\Models\Setting;
 use App\Models\User;
@@ -23,18 +24,11 @@ class CheckoutController extends Controller
         $cart = session('cart', []);
         if (empty($cart)) return redirect()->route('cart.index');
 
-        // Region sets the fee (الضفة/القدس/الداخل); the city under it is what
-        // maps to RoadFN for the actual shipment.
-        $zones = DeliveryZone::main()->where('is_active', true)
-            ->orderBy('sort_order')->get();
-
-        $subZones = DeliveryZone::sub()->where('is_active', true)
-            ->orderBy('sort_order')->orderBy('name_ar')
-            // name_he/name_en too, so the dropdown follows the visitor's
-            // language instead of always showing Arabic city names.
-            ->get(['id', 'parent_id', 'name_ar', 'name_he', 'name_en'])
-            ->groupBy('parent_id')
-            ->map(fn ($g) => $g->map(fn ($z) => ['id' => $z->id, 'name' => $z->name])->values());
+        // RoadFN is flat: the city carries the fee and is what the shipment is
+        // addressed to. The neighbourhood under it is optional and only makes
+        // the drop-off more precise, so it is loaded on demand (see areas()).
+        $zones = DeliveryZone::where('is_active', true)
+            ->orderBy('sort_order')->orderBy('name_ar')->get();
 
         $coupon   = session('coupon');
         $subtotal = collect($cart)->sum(fn($item) => $item['price'] * $item['qty']);
@@ -50,10 +44,25 @@ class CheckoutController extends Controller
         $onlinePaymentEnabled  = Setting::get('online_payment_enabled', '0') === '1';
 
         return view('checkout.index', compact(
-            'cart', 'zones', 'subZones', 'coupon', 'subtotal', 'discount',
+            'cart', 'zones', 'coupon', 'subtotal', 'discount',
             'loyaltyCfg', 'loyaltyBalance', 'loyaltyMax',
             'codEnabled', 'onlinePaymentEnabled'
         ));
+    }
+
+    /**
+     * Neighbourhoods for one city, for the optional area picker at checkout.
+     * Loaded on demand — all 1300 of them would bloat every checkout page.
+     */
+    public function areas(Request $request)
+    {
+        $areas = RoadFnArea::where('delivery_zone_id', $request->zone_id)
+            ->ordered()
+            ->get(['roadfn_area_id', 'name_ar', 'name_he', 'name_en'])
+            ->map(fn ($a) => ['id' => $a->roadfn_area_id, 'name' => $a->name])
+            ->values();
+
+        return response()->json(['areas' => $areas]);
     }
 
     public function getDeliveryFee(Request $request)
@@ -74,24 +83,25 @@ class CheckoutController extends Controller
             'phone'            => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/'],
             'address_line'     => 'required|string|max:500',
             'delivery_zone_id' => 'required|exists:delivery_zones,id',
+            'roadfn_area_id'   => 'nullable|string|max:50',
             'payment_method'   => 'nullable|in:cod,lahza',
         ], [
             'phone.regex'              => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972 ويتبعه 8 إلى 10 أرقام.',
-            'delivery_zone_id.required' => 'يرجى اختيار المنطقة والمدينة.',
+            'delivery_zone_id.required' => 'يرجى اختيار المدينة.',
         ]);
 
         $cart = session('cart', []);
         if (empty($cart)) return redirect()->route('cart.index');
 
-        $zone = DeliveryZone::with('parent')->findOrFail($request->delivery_zone_id);
+        $zone = DeliveryZone::findOrFail($request->delivery_zone_id);
 
-        // Must land on a city, not a region — a shipment needs a real
-        // destination, and RoadFN is mapped at city level.
-        if ($zone->isMain() && $zone->children()->exists()) {
-            return back()->withErrors([
-                'delivery_zone_id' => 'يرجى اختيار المدينة داخل المنطقة.',
-            ])->withInput();
-        }
+        // Only accept a neighbourhood that really belongs to the chosen city,
+        // otherwise the shipment would be addressed to another city's area.
+        $areaId = $request->roadfn_area_id
+            && RoadFnArea::where('delivery_zone_id', $zone->id)
+                ->where('roadfn_area_id', $request->roadfn_area_id)->exists()
+            ? $request->roadfn_area_id
+            : null;
 
         // City comes from the chosen zone, so it always matches the fee.
         $cityName = $zone->name_ar;
@@ -114,13 +124,14 @@ class CheckoutController extends Controller
 
         $paymentMethod = $request->input('payment_method', 'cod');
 
-        DB::transaction(function () use ($request, $cart, $zone, $cityName, $coupon, $subtotal, $discount, $delivery, $total, $pointsToRedeem, $loyaltyDiscount, $paymentMethod) {
+        DB::transaction(function () use ($request, $cart, $zone, $cityName, $areaId, $coupon, $subtotal, $discount, $delivery, $total, $pointsToRedeem, $loyaltyDiscount, $paymentMethod) {
             $order = Order::create([
                 'customer_name'    => $request->first_name . ' ' . $request->last_name,
                 'customer_phone'   => $request->phone,
                 'customer_email'   => $request->email,
                 'city'             => $cityName,
                 'area'             => $request->area,
+                'roadfn_area_id'   => $areaId,
                 'address_line'     => $request->address_line,
                 'building'         => $request->building,
                 'delivery_notes'   => $request->notes,

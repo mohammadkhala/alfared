@@ -65,37 +65,36 @@
             {{ __('checkout_step_address') }}
           </h3>
           <div class="form-grid">
-            {{-- Region sets the delivery fee --}}
+            {{-- City sets the delivery fee and is what the shipment maps to --}}
             <div class="form-group">
-              <label>{{ __('checkout_region') }} <span style="color:red;">{{ __('checkout_required') }}</span></label>
-              <select id="mainZone" onchange="onMainZone(this.value)">
-                <option value="">{{ __('checkout_pick_region') }}</option>
+              <label>{{ __('checkout_city') }} <span style="color:red;">{{ __('checkout_required') }}</span></label>
+              <select name="delivery_zone_id" id="cityZone" onchange="onCity(this.value)">
+                <option value="">{{ __('checkout_pick_city') }}</option>
                 @foreach($zones as $zone)
-                  <option value="{{ $zone->id }}" {{ old('main_zone_id') == $zone->id ? 'selected' : '' }}>
+                  <option value="{{ $zone->id }}" {{ old('delivery_zone_id') == $zone->id ? 'selected' : '' }}>
                     {{ $zone->name }} — {{ ($zone->base_fee ?? $zone->delivery_fee) > 0 ? number_format($zone->base_fee ?? $zone->delivery_fee, 2).' ₪' : __('free') }}
                   </option>
                 @endforeach
               </select>
-              <input type="hidden" name="main_zone_id" id="mainZoneHidden" value="{{ old('main_zone_id', '') }}">
+              @error('delivery_zone_id')<span class="form-error">{{ $message }}</span>@enderror
             </div>
 
-            {{-- City within that region — this is what maps to RoadFN --}}
+            {{-- Neighbourhood: optional, only sharpens the drop-off point --}}
             <div class="form-group">
-              <label>{{ __('checkout_city') }} <span style="color:red;">{{ __('checkout_required') }}</span></label>
-              <input type="hidden" name="delivery_zone_id" id="deliveryZoneHidden" value="{{ old('delivery_zone_id', '') }}">
-              <select id="subZone" onchange="syncZone(this.value); updateDeliveryFee();" disabled>
-                <option value="">{{ __('checkout_pick_region_first') }}</option>
-              </select>
-              @error('delivery_zone_id')<span class="form-error">{{ $message }}</span>@enderror
+              <label>{{ __('checkout_neighborhood') }}</label>
+              <input type="text" id="areaSearch" list="areaOptions" autocomplete="off" disabled
+                     placeholder="{{ __('checkout_pick_city_first') }}"
+                     value="{{ old('area') }}" oninput="onAreaInput()"/>
+              <datalist id="areaOptions"></datalist>
+              <input type="hidden" name="roadfn_area_id" id="roadfnAreaHidden" value="{{ old('roadfn_area_id', '') }}">
+              {{-- The typed name is kept as the order's free-text area, so a
+                   neighbourhood RoadFN doesn't list still reaches the driver. --}}
+              <input type="hidden" name="area" id="areaNameHidden" value="{{ old('area', '') }}">
             </div>
             <div class="form-group" style="grid-column:1/-1;">
               <label>{{ __('checkout_address_line') }} <span style="color:red;">{{ __('checkout_required') }}</span></label>
               <input type="text" name="address_line" value="{{ old('address_line') }}" required placeholder="{{ __('checkout_address_line_ph') }}"/>
               @error('address_line')<span class="form-error">{{ $message }}</span>@enderror
-            </div>
-            <div class="form-group">
-              <label>{{ __('checkout_area_neighborhood') }}</label>
-              <input type="text" name="area" value="{{ old('area') }}" placeholder="{{ __('checkout_area_ph') }}"/>
             </div>
             <div class="form-group">
               <label>{{ __('checkout_building') }}</label>
@@ -275,62 +274,84 @@ const ZONE_LABEL  = @json(__('checkout_choose_zone_short'));
 let deliveryFee   = 0;
 let loyaltyDiscount = 0;
 
-// Cities grouped by their region id.
-const SUB_ZONES = @json($subZones);
-// Option labels follow the visitor's language; they're built in JS, so they
-// can't use __() inline.
-const PICK_CITY = @js(__('checkout_pick_city'));
-const PICK_REGION_FIRST = @js(__('checkout_pick_region_first'));
+// Labels are built in JS, so they can't use __() inline.
+const PICK_NEIGHBORHOOD  = @js(__('checkout_pick_neighborhood'));
+const PICK_CITY_FIRST    = @js(__('checkout_pick_city_first'));
+const AREAS_URL          = @js(route('checkout.areas'));
 
-// Sync select UI value → hidden input (called on change + on submit)
-function syncZone(val) {
-  document.getElementById('deliveryZoneHidden').value = val || '';
-}
+// Neighbourhoods of the currently selected city: name → RoadFN area id.
+let AREAS = [];
 
-// Fill the city dropdown from the chosen region.
-function onMainZone(mainId, preselect) {
-  document.getElementById('mainZoneHidden').value = mainId || '';
+// City chosen → refresh the fee and load that city's neighbourhoods.
+function onCity(zoneId) {
+  const search = document.getElementById('areaSearch');
+  const list   = document.getElementById('areaOptions');
 
-  const sub  = document.getElementById('subZone');
-  const list = SUB_ZONES[mainId] || [];
-  sub.innerHTML = '';
+  // Any previously picked neighbourhood belongs to the old city.
+  AREAS = [];
+  list.innerHTML = '';
+  search.value = '';
+  setArea('', '');
 
-  if (!mainId || list.length === 0) {
-    sub.disabled = true;
-    sub.innerHTML = '<option value="">' + PICK_REGION_FIRST + '</option>';
-    syncZone('');
+  if (!zoneId) {
+    search.disabled = true;
+    search.placeholder = PICK_CITY_FIRST;
     return;
   }
 
-  sub.disabled = false;
-  sub.innerHTML = '<option value="">' + PICK_CITY + '</option>';
-  list.forEach(function (z) {
-    const opt = document.createElement('option');
-    opt.value = z.id;
-    opt.textContent = z.name;
-    if (preselect && String(preselect) === String(z.id)) opt.selected = true;
-    sub.appendChild(opt);
-  });
+  updateDeliveryFee();
 
-  syncZone(sub.value);
-  if (sub.value) updateDeliveryFee();
+  fetch(AREAS_URL + '?zone_id=' + encodeURIComponent(zoneId))
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      AREAS = data.areas || [];
+      AREAS.forEach(function (a) {
+        const opt = document.createElement('option');
+        opt.value = a.name;
+        list.appendChild(opt);
+      });
+      search.disabled = false;
+      search.placeholder = PICK_NEIGHBORHOOD;
+    })
+    .catch(function () {
+      // Optional field — a failed lookup must not block checkout.
+      search.disabled = true;
+      search.placeholder = PICK_NEIGHBORHOOD;
+    });
+}
+
+function setArea(id, name) {
+  document.getElementById('roadfnAreaHidden').value = id || '';
+  document.getElementById('areaNameHidden').value   = name || '';
+}
+
+// Only a typed name that exactly matches a real neighbourhood counts;
+// anything else is left as free text and simply sends no area id.
+function onAreaInput() {
+  const typed = document.getElementById('areaSearch').value.trim();
+  const match = AREAS.find(function (a) { return a.name === typed; });
+  setArea(match ? match.id : '', typed);
 }
 
 document.addEventListener('DOMContentLoaded', function () {
-  // Restore both levels after a validation error
-  const main = document.getElementById('mainZone');
-  if (main && main.value) {
-    onMainZone(main.value, document.getElementById('deliveryZoneHidden').value);
+  // Restore the city (and its neighbourhoods) after a validation error
+  const city = document.getElementById('cityZone');
+  if (city && city.value) {
+    const keepArea = document.getElementById('areaNameHidden').value;
+    onCity(city.value);
+    if (keepArea) {
+      document.getElementById('areaSearch').value = keepArea;
+      // AREAS loads asynchronously; re-match once it has arrived.
+      setTimeout(onAreaInput, 600);
+    }
   }
 
-  // Submit guard: both levels must be chosen
+  // Submit guard: a city is required, the neighbourhood is not
   document.getElementById('checkoutForm').addEventListener('submit', function (e) {
-    const sub = document.getElementById('subZone');
-    syncZone(sub ? sub.value : '');
-    if (!document.getElementById('deliveryZoneHidden').value) {
+    if (!city || !city.value) {
       e.preventDefault();
-      alert(@js(__('checkout_region_city_required')));
-      (main && !main.value ? main : sub).focus();
+      alert(@js(__('checkout_city_required')));
+      if (city) city.focus();
     }
   });
 });
@@ -341,7 +362,7 @@ function recalcTotal() {
 }
 
 async function updateDeliveryFee() {
-  const zoneId = document.getElementById('deliveryZoneHidden').value;
+  const zoneId = document.getElementById('cityZone').value;
   if (!zoneId) return;
 
   const res = await fetch('{{ route("checkout.delivery-fee") }}?zone_id='+zoneId+'&subtotal='+(subtotal - discount - loyaltyDiscount));

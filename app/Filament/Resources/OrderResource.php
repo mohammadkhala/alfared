@@ -21,6 +21,12 @@ use Illuminate\Support\HtmlString;
 
 class OrderResource extends Resource
 {
+    /**
+     * Statuses the admin sets by hand. Everything after the hand-off to the
+     * courier is owned by RoadFN (see services.roadfn.status_map).
+     */
+    private const ADMIN_STATUSES = ['pending', 'confirmed', 'processing'];
+
     protected static ?string $model = Order::class;
     protected static ?string $navigationIcon = 'heroicon-o-shopping-cart';
     protected static ?string $navigationLabel = 'الطلبات';
@@ -504,7 +510,19 @@ class OrderResource extends Resource
                 // ── الحالة (select مباشر) ─────────────────────────────
                 Tables\Columns\SelectColumn::make('status')
                     ->label('الحالة')
-                    ->options(Order::$statusLabels)
+                    // The admin owns the order only until it is handed to the
+                    // courier ("مرسل للتوصيل" comes from the إرسال button, not
+                    // from here). After that RoadFN drives the status, so the
+                    // dropdown locks and just shows where the shipment is —
+                    // otherwise a manual edit would be silently overwritten by
+                    // the next sync.
+                    ->options(function (Order $record) {
+                        $labels = Order::$statusLabels;
+                        return in_array($record->status, self::ADMIN_STATUSES, true)
+                            ? array_intersect_key($labels, array_flip(self::ADMIN_STATUSES))
+                            : array_intersect_key($labels, array_flip([$record->status]));
+                    })
+                    ->disabled(fn (Order $record) => ! in_array($record->status, self::ADMIN_STATUSES, true))
                     // Otherwise it stretches to the longest label ("بانتظار
                     // التأكيد") and eats width the rest of the row needs.
                     // width() only sizes the cell — the <select> inside carries its

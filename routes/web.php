@@ -115,6 +115,7 @@ Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');
     Route::post('/place', [CheckoutController::class, 'placeOrder'])->name('place');
     Route::get('/delivery-fee', [CheckoutController::class, 'getDeliveryFee'])->name('delivery-fee')->middleware('throttle:30,1');
+    Route::get('/areas', [CheckoutController::class, 'areas'])->name('areas')->middleware('throttle:30,1');
     Route::get('/success/{orderNumber}', [CheckoutController::class, 'success'])->name('success');
     Route::get('/failed/{orderNumber}', [CheckoutController::class, 'paymentFailed'])->name('failed');
     Route::get('/tracking/{orderNumber}', [CheckoutController::class, 'tracking'])->name('tracking');

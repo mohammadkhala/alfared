@@ -362,5 +362,9 @@
   "checkout_city": "עיר / מחוז",
   "checkout_pick_region_first": "בחרו אזור תחילה",
   "checkout_pick_city": "בחרו עיר",
-  "checkout_region_city_required": "יש לבחור אזור ועיר"
+  "checkout_region_city_required": "יש לבחור אזור ועיר",
+  "checkout_neighborhood": "שכונה / אזור (רשות)",
+  "checkout_pick_neighborhood": "חפש את האזור שלך, או השאר ריק",
+  "checkout_pick_city_first": "בחר עיר תחילה",
+  "checkout_city_required": "נא לבחור עיר"
 }

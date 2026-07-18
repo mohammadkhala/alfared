@@ -142,17 +142,31 @@ class RoadFnService
         // and pass it into the create call.
         $tracking = $this->reserveTrackingNumber();
 
+        // Card orders are already settled through Lahza, so the driver must not
+        // collect anything — send 0 as the collectible and say why on the note.
+        $prepaid = in_array($order->payment_method, ['lahza', 'card'], true)
+            && $order->payment_status === 'paid';
+
+        $remarks = array_filter([
+            $order->delivery_notes,
+            $prepaid ? 'مدفوع مسبقاً بالبطاقة — لا يوجد مبلغ للتحصيل' : null,
+        ]);
+
         $payload = [
             'ShipmentTrackingNo' => $tracking,
+            // Our own order number, so the same reference identifies the order
+            // on both sides.
+            'ShipmentReference'  => $order->order_number,
             'clientName'         => $order->customer_name,
             // RoadFN wants a 10-digit local number (digits only), not +970…
             'clientPhone'        => $this->localPhone($order->customer_phone),
             'clientCityId'       => $zone->roadfn_city_id,
-            'clientAreaId'       => $zone->roadfn_area_id,
+            // The neighbourhood the customer picked, else the city's default.
+            'clientAreaId'       => $order->roadfn_area_id ?: $zone->roadfn_area_id,
             'clientAddress'      => trim($order->address_line . ' ' . $order->building),
-            'shipmentTotal'      => (float) $order->total,
+            'shipmentTotal'      => $prepaid ? 0 : (float) $order->total,
             'ShipmentTypeID'     => config('services.roadfn.default_shipment_type'),
-            'Remarks'            => $order->delivery_notes,
+            'Remarks'            => implode(' — ', $remarks) ?: null,
             'shipmentContains'   => $order->items->pluck('product_name')->implode(', '),
             'ShipmentQuantity'   => (int) $order->items->sum('quantity') ?: 1,
         ];
