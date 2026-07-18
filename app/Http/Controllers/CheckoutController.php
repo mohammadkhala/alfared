@@ -192,6 +192,12 @@ class CheckoutController extends Controller
 
         $order = Order::find(session('last_order'));
 
+        // The buyer may be a guest, so let this session through the order pages
+        // it just created without having to prove the phone again.
+        if ($order) {
+            \App\Support\OrderAccess::grant($order);
+        }
+
         // ── Lahza online payment ──
         if ($paymentMethod === 'lahza') {
             try {
@@ -286,18 +292,24 @@ class CheckoutController extends Controller
     public function paymentFailed(string $orderNumber)
     {
         $order = Order::where('order_number', $orderNumber)->with('items')->firstOrFail();
+        \App\Support\OrderAccess::authorize($order);
+
         return view('checkout.payment-failed', compact('order'));
     }
 
     public function success(string $orderNumber)
     {
         $order = Order::where('order_number', $orderNumber)->with('items')->firstOrFail();
+        \App\Support\OrderAccess::authorize($order);
+
         return view('checkout.success', compact('order'));
     }
 
     public function tracking(string $orderNumber)
     {
         $order = Order::where('order_number', $orderNumber)->with('items.product')->firstOrFail();
+        \App\Support\OrderAccess::authorize($order);
+
         return view('checkout.tracking', compact('order'));
     }
 }

@@ -103,6 +103,13 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('/coupon/remove', [CartController::class, 'removeCoupon'])->name('coupon.remove');
 });
 
+// ── Public order tracking (guests: order number + phone) ──
+Route::get('/track', [\App\Http\Controllers\TrackOrderController::class, 'form'])->name('track.form');
+Route::post('/track', [\App\Http\Controllers\TrackOrderController::class, 'lookup'])
+    ->name('track.lookup')
+    // The form is an order-number guess away from being brute-forceable.
+    ->middleware('throttle:8,1');
+
 // ── Checkout ──
 Route::prefix('checkout')->name('checkout.')->group(function () {
     Route::get('/', [CheckoutController::class, 'index'])->name('index');

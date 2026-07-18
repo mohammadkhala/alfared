@@ -347,5 +347,14 @@
   "product_status_label": "Status",
   "product_status_available": "✓ In Stock",
   "product_status_out": "✗ Out of Stock",
-  "product_wa_share": "WhatsApp"
+  "product_wa_share": "WhatsApp",
+  "track_page_title": "Track Your Order",
+  "track_page_intro": "Enter your order number and the phone you ordered with to see the shipment status.",
+  "track_order_number_label": "Order Number",
+  "track_phone_label": "Phone Number",
+  "track_phone_hint": "The same number you used when ordering.",
+  "track_submit": "Show Order Status",
+  "track_not_found": "No order matches that number and phone. Please check both.",
+  "track_login_hint": "Have an account?",
+  "track_login_link": "Sign in to see all your orders"
 }

@@ -347,5 +347,14 @@
   "product_status_label": "الحالة",
   "product_status_available": "✓ متوفر في المخزون",
   "product_status_out": "✗ نفد المخزون",
-  "product_wa_share": "واتساب"
+  "product_wa_share": "واتساب",
+  "track_page_title": "تتبّع طلبك",
+  "track_page_intro": "أدخل رقم الطلب ورقم الهاتف الذي طلبت به لعرض حالة الشحنة.",
+  "track_order_number_label": "رقم الطلب",
+  "track_phone_label": "رقم الهاتف",
+  "track_phone_hint": "نفس الرقم الذي أدخلته عند الطلب.",
+  "track_submit": "عرض حالة الطلب",
+  "track_not_found": "لم نجد طلباً بهذا الرقم مع هذا الهاتف. تأكّد من الرقمين.",
+  "track_login_hint": "لديك حساب؟",
+  "track_login_link": "سجّل دخولك لرؤية كل طلباتك"
 }

@@ -347,5 +347,14 @@
   "product_status_label": "סטטוס",
   "product_status_available": "✓ במלאי",
   "product_status_out": "✗ אזל המלאי",
-  "product_wa_share": "ווטסאפ"
+  "product_wa_share": "ווטסאפ",
+  "track_page_title": "מעקב אחר ההזמנה",
+  "track_page_intro": "הזינו את מספר ההזמנה ומספר הטלפון שאיתו הזמנתם כדי לראות את סטטוס המשלוח.",
+  "track_order_number_label": "מספר הזמנה",
+  "track_phone_label": "מספר טלפון",
+  "track_phone_hint": "אותו מספר שהזנתם בעת ההזמנה.",
+  "track_submit": "הצג סטטוס הזמנה",
+  "track_not_found": "לא נמצאה הזמנה עם המספר והטלפון הללו. בדקו את שניהם.",
+  "track_login_hint": "יש לכם חשבון?",
+  "track_login_link": "התחברו כדי לראות את כל ההזמנות"
 }

@@ -235,6 +235,7 @@
       <div class="footer-col">
         <h4>{{ __('footer_support') }}</h4>
         <ul>
+          <li><a href="{{ route('track.form') }}">📦 {{ __('track_page_title') }}</a></li>
           <li><a href="https://wa.me/970598191312" target="_blank">{{ __('whatsapp') }}</a></li>
           <li><a href="{{ route('contact') }}">{{ __('contact_us') }}</a></li>
           <li><a href="{{ route('returns') }}">{{ __('footer_return_policy') }}</a></li>
