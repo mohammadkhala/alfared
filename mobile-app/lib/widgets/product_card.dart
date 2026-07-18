@@ -9,6 +9,7 @@ import '../providers/locale_provider.dart';
 import '../screens/auth/login_screen.dart';
 import '../screens/products/product_detail_screen.dart';
 import '../theme/app_theme.dart';
+import '../theme/theme_ext.dart';
 
 class ProductCard extends StatefulWidget {
   const ProductCard({super.key, required this.product, this.badgeLabel, this.badgeColor});
@@ -77,12 +78,13 @@ class _ProductCardState extends State<ProductCard> with SingleTickerProviderStat
       ),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.card,
           borderRadius: BorderRadius.circular(18),
+          border: Border.all(color: context.line, width: 0.8),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.07),
-              blurRadius: 16,
+              color: Colors.black.withValues(alpha: context.isDark ? 0.28 : 0.06),
+              blurRadius: 14,
               offset: const Offset(0, 4),
             ),
           ],
@@ -97,12 +99,16 @@ class _ProductCardState extends State<ProductCard> with SingleTickerProviderStat
               aspectRatio: 1.05,
               child: Stack(children: [
                 Positioned.fill(
+                  // Product shots are mostly on white, so keep a light plate
+                  // even in dark mode — just muted so it isn't glaring.
                   child: Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topRight,
                         end: Alignment.bottomLeft,
-                        colors: [Color(0xFFFFF8F0), Color(0xFFF5F0FF)],
+                        colors: context.isDark
+                            ? const [Color(0xFFE8E6EF), Color(0xFFDCD9E6)]
+                            : const [Color(0xFFFFF8F0), Color(0xFFF5F0FF)],
                       ),
                     ),
                   ),
@@ -262,10 +268,10 @@ class _ProductCardState extends State<ProductCard> with SingleTickerProviderStat
 
                   Text(displayName,
                     maxLines: 2, overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontSize: 12.5, fontWeight: FontWeight.w700,
                       fontFamily: 'Cairo', height: 1.3,
-                      color: Color(0xFF1A202C),
+                      color: context.text,
                     )),
                   const SizedBox(height: 5),
 

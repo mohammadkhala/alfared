@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../../models/category.dart';
 import '../../models/product.dart';
 import '../../providers/cart_provider.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/theme_ext.dart';
 import '../../widgets/product_card.dart';
 import '../cart/cart_screen.dart';
 
@@ -21,6 +23,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
   final _search = TextEditingController();
   final _scroll = ScrollController();
   final List<Product> _items = [];
+  List<Category> _categories = [];
+  /// null = "الكل". Starts on whatever category the screen was opened with.
+  String? _activeCategory;
   String _sort = 'newest';
   int _page = 1;
   int _lastPage = 1;
@@ -31,8 +36,30 @@ class _ProductsScreenState extends State<ProductsScreen> {
   void initState() {
     super.initState();
     _search.text = widget.searchQuery ?? '';
+    _activeCategory = widget.categorySlug;
     _scroll.addListener(_onScroll);
     _load(reset: true);
+    _loadCategories();
+  }
+
+  Future<void> _loadCategories() async {
+    try {
+      final res = await ApiService.instance.get('/categories');
+      final raw = (res is Map ? (res['data'] ?? res['categories']) : res) as List?;
+      if (raw != null && mounted) {
+        setState(() => _categories =
+            raw.map((e) => Category.fromJson(e as Map<String, dynamic>)).toList());
+      }
+    } catch (_) {
+      // Filter row simply stays hidden if categories can't be fetched.
+    }
+  }
+
+  Future<void> _pickCategory(String? slug) async {
+    if (slug == _activeCategory) return;
+    setState(() => _activeCategory = slug);
+    _scroll.hasClients ? _scroll.jumpTo(0) : null;
+    await _load(reset: true);
   }
 
   void _onScroll() {
@@ -49,7 +76,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     setState(() => _loading = true);
     try {
       final res = await ApiService.instance.get('/products', query: {
-        if (widget.categorySlug != null) 'category': widget.categorySlug!,
+        if (_activeCategory != null) 'category': _activeCategory!,
         if (_search.text.trim().isNotEmpty) 'q': _search.text.trim(),
         'sort': _sort,
         'page': _page,
@@ -77,6 +104,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: context.bg,
       appBar: AppBar(
         title: Text(widget.categoryName ?? 'المتجر'),
         actions: [
@@ -117,6 +145,20 @@ class _ProductsScreenState extends State<ProductsScreen> {
             ),
           ),
         ),
+
+        // category filter
+        if (_categories.isNotEmpty)
+          SizedBox(
+            height: 42,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 12),
+              children: [
+                _categoryChip('الكل', null),
+                ..._categories.map((c) => _categoryChip(c.name, c.slug)),
+              ],
+            ),
+          ),
 
         // sort chips
         SizedBox(
@@ -166,17 +208,46 @@ class _ProductsScreenState extends State<ProductsScreen> {
     );
   }
 
+  /// Filters the grid by category. Blue to set it apart from the orange sort row.
+  Widget _categoryChip(String label, String? slug) {
+    final active = _activeCategory == slug;
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 4),
+      child: GestureDetector(
+        onTap: () => _pickCategory(slug),
+        behavior: HitTestBehavior.opaque,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          decoration: BoxDecoration(
+            color: active ? AppColors.blue : context.card,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: active ? AppColors.blue : context.line),
+          ),
+          alignment: Alignment.center,
+          child: Text(label,
+            style: TextStyle(
+              color: active ? Colors.white : context.text,
+              fontFamily: 'Cairo',
+              fontWeight: active ? FontWeight.w900 : FontWeight.w700,
+              fontSize: 12,
+            )),
+        ),
+      ),
+    );
+  }
+
   Widget _sortChip(String label, String value) {
     final active = _sort == value;
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 4),
       child: ChoiceChip(
-        label: Text(label, style: TextStyle(color: active ? Colors.white : AppColors.text, fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 12)),
+        label: Text(label, style: TextStyle(color: active ? Colors.white : context.text, fontFamily: 'Cairo', fontWeight: FontWeight.w700, fontSize: 12)),
         selected: active,
         onSelected: (_) => _changeSort(value),
         selectedColor: AppColors.orange,
-        backgroundColor: Colors.white,
-        side: BorderSide(color: active ? AppColors.orange : AppColors.border),
+        backgroundColor: context.card,
+        side: BorderSide(color: active ? AppColors.orange : context.line),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
       ),
     );
