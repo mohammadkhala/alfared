@@ -397,9 +397,9 @@ class OrderResource extends Resource
                         return new HtmlString(
                             '<div style="display:flex;align-items:center;gap:8px;">'
                             . '<div style="width:30px;height:30px;border-radius:50%;background:#E8F0FF;color:#122870;display:flex;align-items:center;justify-content:center;font-weight:900;font-size:12px;flex-shrink:0;">'.$initial.'</div>'
-                            . '<div style="min-width:0;">'
-                            . '<div style="font-weight:700;font-size:13px;white-space:nowrap;">'.$name.'</div>'
-                            . '<div style="font-size:11px;color:#64748B;">'.$phone.'</div>'
+                            . '<div style="min-width:0;max-width:150px;">'
+                            . '<div title="'.$name.'" style="font-weight:700;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">'.$name.'</div>'
+                            . '<div style="font-size:11px;color:#64748B;white-space:nowrap;">'.$phone.'</div>'
                             . '</div></div>'
                         );
                     }),
@@ -465,19 +465,20 @@ class OrderResource extends Resource
                 // ── الأقسام المطلوبة ──────────────────────────────────
                 Tables\Columns\TextColumn::make('order_categories')
                     ->label('الأقسام')
-                    ->state(function ($record) {
-                        return $record->items
-                            ->load('product.category')
-                            ->pluck('product.category.name_ar')
-                            ->filter()
-                            ->unique()
-                            ->values()
-                            ->implode('، ');
-                    })
+                    // Relations are already eager-loaded in getEloquentQuery(),
+                    // so no ->load() here — that ran an extra query per row.
+                    ->state(fn ($record) => $record->items
+                        ->pluck('product.category.name_ar')
+                        ->filter()
+                        ->unique()
+                        ->values()
+                        ->implode('، '))
                     ->badge()
                     ->color('primary')
                     ->placeholder('—')
-                    ->toggleable(isToggledHiddenByDefault: false),
+                    ->limit(22)
+                    ->tooltip(fn ($state) => $state)
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 // ── المنطقة (مخفية افتراضياً) ────────────────────────
                 Tables\Columns\TextColumn::make('city')
