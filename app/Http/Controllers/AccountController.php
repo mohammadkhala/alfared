@@ -7,7 +7,6 @@ use App\Models\LoyaltyTransaction;
 use App\Models\OtpCode;
 use App\Models\Wishlist;
 use App\Models\User;
-use App\Services\WaSenderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
