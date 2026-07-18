@@ -9,6 +9,8 @@ import '../../providers/locale_provider.dart';
 import '../../providers/theme_provider.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/theme_ext.dart';
+import '../../widgets/brand_icon.dart';
 import '../../widgets/guest_wall.dart';
 import '../notifications_screen.dart';
 import '../orders/orders_screen.dart';
@@ -344,15 +346,31 @@ class _AccountScreenState extends State<AccountScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Text(s.followUs, style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: AppColors.text)),
               const SizedBox(height: 12),
-              Row(children: [
-                _SocialBtn(emoji: '💬', label: 'WhatsApp', color: const Color(0xFF25D366), url: 'https://wa.me/970598191312'),
-                const SizedBox(width: 10),
-                _SocialBtn(emoji: '📸', label: 'Instagram', color: const Color(0xFFE1306C), url: 'https://instagram.com/alfared.shop'),
-                const SizedBox(width: 10),
-                _SocialBtn(emoji: '📘', label: 'Facebook', color: const Color(0xFF1877F2), url: 'https://facebook.com/alfared.shop'),
-                const SizedBox(width: 10),
-                _SocialBtn(emoji: '🎵', label: 'TikTok', color: Colors.black87, url: 'https://tiktok.com/@alfared.shop'),
-              ]),
+              Builder(builder: (context) {
+                const wa = Color(0xFF25D366);
+                const ig = Color(0xFFE1306C);
+                const fb = Color(0xFF1877F2);
+                // TikTok's black is invisible on a dark page — use the text colour.
+                final tt = context.isDark ? AppColors.darkText : Colors.black87;
+
+                return Row(children: [
+                  _SocialBtn(
+                    icon: const BrandIcon.whatsapp(size: 22, color: wa),
+                    label: 'WhatsApp', color: wa, url: 'https://wa.me/970598191312'),
+                  const SizedBox(width: 10),
+                  _SocialBtn(
+                    icon: const BrandIcon.instagram(size: 22, color: ig),
+                    label: 'Instagram', color: ig, url: 'https://instagram.com/alfared.shop'),
+                  const SizedBox(width: 10),
+                  _SocialBtn(
+                    icon: const BrandIcon.facebook(size: 22, color: fb),
+                    label: 'Facebook', color: fb, url: 'https://facebook.com/alfared.shop'),
+                  const SizedBox(width: 10),
+                  _SocialBtn(
+                    icon: BrandIcon.tiktok(size: 22, color: tt),
+                    label: 'TikTok', color: tt, url: 'https://tiktok.com/@alfared.shop'),
+                ]);
+              }),
             ]),
           ),
 
@@ -722,14 +740,18 @@ class _TierArrow extends StatelessWidget {
 }
 
 class _SocialBtn extends StatelessWidget {
-  const _SocialBtn({required this.emoji, required this.label, required this.color, required this.url});
-  final String emoji;
+  const _SocialBtn({required this.icon, required this.label, required this.color, required this.url});
+  final Widget icon;
   final String label;
   final Color color;
   final String url;
 
   @override
   Widget build(BuildContext context) {
+    // On dark backgrounds a 10% brand tint is nearly invisible, so lift it.
+    final fill   = color.withValues(alpha: context.isDark ? 0.20 : 0.10);
+    final stroke = color.withValues(alpha: context.isDark ? 0.45 : 0.25);
+
     return Expanded(
       child: GestureDetector(
         onTap: () async {
@@ -737,15 +759,15 @@ class _SocialBtn extends StatelessWidget {
           await launchUrl(uri, mode: LaunchMode.externalApplication);
         },
         child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 10),
+          padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.10),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: color.withValues(alpha: 0.25)),
+            color: fill,
+            borderRadius: BorderRadius.circular(14),
+            border: Border.all(color: stroke),
           ),
           child: Column(children: [
-            Text(emoji, style: const TextStyle(fontSize: 20)),
-            const SizedBox(height: 4),
+            icon,
+            const SizedBox(height: 6),
             Text(label, style: TextStyle(fontSize: 9, fontWeight: FontWeight.w800, fontFamily: 'Cairo', color: color)),
           ]),
         ),

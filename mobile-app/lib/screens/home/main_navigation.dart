@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/theme_ext.dart';
 import '../account/account_screen.dart';
 import '../account/wishlist_screen.dart';
 import '../cart/cart_screen.dart';
@@ -109,14 +110,15 @@ class _BottomNav extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.card,
         borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(28),
           topRight: Radius.circular(28),
         ),
+        border: Border(top: BorderSide(color: context.line, width: 0.6)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.10),
+            color: Colors.black.withValues(alpha: context.isDark ? 0.30 : 0.10),
             blurRadius: 24,
             spreadRadius: -2,
             offset: const Offset(0, -6),
@@ -164,9 +166,9 @@ class _NavItem extends StatelessWidget {
               height: 34,
               decoration: BoxDecoration(
                 color: active
-                    ? tab.color.withValues(alpha: 0.13)
+                    ? tab.color.withValues(alpha: context.isDark ? 0.22 : 0.14)
                     : Colors.transparent,
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
               ),
               alignment: Alignment.center,
               child: AnimatedSwitcher(
@@ -174,22 +176,20 @@ class _NavItem extends StatelessWidget {
                 child: Icon(
                   active ? tab.activeIcon : tab.outlineIcon,
                   key: ValueKey(active),
-                  color: active
-                      ? tab.color
-                      : tab.color.withValues(alpha: 0.40),
-                  size: active ? 22 : 21,
+                  // Inactive icons were a washed-out 40% tint of the brand
+                  // colour; a solid muted grey reads far better.
+                  color: active ? tab.color : context.muted,
+                  size: active ? 23 : 22,
                 ),
               ),
             ),
-            const SizedBox(height: 3),
+            const SizedBox(height: 4),
             AnimatedDefaultTextStyle(
               duration: const Duration(milliseconds: 180),
               style: TextStyle(
-                color: active
-                    ? tab.color
-                    : tab.color.withValues(alpha: 0.45),
-                fontSize: 9,
-                fontWeight: active ? FontWeight.w900 : FontWeight.w600,
+                color: active ? tab.color : context.muted,
+                fontSize: 9.5,
+                fontWeight: active ? FontWeight.w900 : FontWeight.w700,
                 fontFamily: 'Cairo',
               ),
               child: Text(tab.label),
@@ -246,7 +246,8 @@ class _CenterCartState extends State<_CenterCart> {
                 ),
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: AppShadows.elevated,
-                border: Border.all(color: Colors.white, width: 3),
+                // Ring must match the bar behind it, not always white.
+                border: Border.all(color: context.card, width: 3),
               ),
               child: Stack(
                 clipBehavior: Clip.none,
