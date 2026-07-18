@@ -16,6 +16,7 @@ use Filament\Notifications\Actions\Action as NotificationAction;
 use Filament\Notifications\Notification as FilamentNotification;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Validation\Rule;
 
 class CheckoutController extends Controller
 {
@@ -24,10 +25,11 @@ class CheckoutController extends Controller
         $cart = session('cart', []);
         if (empty($cart)) return redirect()->route('cart.index');
 
-        // RoadFN is flat: the city carries the fee and is what the shipment is
-        // addressed to. The neighbourhood under it is optional and only makes
-        // the drop-off more precise, so it is loaded on demand (see areas()).
+        // Only cities RoadFN actually ships to: an unmapped zone has no fee of
+        // its own and no neighbourhoods, so offering it would take an order we
+        // cannot hand to the courier. Run `roadfn:sync-zones` to populate these.
         $zones = DeliveryZone::where('is_active', true)
+            ->whereNotNull('roadfn_city_id')
             ->orderBy('sort_order')->orderBy('name_ar')->get();
 
         $coupon   = session('coupon');
@@ -83,25 +85,26 @@ class CheckoutController extends Controller
             'phone'            => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/'],
             'address_line'     => 'required|string|max:500',
             'delivery_zone_id' => 'required|exists:delivery_zones,id',
-            'roadfn_area_id'   => 'nullable|string|max:50',
+            // Must be a neighbourhood of the chosen city — otherwise the
+            // shipment would be addressed to another city's area.
+            'roadfn_area_id'   => [
+                'required', 'string', 'max:50',
+                Rule::exists('roadfn_areas', 'roadfn_area_id')
+                    ->where('delivery_zone_id', $request->delivery_zone_id),
+            ],
             'payment_method'   => 'nullable|in:cod,lahza',
         ], [
-            'phone.regex'              => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972 ويتبعه 8 إلى 10 أرقام.',
+            'phone.regex'               => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972 ويتبعه 8 إلى 10 أرقام.',
             'delivery_zone_id.required' => 'يرجى اختيار المدينة.',
+            'roadfn_area_id.required'   => 'يرجى اختيار الحي من القائمة.',
+            'roadfn_area_id.exists'     => 'الحي المختار لا يتبع المدينة المحددة — اختر حياً من القائمة.',
         ]);
 
         $cart = session('cart', []);
         if (empty($cart)) return redirect()->route('cart.index');
 
-        $zone = DeliveryZone::findOrFail($request->delivery_zone_id);
-
-        // Only accept a neighbourhood that really belongs to the chosen city,
-        // otherwise the shipment would be addressed to another city's area.
-        $areaId = $request->roadfn_area_id
-            && RoadFnArea::where('delivery_zone_id', $zone->id)
-                ->where('roadfn_area_id', $request->roadfn_area_id)->exists()
-            ? $request->roadfn_area_id
-            : null;
+        $zone   = DeliveryZone::findOrFail($request->delivery_zone_id);
+        $areaId = $request->roadfn_area_id; // validated above as belonging to $zone
 
         // City comes from the chosen zone, so it always matches the fee.
         $cityName = $zone->name_ar;

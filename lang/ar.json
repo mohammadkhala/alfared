@@ -363,8 +363,9 @@
   "checkout_pick_region_first": "اختر المنطقة أولاً",
   "checkout_pick_city": "اختر المدينة",
   "checkout_region_city_required": "يرجى اختيار المنطقة والمدينة",
-  "checkout_neighborhood": "الحي / المنطقة (اختياري)",
-  "checkout_pick_neighborhood": "ابحث عن الحي أو اتركه فارغاً",
+  "checkout_neighborhood": "الحي / المنطقة",
+  "checkout_pick_neighborhood": "ابحث عن الحي واختره من القائمة",
+  "checkout_neighborhood_required": "يرجى اختيار الحي من القائمة",
   "checkout_pick_city_first": "اختر المدينة أولاً",
   "checkout_city_required": "يرجى اختيار المدينة"
 }

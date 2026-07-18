@@ -79,13 +79,14 @@
               @error('delivery_zone_id')<span class="form-error">{{ $message }}</span>@enderror
             </div>
 
-            {{-- Neighbourhood: optional, only sharpens the drop-off point --}}
+            {{-- Neighbourhood: required, and must be picked from RoadFN's list --}}
             <div class="form-group">
-              <label>{{ __('checkout_neighborhood') }}</label>
+              <label>{{ __('checkout_neighborhood') }} <span style="color:red;">{{ __('checkout_required') }}</span></label>
               <input type="text" id="areaSearch" list="areaOptions" autocomplete="off" disabled
                      placeholder="{{ __('checkout_pick_city_first') }}"
                      value="{{ old('area') }}" oninput="onAreaInput()"/>
               <datalist id="areaOptions"></datalist>
+              @error('roadfn_area_id')<span class="form-error">{{ $message }}</span>@enderror
               <input type="hidden" name="roadfn_area_id" id="roadfnAreaHidden" value="{{ old('roadfn_area_id', '') }}">
               {{-- The typed name is kept as the order's free-text area, so a
                    neighbourhood RoadFN doesn't list still reaches the driver. --}}
@@ -346,12 +347,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
   }
 
-  // Submit guard: a city is required, the neighbourhood is not
+  // Submit guard: both the city and a neighbourhood from the list are required
   document.getElementById('checkoutForm').addEventListener('submit', function (e) {
     if (!city || !city.value) {
       e.preventDefault();
       alert(@js(__('checkout_city_required')));
       if (city) city.focus();
+      return;
+    }
+    // Free text isn't enough — RoadFN needs a real area id.
+    if (!document.getElementById('roadfnAreaHidden').value) {
+      e.preventDefault();
+      alert(@js(__('checkout_neighborhood_required')));
+      document.getElementById('areaSearch').focus();
     }
   });
 });

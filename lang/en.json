@@ -363,8 +363,9 @@
   "checkout_pick_region_first": "Select a region first",
   "checkout_pick_city": "Select a city",
   "checkout_region_city_required": "Please select a region and a city",
-  "checkout_neighborhood": "Neighborhood / Area (optional)",
-  "checkout_pick_neighborhood": "Search for your area, or leave blank",
+  "checkout_neighborhood": "Neighborhood / Area",
+  "checkout_pick_neighborhood": "Search and pick your area from the list",
+  "checkout_neighborhood_required": "Please pick your area from the list",
   "checkout_pick_city_first": "Choose a city first",
   "checkout_city_required": "Please choose a city"
 }
