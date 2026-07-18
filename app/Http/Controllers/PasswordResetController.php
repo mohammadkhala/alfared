@@ -57,7 +57,7 @@ class PasswordResetController extends Controller
         // delivers them, so verification stays identical for both.
         $key = $user->phone;
 
-        if ($wait = OtpThrottle::retryAfter($key)) {
+        if ($wait = OtpThrottle::retryAfter($key, $method)) {
             $field = $method === 'email' ? 'email' : 'phone';
             return back()->withErrors([$field => OtpThrottle::message($wait)])->withInput();
         }
@@ -66,7 +66,7 @@ class PasswordResetController extends Controller
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         OtpCode::create(['phone' => $key, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
 
-        OtpThrottle::record($key);
+        OtpThrottle::record($key, $method);
 
         if ($method === 'email') {
             try {

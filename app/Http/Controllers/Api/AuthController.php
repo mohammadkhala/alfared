@@ -206,7 +206,7 @@ class AuthController extends Controller
         // Always key the OTP by the account's phone, whichever channel sends it.
         $key = $user->phone;
 
-        if ($wait = \App\Support\OtpThrottle::retryAfter($key)) {
+        if ($wait = \App\Support\OtpThrottle::retryAfter($key, $method)) {
             return response()->json([
                 'message'     => \App\Support\OtpThrottle::message($wait),
                 'retry_after' => $wait,
@@ -217,7 +217,7 @@ class AuthController extends Controller
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
         OtpCode::create(['phone' => $key, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
 
-        \App\Support\OtpThrottle::record($key);
+        \App\Support\OtpThrottle::record($key, $method);
 
         if ($method === 'email') {
             try {
