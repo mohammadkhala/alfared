@@ -19,11 +19,12 @@
     </div>
 
     <div style="text-align:center;margin-bottom:28px;">
-      <div style="font-size:48px;margin-bottom:12px;">🔐</div>
-      <h1 style="font-size:1.4rem;font-weight:700;color:#1B3B8C;margin:0 0 8px;">أدخل رمز التحقق</h1>
-      <p style="color:#6B7280;margin:0;font-size:14px;">
-        أرسلنا رمزاً مكوناً من 6 أرقام عبر واتساب إلى<br/>
-        <strong style="color:#1B3B8C;">{{ $phone }}</strong>
+      <div style="font-size:48px;margin-bottom:12px;">📧</div>
+      <h1 style="font-size:1.4rem;font-weight:700;color:#1B3B8C;margin:0 0 8px;">أكّد بريدك الإلكتروني</h1>
+      <p style="color:#6B7280;margin:0;font-size:14px;line-height:1.8;">
+        أرسلنا رمزاً مكوناً من 6 أرقام إلى<br/>
+        <strong dir="ltr" style="color:#1B3B8C;">{{ session('reg_email') }}</strong><br/>
+        <span style="font-size:12px;color:#9CA3AF;">لم تجده؟ تفقّد مجلد الرسائل غير المرغوبة (Spam)</span>
       </p>
     </div>
 

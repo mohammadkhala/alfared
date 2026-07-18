@@ -68,6 +68,9 @@ class AuthProvider extends ChangeNotifier {
     required String email,
     required String phone,
     required String password,
+    /// Code e-mailed by /auth/send-email-verification — the backend verifies
+    /// it before creating the account.
+    String? code,
     String? fcmToken,
     String? deviceType,
   }) async {
@@ -79,6 +82,7 @@ class AuthProvider extends ChangeNotifier {
         'phone':                 phone,
         'password':              password,
         'password_confirmation': password,
+        if (code != null) 'code': code,
       });
       final m = res as Map<String, dynamic>;
       await ApiService.instance.setToken(m['token'] as String);

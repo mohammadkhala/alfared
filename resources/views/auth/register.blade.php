@@ -10,7 +10,7 @@
         📱
       </div>
       <h1 style="font-size:1.6rem;font-weight:700;color:#1B3B8C;margin:0 0 6px;">إنشاء حساب جديد</h1>
-      <p style="color:#6B7280;margin:0;font-size:14px;">سنرسل رمز تحقق لرقم واتساب الخاص بك</p>
+      <p style="color:#6B7280;margin:0;font-size:14px;">سنرسل رمز تأكيد إلى بريدك الإلكتروني</p>
     </div>
 
     {{-- Steps indicator --}}
@@ -45,19 +45,20 @@
         </div>
 
         <div>
-          <label style="display:block;font-size:14px;font-weight:600;color:#374151;margin-bottom:6px;">رقم الهاتف (واتساب) <span style="color:#EF4444;">*</span></label>
+          <label style="display:block;font-size:14px;font-weight:600;color:#374151;margin-bottom:6px;">رقم الهاتف <span style="color:#EF4444;">*</span></label>
           <x-phone-input name="phone" :value="old('phone')" :required="true"/>
-          <p style="color:#9CA3AF;font-size:12px;margin:5px 0 0;">📱 سيُرسل رمز تحقق لهذا الرقم عبر واتساب</p>
+          <p style="color:#9CA3AF;font-size:12px;margin:5px 0 0;">📱 ستستخدمه لتسجيل الدخول</p>
           @error('phone')<p style="color:#EF4444;font-size:12px;margin:4px 0 0;">{{ $message }}</p>@enderror
         </div>
 
         <div>
           <label style="display:block;font-size:14px;font-weight:600;color:#374151;margin-bottom:6px;">
-            البريد الإلكتروني <span style="color:#9CA3AF;font-weight:400;">(اختياري)</span>
+            البريد الإلكتروني <span style="color:#EF4444;">*</span>
           </label>
-          <input type="email" name="email" value="{{ old('email') }}" placeholder="email@example.com"
+          <input type="email" name="email" value="{{ old('email') }}" required dir="ltr" placeholder="email@example.com"
             style="width:100%;padding:13px 16px;border:1.5px solid {{ $errors->has('email') ? '#EF4444' : '#E5E7EB' }};border-radius:12px;font-family:inherit;font-size:15px;box-sizing:border-box;"
             onfocus="this.style.borderColor='#1B3B8C'" onblur="this.style.borderColor='#E5E7EB'"/>
+          <p style="color:#9CA3AF;font-size:12px;margin:5px 0 0;">📧 سنرسل رمز تأكيد إلى هذا البريد</p>
           @error('email')<p style="color:#EF4444;font-size:12px;margin:4px 0 0;">{{ $message }}</p>@enderror
         </div>
 

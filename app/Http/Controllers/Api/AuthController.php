@@ -27,9 +27,25 @@ class AuthController extends Controller
             'fcm_token'     => 'nullable|string|max:255',
             'device_type'   => 'nullable|in:ios,android',
             'referral_code' => 'nullable|string|max:16',
+            'code'          => 'nullable|string|size:6',
         ], [
             'phone.regex' => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972 ويتبعه 8 إلى 10 أرقام.',
         ]);
+
+        // Confirm the e-mailed code before creating the account.
+        $otp = OtpCode::where('phone', $data['phone'])
+            ->where('code', $data['code'] ?? '')
+            ->where('used', false)
+            ->where('expires_at', '>', now())
+            ->first();
+
+        if (! $otp) {
+            return response()->json([
+                'message' => 'رمز تأكيد البريد غير صحيح أو منتهي الصلاحية',
+            ], 422);
+        }
+
+        $otp->update(['used' => true]);
 
         // ─── Apply referral code if any ───
         $referredBy = null;
@@ -51,6 +67,10 @@ class AuthController extends Controller
             'role'        => User::ROLE_CUSTOMER,
             'referred_by' => $referredBy,
         ]);
+
+        // Not mass-assignable (kept out of $fillable), so set it directly —
+        // the confirmed code proves the address belongs to them.
+        $user->forceFill(['email_verified_at' => now()])->save();
 
         // ─── Reward the referrer too ───
         if ($referredBy && $referrerBonus > 0 && LoyaltyService::enabled()) {
@@ -122,6 +142,42 @@ class AuthController extends Controller
         }
 
         return response()->json(['message' => 'تم إرسال رمز التحقق عبر واتساب']);
+    }
+
+    /**
+     * Signup step 1 — e-mail a verification code. The account is only created
+     * later by /auth/register once the code is confirmed, so an unverified
+     * address never produces an account.
+     */
+    public function sendEmailVerification(Request $request): JsonResponse
+    {
+        $data = $request->validate([
+            'email' => ['required', 'email', 'max:191', 'unique:users,email'],
+            'phone' => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/', 'unique:users,phone'],
+            'name'  => ['nullable', 'string', 'max:100'],
+        ], [
+            'email.unique' => 'البريد الإلكتروني مسجل مسبقاً',
+            'phone.unique' => 'رقم الهاتف مسجل مسبقاً',
+        ]);
+
+        OtpCode::where('phone', $data['phone'])->delete();
+        $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
+        OtpCode::create([
+            'phone'      => $data['phone'],
+            'code'       => $code,
+            'expires_at' => now()->addMinutes(10),
+        ]);
+
+        try {
+            \Illuminate\Support\Facades\Mail::to($data['email'])->send(
+                new \App\Mail\EmailVerificationCodeMail($code, $data['name'] ?? '')
+            );
+        } catch (\Throwable $e) {
+            report($e);
+            return response()->json(['message' => 'تعذّر إرسال رمز التأكيد إلى بريدك'], 500);
+        }
+
+        return response()->json(['message' => 'تم إرسال رمز التأكيد إلى بريدك']);
     }
 
     /**

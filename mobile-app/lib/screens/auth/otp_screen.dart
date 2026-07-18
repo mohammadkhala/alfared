@@ -87,20 +87,14 @@ class _OTPScreenState extends State<OTPScreen> {
     }
     setState(() => _loading = true);
     try {
-      // Step 1: verify OTP
-      await ApiService.instance.post('/auth/verify-otp', data: {
-        'phone': widget.phone,
-        'code':  _otp,
-      });
-
-      if (!mounted) return;
-
-      // Step 2: register on backend
+      // The backend verifies the e-mailed code inside /auth/register, so the
+      // account is created only when the code is valid — one round trip.
       await context.read<AuthProvider>().register(
         name:     widget.name,
         email:    widget.email,
         phone:    widget.phone,
         password: widget.password,
+        code:     _otp,
       );
       if (!mounted) return;
       await context.read<CartProvider>().load();
@@ -133,13 +127,17 @@ class _OTPScreenState extends State<OTPScreen> {
     if (_seconds > 0 || _loading) return;
     setState(() => _loading = true);
     try {
-      await ApiService.instance.post('/auth/send-otp', data: {'phone': widget.phone});
+      await ApiService.instance.post('/auth/send-email-verification', data: {
+        'email': widget.email,
+        'phone': widget.phone,
+        'name':  widget.name,
+      });
       if (!mounted) return;
       setState(() { _loading = false; for (final c in _ctrl) c.clear(); });
       _startTimer();
       _focus[0].requestFocus();
       Fluttertoast.showToast(
-        msg: '✅ تم إرسال رمز جديد عبر واتساب',
+        msg: '✅ تم إرسال رمز جديد إلى بريدك',
         backgroundColor: AppColors.success, textColor: Colors.white,
       );
     } on ApiException catch (e) {
@@ -159,7 +157,7 @@ class _OTPScreenState extends State<OTPScreen> {
     return Scaffold(
       backgroundColor: AppColors.grayBg,
       appBar: AppBar(
-        title: const Text('التحقق من الرقم'),
+        title: const Text('تأكيد البريد الإلكتروني'),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_rounded),
           onPressed: () => Navigator.of(context).pop(),
@@ -173,19 +171,19 @@ class _OTPScreenState extends State<OTPScreen> {
             children: [
               const SizedBox(height: 16),
 
-              // ── WhatsApp icon ───────────────────────────────────
+              // ── E-mail icon ─────────────────────────────────────
               Container(
                 width: 88, height: 88,
                 decoration: BoxDecoration(
-                  color: const Color(0xFFE7F5EC),
+                  color: AppColors.blueLight,
                   borderRadius: BorderRadius.circular(26),
                   boxShadow: [BoxShadow(
-                    color: const Color(0xFF25D366).withValues(alpha: 0.2),
+                    color: AppColors.blue.withValues(alpha: 0.18),
                     blurRadius: 20, offset: const Offset(0, 8),
                   )],
                 ),
                 child: const Center(
-                  child: Text('💬', style: TextStyle(fontSize: 44)),
+                  child: Icon(Icons.mark_email_unread_outlined, size: 44, color: AppColors.blue),
                 ),
               ),
               const SizedBox(height: 22),
@@ -196,9 +194,14 @@ class _OTPScreenState extends State<OTPScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'تم إرسال رمز مكوّن من 6 أرقام\nعبر واتساب إلى\n${widget.phone}',
+                'تم إرسال رمز مكوّن من 6 أرقام إلى بريدك\n${widget.email}',
                 style: const TextStyle(fontSize: 13, color: AppColors.gray,
                     fontFamily: 'Cairo', height: 1.7),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 6),
+              const Text('لم تجده؟ تفقّد مجلد الرسائل غير المرغوبة (Spam)',
+                style: TextStyle(fontSize: 11, color: AppColors.grayLight, fontFamily: 'Cairo'),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 36),

@@ -11,6 +11,7 @@ use App\Services\WaSenderService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 
 class AccountController extends Controller
 {
@@ -142,7 +143,7 @@ class AccountController extends Controller
         $request->validate([
             'name'           => 'required|string|max:100',
             'phone'          => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/', 'unique:users,phone'],
-            'email'          => 'nullable|email|max:191|unique:users,email',
+            'email'          => 'required|email|max:191|unique:users,email',
             'password'       => 'required|string|min:8|confirmed',
             'privacy_policy' => 'accepted',
         ], [
@@ -150,30 +151,17 @@ class AccountController extends Controller
             'phone.required'          => 'رقم الهاتف مطلوب',
             'phone.regex'             => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972',
             'phone.unique'            => 'رقم الهاتف مسجل مسبقاً — هل تريد تسجيل الدخول؟',
+            'email.required'          => 'البريد الإلكتروني مطلوب لتأكيد حسابك',
+            'email.email'             => 'صيغة البريد الإلكتروني غير صحيحة',
             'email.unique'            => 'البريد الإلكتروني مسجل مسبقاً',
             'password.min'            => 'كلمة المرور يجب أن تكون 8 أحرف على الأقل',
             'password.confirmed'      => 'كلمة المرور وتأكيدها غير متطابقتين',
             'privacy_policy.accepted' => 'يجب الموافقة على سياسة الخصوصية وشروط الاستخدام للمتابعة.',
         ]);
 
-        // Phone verification can be switched off from Site Settings (e.g. when
-        // the sender WhatsApp number is banned) — then create the account now.
-        if (! \App\Support\PhoneVerification::enabled()) {
-            return $this->createVerifiedUser(
-                $request,
-                $request->name,
-                $request->phone,
-                $request->email,
-                bcrypt($request->password),
-            );
-        }
-
-        // Per-phone limit — protects the sender WhatsApp number from spam bans.
-        if ($wait = \App\Support\OtpThrottle::retryAfter($request->phone)) {
-            return back()->withErrors(['phone' => \App\Support\OtpThrottle::message($wait)])->withInput();
-        }
-
-        // Save form data in session, send OTP
+        // Hold the details in the session — the account is only created once
+        // the e-mailed code is confirmed, so an unverified address never
+        // results in an account.
         session([
             'reg_name'     => $request->name,
             'reg_phone'    => $request->phone,
@@ -182,16 +170,24 @@ class AccountController extends Controller
             'reg_sent_at'  => now()->timestamp,
         ]);
 
+        // Codes are keyed by phone (the account's future identifier).
         OtpCode::where('phone', $request->phone)->delete();
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        OtpCode::create(['phone' => $request->phone, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
+        OtpCode::create([
+            'phone'      => $request->phone,
+            'code'       => $code,
+            'expires_at' => now()->addMinutes(10),
+        ]);
 
-        \App\Support\OtpThrottle::record($request->phone);
-
-        $sent = app(WaSenderService::class)->sendOtp($request->phone, $code);
-
-        if (! $sent) {
-            return back()->withErrors(['phone' => 'فشل إرسال رمز التحقق عبر واتساب. تأكد أن رقمك مسجل على واتساب.'])->withInput();
+        try {
+            Mail::to($request->email)->send(
+                new \App\Mail\EmailVerificationCodeMail($code, $request->name)
+            );
+        } catch (\Throwable $e) {
+            report($e);
+            return back()->withErrors([
+                'email' => 'تعذّر إرسال رمز التأكيد إلى بريدك. تأكد من صحة البريد وحاول مجدداً.',
+            ])->withInput();
         }
 
         return redirect()->route('register.verify');
@@ -272,6 +268,10 @@ class AccountController extends Controller
             'email' => $email ?: null,
             'role'  => 'customer',
         ]);
+        // Reaching here means the e-mailed code was confirmed.
+        if ($email) {
+            $user->email_verified_at = now();
+        }
         // Write hashed password directly to bypass the 'hashed' cast re-hashing
         $user->setRawAttributes(array_merge($user->getAttributes(), [
             'password' => $hashedPassword,
@@ -299,26 +299,22 @@ class AccountController extends Controller
     public function registerResendOtp(Request $request)
     {
         $phone = session('reg_phone');
-        if (! $phone) {
+        $email = session('reg_email');
+        if (! $phone || ! $email) {
             return response()->json(['error' => 'انتهت الجلسة'], 422);
-        }
-
-        if ($wait = \App\Support\OtpThrottle::retryAfter($phone)) {
-            return response()->json([
-                'error'       => \App\Support\OtpThrottle::message($wait),
-                'retry_after' => $wait,
-            ], 429);
         }
 
         OtpCode::where('phone', $phone)->delete();
         $code = str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
-        OtpCode::create(['phone' => $phone, 'code' => $code, 'expires_at' => now()->addMinutes(5)]);
+        OtpCode::create(['phone' => $phone, 'code' => $code, 'expires_at' => now()->addMinutes(10)]);
 
-        \App\Support\OtpThrottle::record($phone);
-
-        $sent = app(WaSenderService::class)->sendOtp($phone, $code);
-        if (! $sent) {
-            return response()->json(['error' => 'فشل الإرسال'], 500);
+        try {
+            Mail::to($email)->send(
+                new \App\Mail\EmailVerificationCodeMail($code, session('reg_name', ''))
+            );
+        } catch (\Throwable $e) {
+            report($e);
+            return response()->json(['error' => 'تعذّر إرسال البريد، حاول مجدداً'], 500);
         }
 
         session(['reg_sent_at' => now()->timestamp]);
