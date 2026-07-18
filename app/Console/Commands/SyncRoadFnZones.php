@@ -57,7 +57,27 @@ class SyncRoadFnZones extends Command
                 $zone = DeliveryZone::where('roadfn_city_id', $cityId)->orderBy('id')->first()
                     ?? $this->matchCityByName($cityName);
 
+                // No single city matched — this may be a whole-region entry
+                // such as "مناطق الداخل", which covers all of its cities.
                 if (! $zone) {
+                    if ($region = $this->matchRegion($cityName)) {
+                        $cities = $region->children()->where('is_active', true)
+                            ->whereNull('roadfn_city_id')->get();
+
+                        if ($cities->isNotEmpty()) {
+                            $defaultArea = $roadFn->pickDefaultAreaId($areas);
+                            foreach ($cities as $c) {
+                                $c->roadfn_city_id = $cityId;
+                                $c->roadfn_area_id = $c->roadfn_area_id ?: $defaultArea;
+                                $c->save();
+                                $this->syncAreas($c, $areas);
+                                $matched++;
+                            }
+                            $this->line("✓ {$region->name_ar}: رُبطت {$cities->count()} مدينة ← RoadFN {$cityId}");
+                            continue;
+                        }
+                    }
+
                     $unmatched[] = $cityName;
                     continue;
                 }
@@ -96,27 +116,74 @@ class SyncRoadFnZones extends Command
     /**
      * Finds our city for a RoadFN destination name.
      *
-     * The two lists are written differently ("رام الله" vs "رام الله والبيرة",
-     * "الخليل المدينة" vs "الخليل"), so fall back to a contains-match after the
-     * exact one. Only unmapped cities are considered, so a name that matches
-     * two of ours can't steal an already-mapped row.
+     * Spelling differs between the two lists ("اريحا" vs "أريحا والأغوار",
+     * "رام الله" vs "رام الله والبيرة"), so names are normalised before
+     * comparing. Already-mapped cities are skipped — RoadFN lists Jerusalem
+     * twice, and without this the second entry silently overwrote the first.
      */
     private function matchCityByName(string $name): ?DeliveryZone
     {
-        $exact = DeliveryZone::sub()->where('name_ar', $name)->first();
-        if ($exact) {
-            return $exact;
+        $target = $this->normalize($name);
+
+        $candidates = DeliveryZone::sub()
+            ->where('is_active', true)
+            ->whereNull('roadfn_city_id')
+            ->get(['id', 'name_ar', 'parent_id', 'roadfn_city_id', 'roadfn_area_id']);
+
+        // Exact match on the normalised form.
+        foreach ($candidates as $c) {
+            if ($this->normalize($c->name_ar) === $target) {
+                return $c;
+            }
         }
 
-        return DeliveryZone::sub()
-            ->whereNull('roadfn_city_id')
-            ->where(function ($q) use ($name) {
-                $q->where('name_ar', 'like', "%{$name}%")
-                  ->orWhereRaw('? like concat("%", name_ar, "%")', [$name]);
+        // Then containment, shortest name first so a generic word doesn't
+        // grab a longer unrelated city.
+        $partial = $candidates
+            ->filter(function ($c) use ($target) {
+                $n = $this->normalize($c->name_ar);
+                return $n !== '' && (str_contains($n, $target) || str_contains($target, $n));
             })
-            // Prefer the closest name so "رام الله" doesn't grab a longer unrelated one.
-            ->orderByRaw('CHAR_LENGTH(name_ar) ASC')
-            ->first();
+            ->sortBy(fn ($c) => mb_strlen($c->name_ar));
+
+        return $partial->first();
+    }
+
+    /**
+     * Maps a whole region in one go.
+     *
+     * RoadFN ships to all of الداخل under a single destination, so that entry
+     * has to cover every city we list under that region rather than matching
+     * one of them.
+     */
+    private function matchRegion(string $name): ?DeliveryZone
+    {
+        $target = $this->normalize($name);
+
+        return DeliveryZone::main()->get(['id', 'name_ar'])
+            ->first(function ($m) use ($target) {
+                $n = $this->normalize($m->name_ar);
+                return $n !== '' && (str_contains($target, $n) || str_contains($n, $target));
+            });
+    }
+
+    /** Folds the spelling variants that differ between the two data sources. */
+    private function normalize(string $s): string
+    {
+        $s = trim($s);
+
+        // Qualifiers go first — folding ة→ه below would stop "محافظة" matching.
+        $s = preg_replace('/^(محافظة|مناطق|مدينة)\s+/u', '', $s) ?? $s;
+        // Leading "ال" only; stripping it per-word turns "رام الله" into
+        // "رام له" and invites false matches.
+        $s = preg_replace('/^ال/u', '', $s) ?? $s;
+
+        $s = str_replace(['أ', 'إ', 'آ', 'ٱ'], 'ا', $s);
+        $s = str_replace(['ة'], 'ه', $s);
+        $s = str_replace(['ى'], 'ي', $s);
+        $s = preg_replace('/\s+/u', ' ', $s) ?? $s;
+
+        return trim($s);
     }
 
     /** Upserts a city's neighborhoods and prunes any RoadFN no longer returns. */
