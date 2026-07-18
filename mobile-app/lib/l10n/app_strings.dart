@@ -127,6 +127,10 @@ class S {
   String get orderConfirmed    => _t('orderConfirmed');
   String get orderProcessing   => _t('orderProcessing');
   String get orderSentToDelivery => _t('orderSentToDelivery');
+  String get trackIntro        => _t('trackIntro');
+  String get trackNumberLabel  => _t('trackNumberLabel');
+  String get trackSubmit       => _t('trackSubmit');
+  String get trackEnterNumber  => _t('trackEnterNumber');
   String get orderShipped      => _t('orderShipped');
   String get orderDelivered    => _t('orderDelivered');
   String get orderCancelled    => _t('orderCancelled');
@@ -451,6 +455,10 @@ class AppStrings {
     'orderConfirmed':     {'ar': 'تم تأكيد الطلب',   'he': 'ההזמנה אושרה',   'en': 'Order Confirmed'},
     'orderProcessing':    {'ar': 'جاري تجهيز الطلب', 'he': 'ההזמנה בהכנה',   'en': 'Order Processing'},
     'orderSentToDelivery':{'ar': 'مرسل للتوصيل',    'he': 'נשלח לשליחות',   'en': 'Sent to Courier'},
+    'trackIntro':         {'ar': 'أدخل رقم الطلب لعرض حالة الشحنة.', 'he': 'הזינו את מספר ההזמנה כדי לראות את סטטוס המשלוח.', 'en': 'Enter your order number to see the shipment status.'},
+    'trackNumberLabel':   {'ar': 'رقم الطلب',       'he': 'מספר הזמנה',     'en': 'Order Number'},
+    'trackSubmit':        {'ar': 'عرض حالة الطلب',  'he': 'הצג סטטוס',      'en': 'Show Status'},
+    'trackEnterNumber':   {'ar': 'أدخل رقم الطلب',  'he': 'הזינו מספר הזמנה','en': 'Enter an order number'},
     'orderShipped':       {'ar': 'مع المندوب',       'he': 'עם השליח',       'en': 'With Courier'},
     'orderDelivered':     {'ar': 'تم التوصيل',        'he': 'נמסר',           'en': 'Delivered'},
     'orderCancelled':     {'ar': '❌ تم إلغاء هذا الطلب', 'he': '❌ ההזמנה בוטלה', 'en': '❌ This order was cancelled'},

@@ -14,6 +14,7 @@ import '../../widgets/brand_icon.dart';
 import '../../widgets/guest_wall.dart';
 import '../notifications_screen.dart';
 import '../orders/orders_screen.dart';
+import '../orders/track_order_screen.dart';
 import 'addresses_screen.dart';
 import 'loyalty_screen.dart';
 import 'rewards_screen.dart';
@@ -317,6 +318,9 @@ class _AccountScreenState extends State<AccountScreen> {
             child: Column(children: [
               _MenuItem(icon: '📦', iconBg: AppColors.blueLight, label: s.myOrders, badge: _ordersCount > 0 ? '$_ordersCount' : null,
                 onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const OrdersScreen()))),
+              _MenuDivider(),
+              _MenuItem(icon: '🚚', iconBg: AppColors.blueLight, label: s.trackOrder,
+                onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const TrackOrderScreen()))),
               _MenuDivider(),
               _MenuItem(icon: '❤️', iconBg: AppColors.orangeLight, label: s.myWishlist,
                 onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (_) => const WishlistScreen()))),
