@@ -65,24 +65,29 @@
             {{ __('checkout_step_address') }}
           </h3>
           <div class="form-grid">
+            {{-- Main region decides the delivery fee --}}
             <div class="form-group">
-              <label>{{ __('checkout_delivery_zone') }} <span style="color:red;">{{ __('checkout_required') }}</span></label>
-              {{-- Hidden input carries the actual value on submit --}}
-              <input type="hidden" name="delivery_zone_id" id="deliveryZoneHidden" value="{{ old('delivery_zone_id', '') }}">
-              <select id="deliveryZone" onchange="syncZone(this.value); updateDeliveryFee();">
-                <option value="">{{ __('checkout_choose_zone') }}</option>
+              <label>المنطقة <span style="color:red;">{{ __('checkout_required') }}</span></label>
+              <select id="mainZone" onchange="onMainZone(this.value)">
+                <option value="">اختر المنطقة</option>
                 @foreach($zones as $zone)
-                  <option value="{{ $zone->id }}" {{ old('delivery_zone_id') == $zone->id ? 'selected' : '' }}>
-                    {{ $zone->name_ar }} — {{ $zone->base_fee > 0 ? number_format($zone->base_fee, 2).' ₪' : __('free') }}
+                  <option value="{{ $zone->id }}" data-fee="{{ $zone->base_fee ?? $zone->delivery_fee ?? 0 }}"
+                    {{ old('main_zone_id') == $zone->id ? 'selected' : '' }}>
+                    {{ $zone->name_ar }} — {{ ($zone->base_fee ?? $zone->delivery_fee) > 0 ? number_format($zone->base_fee ?? $zone->delivery_fee, 2).' ₪' : __('free') }}
                   </option>
                 @endforeach
               </select>
-              @error('delivery_zone_id')<span class="form-error">{{ $message }}</span>@enderror
+              <input type="hidden" name="main_zone_id" id="mainZoneHidden" value="{{ old('main_zone_id', '') }}">
             </div>
+
+            {{-- Sub zone (city / governorate) filtered by the region above --}}
             <div class="form-group">
-              <label>{{ __('city') }} <span style="color:red;">{{ __('checkout_required') }}</span></label>
-              <input type="text" name="city" value="{{ old('city', __('checkout_city_ph')) }}" required placeholder="{{ __('checkout_city_ph') }}"/>
-              @error('city')<span class="form-error">{{ $message }}</span>@enderror
+              <label>المدينة / المحافظة <span style="color:red;">{{ __('checkout_required') }}</span></label>
+              <input type="hidden" name="delivery_zone_id" id="deliveryZoneHidden" value="{{ old('delivery_zone_id', '') }}">
+              <select id="subZone" onchange="syncZone(this.value); updateDeliveryFee();" disabled>
+                <option value="">اختر المنطقة أولاً</option>
+              </select>
+              @error('delivery_zone_id')<span class="form-error">{{ $message }}</span>@enderror
             </div>
             <div class="form-group" style="grid-column:1/-1;">
               <label>{{ __('checkout_address_line') }} <span style="color:red;">{{ __('checkout_required') }}</span></label>
@@ -271,23 +276,58 @@ const ZONE_LABEL  = @json(__('checkout_choose_zone_short'));
 let deliveryFee   = 0;
 let loyaltyDiscount = 0;
 
+// Sub zones grouped by their main zone id.
+const SUB_ZONES = @json($subZones);
+
 // Sync select UI value → hidden input (called on change + on submit)
 function syncZone(val) {
   document.getElementById('deliveryZoneHidden').value = val || '';
 }
 
-// On page load: sync hidden input if old() value pre-selected the select
-document.addEventListener('DOMContentLoaded', function () {
-  const sel = document.getElementById('deliveryZone');
-  if (sel && sel.value) syncZone(sel.value);
+// Fill the city dropdown from the chosen region.
+function onMainZone(mainId, preselect) {
+  document.getElementById('mainZoneHidden').value = mainId || '';
 
-  // Submit guard: validate zone selected
+  const sub = document.getElementById('subZone');
+  sub.innerHTML = '';
+
+  const list = SUB_ZONES[mainId] || [];
+  if (!mainId || list.length === 0) {
+    sub.disabled = true;
+    sub.innerHTML = '<option value="">اختر المنطقة أولاً</option>';
+    syncZone('');
+    return;
+  }
+
+  sub.disabled = false;
+  sub.innerHTML = '<option value="">اختر المدينة</option>';
+  list.forEach(function (z) {
+    const opt = document.createElement('option');
+    opt.value = z.id;
+    opt.textContent = z.name;
+    if (preselect && String(preselect) === String(z.id)) opt.selected = true;
+    sub.appendChild(opt);
+  });
+
+  syncZone(sub.value);
+  if (sub.value) updateDeliveryFee();
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+  // Restore both levels after a validation error
+  const main = document.getElementById('mainZone');
+  if (main && main.value) {
+    onMainZone(main.value, document.getElementById('deliveryZoneHidden').value);
+  }
+
+  // Submit guard: both levels must be chosen
   document.getElementById('checkoutForm').addEventListener('submit', function (e) {
-    syncZone(document.getElementById('deliveryZone').value);
+    const sub = document.getElementById('subZone');
+    syncZone(sub ? sub.value : '');
     if (!document.getElementById('deliveryZoneHidden').value) {
       e.preventDefault();
-      alert(@json(__('checkout_choose_zone')));
-      document.getElementById('deliveryZone').focus();
+      alert('يرجى اختيار المنطقة والمدينة');
+      (main && !main.value ? main : sub).focus();
     }
   });
 });
@@ -298,7 +338,7 @@ function recalcTotal() {
 }
 
 async function updateDeliveryFee() {
-  const zoneId = document.getElementById('deliveryZone').value;
+  const zoneId = document.getElementById('deliveryZoneHidden').value;
   if (!zoneId) return;
 
   const res = await fetch('{{ route("checkout.delivery-fee") }}?zone_id='+zoneId+'&subtotal='+(subtotal - discount - loyaltyDiscount));

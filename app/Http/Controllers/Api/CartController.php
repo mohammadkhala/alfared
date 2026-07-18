@@ -177,16 +177,33 @@ class CartController extends Controller
     /** Get delivery zones list */
     public function deliveryZones(): JsonResponse
     {
-        $zones = DeliveryZone::where('is_active', true)->get()->map(fn ($z) => [
+        $all = DeliveryZone::where('is_active', true)
+            ->orderBy('sort_order')->orderBy('name_ar')->get();
+
+        $format = fn ($z) => [
             'id'             => $z->id,
+            'parent_id'      => $z->parent_id,
             'name'           => $z->name_ar,
             'name_en'        => $z->name_en,
             'name_he'        => $z->name_he,
-            'base_fee'       => (float) ($z->base_fee ?? 0),
+            'base_fee'       => (float) ($z->base_fee ?? $z->delivery_fee ?? 0),
             'free_above'     => $z->free_above ? (float) $z->free_above : null,
             'estimated_days' => (int) ($z->estimated_days ?? 1),
+        ];
+
+        $mains = $all->whereNull('parent_id');
+
+        // `zones` stays flat for app builds that predate the hierarchy: they
+        // see only the main regions and still get a valid fee.
+        // `tree` carries the two levels for newer builds.
+        return response()->json([
+            'zones' => $mains->map($format)->values(),
+            'tree'  => $mains->map(function ($m) use ($all, $format) {
+                $row = $format($m);
+                $row['children'] = $all->where('parent_id', $m->id)->map($format)->values();
+                return $row;
+            })->values(),
         ]);
-        return response()->json(['zones' => $zones]);
     }
 
     /** Compute totals given a zone + optional coupon + optional loyalty */

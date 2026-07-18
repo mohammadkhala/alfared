@@ -1,0 +1,170 @@
+[
+  {
+    "id": 1338,
+    "name": "الناصرة",
+    "name_en": "Nazareth",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1339,
+    "name": "أم الفحم",
+    "name_en": "Umm al-Fahm",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1340,
+    "name": "سخنين",
+    "name_en": "Sakhnin",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1341,
+    "name": "شفا عمرو",
+    "name_en": "Shefa-Amr",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1342,
+    "name": "طمرة",
+    "name_en": "Tamra",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1343,
+    "name": "رهط",
+    "name_en": "Rahat",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1345,
+    "name": "باقة الغربية",
+    "name_en": "Baqa al-Gharbiyye",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1346,
+    "name": "الطيبة",
+    "name_en": "Tayibe",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1391,
+    "name": "الطيرة",
+    "name_en": "Al Tireh",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1349,
+    "name": "كفر قاسم",
+    "name_en": "Kafr Qasim",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1385,
+    "name": "عكا العربية",
+    "name_en": "Arab Acre",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1386,
+    "name": "حيفا العربية",
+    "name_en": "Arab Haifa",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1387,
+    "name": "اللد",
+    "name_en": "Lod",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1388,
+    "name": "الرملة",
+    "name_en": "Ramla",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1389,
+    "name": "يافا",
+    "name_en": "Jaffa",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1372,
+    "name": "دالية الكرمل",
+    "name_en": "Daliyat al-Karmel",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1374,
+    "name": "المغار",
+    "name_en": "Maghar",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1382,
+    "name": "كفر ياسيف",
+    "name_en": "Kafr Yasif",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1519,
+    "name": "أبو غوش",
+    "name_en": "Abu Ghosh",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1511,
+    "name": "مجدل شمس",
+    "name_en": "Majdal Shams",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1576,
+    "name": "ترشيحا",
+    "name_en": "Tarshiha",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1370,
+    "name": "جسر الزرقاء",
+    "name_en": "Jisr az-Zarqa",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1371,
+    "name": "الفريديس",
+    "name_en": "Fureidis",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  },
+  {
+    "id": 1344,
+    "name": "عرابة البطوف",
+    "name_en": "Arraba",
+    "region": "inside_48",
+    "type": "inside_city_hub"
+  }
+]

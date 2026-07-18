@@ -23,7 +23,17 @@ class CheckoutController extends Controller
         $cart = session('cart', []);
         if (empty($cart)) return redirect()->route('cart.index');
 
-        $zones    = DeliveryZone::where('is_active', true)->get();
+        // Main zones carry the fee; sub zones are grouped under them for the
+        // cascading city dropdown.
+        $zones = DeliveryZone::main()->where('is_active', true)
+            ->orderBy('sort_order')->get();
+
+        $subZones = DeliveryZone::sub()->where('is_active', true)
+            ->orderBy('sort_order')->orderBy('name_ar')
+            ->get(['id', 'parent_id', 'name_ar'])
+            ->groupBy('parent_id')
+            ->map(fn ($g) => $g->map(fn ($z) => ['id' => $z->id, 'name' => $z->name_ar])->values());
+
         $coupon   = session('coupon');
         $subtotal = collect($cart)->sum(fn($item) => $item['price'] * $item['qty']);
         $discount = $coupon ? $coupon['discount'] : 0;
@@ -38,7 +48,7 @@ class CheckoutController extends Controller
         $onlinePaymentEnabled  = Setting::get('online_payment_enabled', '0') === '1';
 
         return view('checkout.index', compact(
-            'cart', 'zones', 'coupon', 'subtotal', 'discount',
+            'cart', 'zones', 'subZones', 'coupon', 'subtotal', 'discount',
             'loyaltyCfg', 'loyaltyBalance', 'loyaltyMax',
             'codEnabled', 'onlinePaymentEnabled'
         ));
@@ -60,18 +70,29 @@ class CheckoutController extends Controller
             'first_name'       => 'required|string|max:100',
             'last_name'        => 'required|string|max:100',
             'phone'            => ['required', 'string', 'regex:/^\+(970|972)\d{8,10}$/'],
-            'city'             => 'required|string|max:100',
             'address_line'     => 'required|string|max:500',
             'delivery_zone_id' => 'required|exists:delivery_zones,id',
             'payment_method'   => 'nullable|in:cod,lahza',
         ], [
-            'phone.regex' => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972 ويتبعه 8 إلى 10 أرقام.',
+            'phone.regex'              => 'رقم الهاتف يجب أن يبدأ بـ +970 أو +972 ويتبعه 8 إلى 10 أرقام.',
+            'delivery_zone_id.required' => 'يرجى اختيار المنطقة والمدينة.',
         ]);
 
         $cart = session('cart', []);
         if (empty($cart)) return redirect()->route('cart.index');
 
-        $zone     = DeliveryZone::findOrFail($request->delivery_zone_id);
+        $zone = DeliveryZone::with('parent')->findOrFail($request->delivery_zone_id);
+
+        // The customer must land on a city, not a region — otherwise the
+        // address would only say "الضفة الغربية".
+        if ($zone->isMain() && $zone->children()->exists()) {
+            return back()->withErrors([
+                'delivery_zone_id' => 'يرجى اختيار المدينة داخل المنطقة.',
+            ])->withInput();
+        }
+
+        // City comes from the chosen zone, so it always matches the fee.
+        $cityName = $zone->name_ar;
         $coupon   = session('coupon');
         $subtotal = collect($cart)->sum(fn($item) => $item['price'] * $item['qty']);
         $discount = $coupon ? $coupon['discount'] : 0;
@@ -96,7 +117,7 @@ class CheckoutController extends Controller
                 'customer_name'    => $request->first_name . ' ' . $request->last_name,
                 'customer_phone'   => $request->phone,
                 'customer_email'   => $request->email,
-                'city'             => $request->city,
+                'city'             => $cityName,
                 'area'             => $request->area,
                 'address_line'     => $request->address_line,
                 'building'         => $request->building,
