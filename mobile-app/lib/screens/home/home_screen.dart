@@ -12,6 +12,7 @@ import '../../providers/cart_provider.dart';
 import '../../services/api_service.dart';
 import '../../services/recently_viewed_service.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/theme_ext.dart';
 import '../../providers/locale_provider.dart';
 import '../../utils/greeting.dart';
 import '../../widgets/product_card.dart';
@@ -86,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final s         = context.watch<LocaleProvider>().s;
 
     return Scaffold(
-      backgroundColor: AppColors.grayBg,
+      backgroundColor: context.bg,
       floatingActionButton: _WhatsAppFab(),
       floatingActionButtonLocation: FloatingActionButtonLocation.startFloat,
       body: _loading
@@ -104,12 +105,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     const Icon(Icons.wifi_off_rounded, size: 56, color: AppColors.grayLight),
                     const SizedBox(height: 16),
-                    const Text('تعذّر تحميل الصفحة',
-                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: AppColors.text)),
+                    Text('تعذّر تحميل الصفحة',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: context.text)),
                     const SizedBox(height: 6),
-                    const Text('تحقّق من اتصالك بالإنترنت وحاول مجدداً',
+                    Text('تحقّق من اتصالك بالإنترنت وحاول مجدداً',
                       textAlign: TextAlign.center,
-                      style: TextStyle(fontSize: 13, fontFamily: 'Cairo', color: AppColors.gray)),
+                      style: TextStyle(fontSize: 13, fontFamily: 'Cairo', color: context.muted)),
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
                       onPressed: _load,
@@ -656,9 +657,9 @@ class _FeaturesStrip extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text(titles[i],
                   textAlign: TextAlign.center, maxLines: 2, overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 10, fontWeight: FontWeight.w800,
-                    fontFamily: 'Cairo', color: AppColors.text,
+                    fontFamily: 'Cairo', color: context.text,
                   )),
               ]),
             ),
@@ -778,7 +779,7 @@ class _CategoryStories extends StatelessWidget {
                   textAlign: TextAlign.center, maxLines: 1, overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 10, fontFamily: 'Cairo', fontWeight: FontWeight.w800,
-                    color: i == 0 ? grad[0] : AppColors.text,
+                    color: i == 0 ? grad[0] : context.text,
                   )),
               ),
             ]),
@@ -1168,8 +1169,9 @@ class _TrustBadges extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 14),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.card,
         borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: context.line, width: 0.8),
         boxShadow: AppShadows.card,
       ),
       child: Column(children: [

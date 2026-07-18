@@ -12,6 +12,7 @@ import '../../services/api_service.dart';
 import '../cart/cart_screen.dart';
 import '../../services/recently_viewed_service.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/theme_ext.dart';
 import '../../widgets/animated_heart.dart';
 import '../auth/login_screen.dart';
 
@@ -176,7 +177,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
     final saveAmount = p.comparePrice != null ? (p.comparePrice! - p.price) : 0;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.bg,
       body: SafeArea(
         bottom: false,
         child: Column(children: [
@@ -277,7 +278,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   AnimatedHeart(isFavorite: _favorite, onToggle: _toggleFavorite),
                 ]),
                 const SizedBox(height: 8),
-                Text(p.name, style: const TextStyle(fontSize: 17, fontWeight: FontWeight.w900, fontFamily: 'Cairo', height: 1.3, color: AppColors.text)),
+                Text(p.name, style: TextStyle(fontSize: 17, fontWeight: FontWeight.w900, fontFamily: 'Cairo', height: 1.3, color: context.text)),
                 const SizedBox(height: 8),
 
                 // Rating
@@ -289,7 +290,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   const SizedBox(width: 6),
                   Text(p.ratingAvg.toStringAsFixed(1), style: const TextStyle(fontSize: 11, color: AppColors.gray, fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
                   const SizedBox(width: 10),
-                  Container(width: 1, height: 12, color: AppColors.border),
+                  Container(width: 1, height: 12, color: context.line),
                   const SizedBox(width: 10),
                   Text('${p.reviewsCount}+ مبيعة', style: const TextStyle(fontSize: 11, color: AppColors.gray, fontFamily: 'Cairo')),
                 ]),
@@ -329,7 +330,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 // Quantity row
                 Row(children: [
-                  const Text('الكمية', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: AppColors.text)),
+                  Text('الكمية', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: context.text)),
                   const Spacer(),
                   _QtyButton(icon: Icons.remove, onTap: () => setState(() => _qty = (_qty - 1).clamp(1, 99))),
                   Padding(padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -340,13 +341,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 if ((p.descriptionHtml != null && p.descriptionHtml!.isNotEmpty) ||
                     (p.description != null && p.description!.trim().isNotEmpty)) ...[
-                  const Text('الوصف', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: AppColors.text)),
+                  Text('الوصف', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: context.text)),
                   const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
                     decoration: BoxDecoration(
-                      color: AppColors.grayBg,
+                      color: context.isDark ? AppColors.darkCard : AppColors.grayBg,
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: _DescriptionBody(product: p),
@@ -356,7 +357,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 // Reviews section
                 Row(children: [
-                  const Text('تقييمات العملاء', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: AppColors.text)),
+                  Text('تقييمات العملاء', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: context.text)),
                   const Spacer(),
                   if (!_reviewSubmitted && context.read<AuthProvider>().isLoggedIn)
                     GestureDetector(
@@ -379,7 +380,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   ...p.reviews.map((r) => Container(
                     margin: const EdgeInsets.only(bottom: 10),
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: AppColors.grayBg, borderRadius: BorderRadius.circular(12)),
+                    decoration: BoxDecoration(color: context.isDark ? AppColors.darkCard : AppColors.grayBg, borderRadius: BorderRadius.circular(12)),
                     child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                       Row(children: [
                         Text(r['name']?.toString() ?? '—', style: const TextStyle(fontWeight: FontWeight.w800, fontFamily: 'Cairo', fontSize: 12)),
@@ -403,13 +404,13 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
           Container(
             padding: EdgeInsets.fromLTRB(16, 12, 16, MediaQuery.of(context).padding.bottom + 12),
             decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border(top: BorderSide(color: AppColors.grayBg, width: 1)),
+              color: context.card,
+              border: Border(top: BorderSide(color: context.line, width: 1)),
             ),
             child: Row(children: [
               Container(
                 width: 50, height: 50,
-                decoration: BoxDecoration(color: AppColors.grayBg, borderRadius: BorderRadius.circular(14)),
+                decoration: BoxDecoration(color: context.isDark ? AppColors.darkCard : AppColors.grayBg, borderRadius: BorderRadius.circular(14)),
                 child: Center(child: AnimatedHeart(isFavorite: _favorite, onToggle: _toggleFavorite, size: 22)),
               ),
               const SizedBox(width: 10),
@@ -485,7 +486,7 @@ class _DescriptionBody extends StatelessWidget {
             fontFamily: 'Cairo',
             fontSize: FontSize(13.5),
             lineHeight: LineHeight(1.7),
-            color: AppColors.text,
+            color: context.text,
             textAlign: TextAlign.start,
           ),
           // Section headings (الوصف / المميزات / المواصفات …)
@@ -497,7 +498,7 @@ class _DescriptionBody extends StatelessWidget {
             margin: Margins.only(top: 14, bottom: 6),
           ),
           'p': Style(margin: Margins.only(bottom: 8)),
-          'strong, b': Style(fontWeight: FontWeight.w800, color: AppColors.text),
+          'strong, b': Style(fontWeight: FontWeight.w800, color: context.text),
           'ul, ol': Style(margin: Margins.only(bottom: 8), padding: HtmlPaddings.only(right: 18)),
           'li': Style(margin: Margins.only(bottom: 4)),
         },
@@ -516,7 +517,7 @@ class _DescriptionBody extends StatelessWidget {
               child: Text(
                 para.trim(),
                 textAlign: TextAlign.justify,
-                style: const TextStyle(fontSize: 13, height: 1.8, fontFamily: 'Cairo', color: AppColors.text),
+                style: TextStyle(fontSize: 13, height: 1.8, fontFamily: 'Cairo', color: context.text),
               ),
             ),
       ],

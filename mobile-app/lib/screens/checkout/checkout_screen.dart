@@ -7,6 +7,7 @@ import '../../providers/cart_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/theme_ext.dart';
 import '../account/addresses_screen.dart';
 import 'lahza_webview_screen.dart';
 import 'success_screen.dart';
@@ -199,10 +200,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     );
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: context.bg,
       appBar: AppBar(
         title: Text(s.checkout),
-        backgroundColor: Colors.white,
+        backgroundColor: context.bg,
         foregroundColor: const Color(0xFF1B3B8C),
         elevation: 0,
         surfaceTintColor: Colors.transparent,
@@ -423,7 +424,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             margin: const EdgeInsets.symmetric(vertical: 14),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.card,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(color: AppColors.border),
             ),
@@ -465,7 +466,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     margin: const EdgeInsets.only(bottom: 14),
     padding: const EdgeInsets.fromLTRB(16, 16, 16, 18),
     decoration: BoxDecoration(
-      color: Colors.white,
+      color: context.card,
       borderRadius: BorderRadius.circular(16),
       boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.06), blurRadius: 12, offset: const Offset(0, 3))],
     ),

@@ -8,6 +8,7 @@ import '../../providers/cart_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
+import '../../theme/theme_ext.dart';
 import '../../widgets/empty_state.dart';
 import '../../widgets/guest_wall.dart';
 import '../checkout/checkout_screen.dart';
@@ -44,7 +45,7 @@ class _CartScreenState extends State<CartScreen> {
     if (!auth.isLoggedIn) return const GuestWall(icon: Icons.shopping_bag_outlined);
 
     return Scaffold(
-      backgroundColor: AppColors.grayBg,
+      backgroundColor: context.bg,
       body: Column(children: [
 
         // ── Header ──────────────────────────────────────────────
@@ -160,7 +161,7 @@ class _CartScreenState extends State<CartScreen> {
           Container(
             padding: EdgeInsets.fromLTRB(14, 12, 14, MediaQuery.of(context).padding.bottom + 14),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: context.card,
               boxShadow: [BoxShadow(
                 color: Colors.black.withValues(alpha: 0.06),
                 blurRadius: 20, offset: const Offset(0, -3),
@@ -261,7 +262,7 @@ class _CartItemCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: context.card,
           borderRadius: BorderRadius.circular(AppRadius.lg),
           boxShadow: AppShadows.card,
         ),
@@ -274,7 +275,7 @@ class _CartItemCard extends StatelessWidget {
               child: ImageHelper.cleanUrl(item['image']) != null
                 ? CachedNetworkImage(imageUrl: ImageHelper.cleanUrl(item['image'])!, fit: BoxFit.cover)
                 : Container(
-                    color: AppColors.grayBg,
+                    color: context.isDark ? AppColors.darkBg : AppColors.grayBg,
                     child: const Icon(Icons.image_not_supported, color: AppColors.gray),
                   ),
             ),
@@ -287,9 +288,9 @@ class _CartItemCard extends StatelessWidget {
                 child: Text(
                   item['name']?.toString() ?? '',
                   maxLines: 2, overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 13, fontWeight: FontWeight.w800,
-                    fontFamily: 'Cairo', color: AppColors.text, height: 1.4,
+                    fontFamily: 'Cairo', color: context.text, height: 1.4,
                   ),
                 ),
               ),
@@ -322,7 +323,7 @@ class _CartItemCard extends StatelessWidget {
               // Qty controls
               Container(
                 decoration: BoxDecoration(
-                  color: AppColors.grayBg,
+                  color: context.isDark ? AppColors.darkBg : AppColors.grayBg,
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
@@ -342,9 +343,9 @@ class _CartItemCard extends StatelessWidget {
                     child: Text(
                       '${item['qty']}',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 14, fontWeight: FontWeight.w900,
-                        fontFamily: 'Cairo', color: AppColors.text,
+                        fontFamily: 'Cairo', color: context.text,
                       ),
                     ),
                   ),
@@ -380,7 +381,7 @@ class _CouponBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.card,
         borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: AppShadows.card,
       ),
@@ -389,7 +390,7 @@ class _CouponBox extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12),
             decoration: BoxDecoration(
-              color: AppColors.grayBg,
+              color: context.isDark ? AppColors.darkBg : AppColors.grayBg,
               borderRadius: BorderRadius.circular(10),
             ),
             child: TextField(
@@ -441,7 +442,7 @@ class _SummaryBox extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: context.card,
         borderRadius: BorderRadius.circular(AppRadius.lg),
         boxShadow: AppShadows.card,
       ),
