@@ -299,6 +299,46 @@ class ProductResource extends Resource
             // Actions first in the row so they stay visible without scrolling
             // the wide products table sideways.
             ->actions([
+                Tables\Actions\Action::make('quick_price')
+                    ->label('السعر')
+                    ->icon('heroicon-o-currency-dollar')
+                    ->color('warning')
+                    ->modalHeading(fn (Product $record) => 'تعديل سعر: '.$record->name_ar)
+                    ->modalSubmitActionLabel('حفظ')
+                    ->modalCancelActionLabel('إلغاء')
+                    ->modalWidth('md')
+                    ->fillForm(fn (Product $record) => [
+                        'price'         => $record->price,
+                        'compare_price' => $record->compare_price,
+                    ])
+                    ->form([
+                        Forms\Components\TextInput::make('price')
+                            ->label('السعر (₪)')->required()->numeric()->minValue(0)->prefix('₪'),
+                        Forms\Components\TextInput::make('compare_price')
+                            ->label('سعر قبل الخصم (اختياري)')->numeric()->minValue(0)->prefix('₪')
+                            ->helperText('اتركه فارغاً لإلغاء الخصم. يجب أن يكون أكبر من السعر.')
+                            ->gt('price'),
+                    ])
+                    ->action(function (Product $record, array $data): void {
+                        $record->update([
+                            'price'         => $data['price'],
+                            'compare_price' => $data['compare_price'] ?: null,
+                        ]);
+
+                        // Home listings are cached — bust them so the new price
+                        // shows immediately instead of after the TTL expires.
+                        foreach (['ar', 'en', 'he'] as $loc) {
+                            foreach (['featured', 'new', 'bestsellers', 'sale'] as $key) {
+                                \Illuminate\Support\Facades\Cache::forget("home:{$loc}:{$key}");
+                            }
+                        }
+                        \Illuminate\Support\Facades\Cache::forget('api:home');
+
+                        \Filament\Notifications\Notification::make()
+                            ->title('تم تحديث السعر ✓')
+                            ->success()
+                            ->send();
+                    }),
                 Tables\Actions\EditAction::make()->label('تعديل'),
                 Tables\Actions\DeleteAction::make()->label('حذف'),
             ], position: Tables\Enums\ActionsPosition::BeforeCells)
