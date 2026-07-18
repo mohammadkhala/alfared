@@ -43,48 +43,80 @@ class SyncRoadFnZones extends Command
             $areasByCity[$cityId] = $roadFn->getAreas($cityId);
         }
 
-        DB::transaction(function () use ($destinations, $roadFn, $areasByCity) {
-            // RoadFN is the source of truth: reset, then reactivate what it serves.
-            DeliveryZone::query()->update(['is_active' => false]);
+        $matched = 0;
+        $unmatched = [];
 
-            foreach ($destinations as $i => $d) {
-                $cityId = (string) $d['ToCityId'];
-                $areas  = $areasByCity[$cityId] ?? [];
+        DB::transaction(function () use ($destinations, $roadFn, $areasByCity, &$matched, &$unmatched) {
+            foreach ($destinations as $d) {
+                $cityId   = (string) $d['ToCityId'];
+                $cityName = trim($d['ToCity']);
+                $areas    = $areasByCity[$cityId] ?? [];
 
+                // Map onto an existing city (sub zone). Pricing stays on the main
+                // zone — RoadFN's own fee is its cost to us, not the customer's.
                 $zone = DeliveryZone::where('roadfn_city_id', $cityId)->orderBy('id')->first()
-                    ?? new DeliveryZone(['roadfn_city_id' => $cityId]);
+                    ?? $this->matchCityByName($cityName);
 
-                $zone->name_ar        = trim($d['ToCity']);
-                $zone->base_fee       = $d['Fees'];
-                // Delivery price = RoadFN's. Free-shipping is a store promo, off by
-                // default here — the admin can set a threshold per city afterwards.
-                $zone->free_above     = null;
+                if (! $zone) {
+                    $unmatched[] = $cityName;
+                    continue;
+                }
+
                 $zone->roadfn_city_id = $cityId;
-                $zone->parent_id      = null;
-                $zone->is_active      = true;
-                // Only resolve the fallback area for rows that don't already have one —
-                // keeps an admin override, and the customer's picked area wins anyway.
+                // Keep an admin override; the customer's picked area wins anyway.
                 if (! $zone->roadfn_area_id) {
                     $zone->roadfn_area_id = $roadFn->pickDefaultAreaId($areas);
-                }
-                if (! $zone->exists) {
-                    $zone->sort_order = $i;
                 }
                 $zone->save();
 
                 $this->syncAreas($zone, $areas);
+                $matched++;
 
-                $this->line("✓ {$zone->name_ar} — {$zone->base_fee} ₪ (RoadFN {$cityId}) — " . count($areas) . " منطقة فرعية");
+                $this->line("✓ {$zone->name_ar} ← RoadFN {$cityId} — " . count($areas) . ' حي');
             }
         });
 
-        $deactivated = DeliveryZone::where('is_active', false)->pluck('name_ar');
-        if ($deactivated->isNotEmpty()) {
-            $this->warn('مناطق مُعطّلة (لا يخدمها RoadFN أو مكرّرة): ' . $deactivated->implode('، '));
+        $this->newLine();
+        $this->info("رُبطت {$matched} مدينة بـ RoadFN.");
+
+        if ($unmatched) {
+            $this->warn('وجهات لدى RoadFN بلا مدينة مطابقة عندنا: ' . implode('، ', $unmatched));
+            $this->line('اربطها يدوياً من لوحة الأدمن إن لزم.');
         }
 
-        $this->info('اكتملت المزامنة.');
+        $missing = DeliveryZone::sub()->where('is_active', true)
+            ->whereNull('roadfn_city_id')->pluck('name_ar');
+        if ($missing->isNotEmpty()) {
+            $this->warn('مدن عندنا بلا ربط RoadFN (لن يعمل زر الإرسال لها): ' . $missing->implode('، '));
+        }
+
         return self::SUCCESS;
+    }
+
+    /**
+     * Finds our city for a RoadFN destination name.
+     *
+     * The two lists are written differently ("رام الله" vs "رام الله والبيرة",
+     * "الخليل المدينة" vs "الخليل"), so fall back to a contains-match after the
+     * exact one. Only unmapped cities are considered, so a name that matches
+     * two of ours can't steal an already-mapped row.
+     */
+    private function matchCityByName(string $name): ?DeliveryZone
+    {
+        $exact = DeliveryZone::sub()->where('name_ar', $name)->first();
+        if ($exact) {
+            return $exact;
+        }
+
+        return DeliveryZone::sub()
+            ->whereNull('roadfn_city_id')
+            ->where(function ($q) use ($name) {
+                $q->where('name_ar', 'like', "%{$name}%")
+                  ->orWhereRaw('? like concat("%", name_ar, "%")', [$name]);
+            })
+            // Prefer the closest name so "رام الله" doesn't grab a longer unrelated one.
+            ->orderByRaw('CHAR_LENGTH(name_ar) ASC')
+            ->first();
     }
 
     /** Upserts a city's neighborhoods and prunes any RoadFN no longer returns. */
