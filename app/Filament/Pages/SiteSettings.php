@@ -170,8 +170,7 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
                             Forms\Components\Section::make('التحقق من الهاتف')->schema([
                                 Forms\Components\Toggle::make('phone_verification_enabled')
                                     ->label('طلب رمز تحقق واتساب عند التسجيل')
-                                    ->default(true)
-                                    ->helperText('⚠️ أطفئه فوراً إذا حُظر رقم واتساب المرسِل — عندها ينشئ المستخدمون حساباتهم مباشرة دون رمز، في الموقع والتطبيق معاً، وبلا حاجة لنشر نسخة جديدة. أعد تفعيله بعد حل المشكلة.'),
+                                    ->default(true),
                             ]),
                         ]),
 
