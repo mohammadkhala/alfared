@@ -56,7 +56,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       _zoneId = subs.isEmpty ? id : null;
       if (subs.isEmpty) {
         final main = _zones.firstWhere((z) => z['id'] == id, orElse: () => {});
-        _city.text = main['name']?.toString() ?? '';
+        _city.text = _zoneName(main);
       } else {
         _city.clear();
       }
@@ -208,6 +208,19 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
     } finally {
       if (mounted) setState(() => _placing = false);
     }
+  }
+
+  /// The API sends name (Arabic), name_en and name_he for every zone. Without
+  /// this the checkout showed Arabic city names in the English and Hebrew UI.
+  String _zoneName(Map z) {
+    final code = context.read<LocaleProvider>().code;
+    final localized = switch (code) {
+      'he' => z['name_he'],
+      'en' => z['name_en'],
+      _ => null,
+    };
+    final value = localized?.toString().trim() ?? '';
+    return value.isNotEmpty ? value : (z['name']?.toString() ?? '');
   }
 
   @override
@@ -380,7 +393,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               items: _zones.map((z) => DropdownMenuItem<int>(
                 value: z['id'] as int,
                 child: Text(
-                  '${z['name']} — ${(z['base_fee'] as num) > 0 ? '${z['base_fee']} ₪' : s.freeDelivery}',
+                  '${_zoneName(z)} — ${(z['base_fee'] as num) > 0 ? '${z['base_fee']} ₪' : s.freeDelivery}',
                   style: const TextStyle(fontFamily: 'Cairo'),
                 ),
               )).toList(),
@@ -398,15 +411,15 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               ),
               items: _subZones.map((z) => DropdownMenuItem<int>(
                 value: z['id'] as int,
-                child: Text('${z['name']}', style: const TextStyle(fontFamily: 'Cairo')),
+                child: Text(_zoneName(z), style: const TextStyle(fontFamily: 'Cairo')),
               )).toList(),
               onChanged: _subZones.isEmpty ? null : (v) {
                 setState(() {
                   _zoneId = v;
                   // City is derived from the picked zone so it can never
                   // disagree with the fee.
-                  _city.text = _subZones
-                      .firstWhere((z) => z['id'] == v, orElse: () => {})['name']?.toString() ?? '';
+                  _city.text = _zoneName(
+                      _subZones.firstWhere((z) => z['id'] == v, orElse: () => {}));
                 });
                 _preview();
               },

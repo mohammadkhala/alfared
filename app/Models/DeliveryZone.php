@@ -80,14 +80,25 @@ class DeliveryZone extends Model
         return $this->parent_id ? ($this->parent ?? $this) : $this;
     }
 
-    public function getNameAttribute(): string { return $this->name_ar; }
+    /**
+     * The zone name in the visitor's language, matching Product and Category.
+     * Falls back to Arabic so a zone with no translation yet still reads.
+     */
+    public function getNameAttribute(): string
+    {
+        return match (app()->getLocale()) {
+            'he'    => $this->name_he ?: $this->name_ar,
+            'en'    => $this->name_en ?: $this->name_ar,
+            default => $this->name_ar,
+        };
+    }
 
     /** "الضفة الغربية — نابلس" for invoices and the admin list. */
     public function getFullNameAttribute(): string
     {
         return $this->parent_id && $this->parent
-            ? "{$this->parent->name_ar} — {$this->name_ar}"
-            : $this->name_ar;
+            ? "{$this->parent->name} — {$this->name}"
+            : $this->name;
     }
 
     public function calculateFee(float $subtotal): float

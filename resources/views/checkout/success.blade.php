@@ -38,7 +38,7 @@
         </div>
         <div style="display:flex;justify-content:space-between;font-size:14px;">
           <span style="color:#6B7280;">{{ __('address') }}</span>
-          <span style="font-weight:600;text-align:end;">{{ $order->city }}، {{ $order->address_line }}</span>
+          <span style="font-weight:600;text-align:end;">{{ $order->deliveryZone?->full_name ?? $order->city }}، {{ $order->address_line }}</span>
         </div>
         <div style="display:flex;justify-content:space-between;font-size:14px;">
           <span style="color:#6B7280;">{{ __('success_status') }}</span>

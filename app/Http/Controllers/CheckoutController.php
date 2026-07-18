@@ -30,9 +30,11 @@ class CheckoutController extends Controller
 
         $subZones = DeliveryZone::sub()->where('is_active', true)
             ->orderBy('sort_order')->orderBy('name_ar')
-            ->get(['id', 'parent_id', 'name_ar'])
+            // name_he/name_en too, so the dropdown follows the visitor's
+            // language instead of always showing Arabic city names.
+            ->get(['id', 'parent_id', 'name_ar', 'name_he', 'name_en'])
             ->groupBy('parent_id')
-            ->map(fn ($g) => $g->map(fn ($z) => ['id' => $z->id, 'name' => $z->name_ar])->values());
+            ->map(fn ($g) => $g->map(fn ($z) => ['id' => $z->id, 'name' => $z->name])->values());
 
         $coupon   = session('coupon');
         $subtotal = collect($cart)->sum(fn($item) => $item['price'] * $item['qty']);
@@ -299,7 +301,9 @@ class CheckoutController extends Controller
 
     public function success(string $orderNumber)
     {
-        $order = Order::where('order_number', $orderNumber)->with('items')->firstOrFail();
+        $order = Order::where('order_number', $orderNumber)
+            ->with(['items', 'deliveryZone.parent'])
+            ->firstOrFail();
         \App\Support\OrderAccess::authorize($order);
 
         return view('checkout.success', compact('order'));
@@ -307,7 +311,11 @@ class CheckoutController extends Controller
 
     public function tracking(string $orderNumber)
     {
-        $order = Order::where('order_number', $orderNumber)->with('items.product')->firstOrFail();
+        // deliveryZone.parent so the view can print "الضفة الغربية — نابلس"
+        // in the visitor's language without extra queries.
+        $order = Order::where('order_number', $orderNumber)
+            ->with(['items.product', 'deliveryZone.parent'])
+            ->firstOrFail();
         \App\Support\OrderAccess::authorize($order);
 
         return view('checkout.tracking', compact('order'));

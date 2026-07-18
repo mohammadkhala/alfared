@@ -117,7 +117,11 @@
       <h4 style="color:#1B3B8C;margin:0 0 16px;font-size:1rem;">{{ __('tracking_delivery_address') }}</h4>
       <div style="font-size:14px;color:#4B5563;line-height:1.7;">
         <strong>{{ $order->customer_name }}</strong><br/>
-        {{ $order->city }}، {{ $order->address_line }}<br/>
+        {{-- city is an Arabic snapshot taken at checkout; the zone carries the
+             translations, so prefer it and keep the snapshot as a fallback for
+             older orders whose zone was since deactivated. --}}
+        {{ $order->deliveryZone?->full_name ?? $order->city }}<br/>
+        {{ $order->address_line }}<br/>
         @if($order->area){{ $order->area }}<br/>@endif
         📞 {{ $order->customer_phone }}
       </div>
