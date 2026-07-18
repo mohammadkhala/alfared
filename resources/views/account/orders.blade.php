@@ -7,6 +7,7 @@
     'pending'    => 'order_status_pending',
     'confirmed'  => 'order_status_confirmed',
     'processing' => 'order_status_processing',
+    'sent_to_delivery' => 'order_status_sent_to_delivery',
     'shipped'    => 'order_status_shipped',
     'delivered'  => 'order_status_delivered',
     'cancelled'  => 'order_status_cancelled',
@@ -32,7 +33,7 @@
           <div style="display:flex;flex-direction:column;gap:16px;">
             @foreach($orders as $order)
               @php
-                $colors = ['pending'=>'#FEF3C7|#D97706','confirmed'=>'#DBEAFE|#1D4ED8','processing'=>'#E0E7FF|#7C3AED','shipped'=>'#D1FAE5|#059669','delivered'=>'#D1FAE5|#059669','cancelled'=>'#FEE2E2|#DC2626'];
+                $colors = ['pending'=>'#FEF3C7|#D97706','confirmed'=>'#DBEAFE|#1D4ED8','processing'=>'#E0E7FF|#7C3AED','sent_to_delivery'=>'#DBEAFE|#1B3B8C','shipped'=>'#D1FAE5|#059669','delivered'=>'#D1FAE5|#059669','cancelled'=>'#FEE2E2|#DC2626'];
                 [$bg,$tc] = explode('|', $colors[$order->status] ?? '#F3F4F6|#374151');
               @endphp
               <div style="border:1px solid #E5E7EB;border-radius:14px;padding:20px;transition:box-shadow .2s;" onmouseenter="this.style.boxShadow='0 4px 20px rgba(27,59,140,.12)'" onmouseleave="this.style.boxShadow='none'">

@@ -10,17 +10,29 @@
 
   {{-- Status timeline --}}
   @php
-    $statuses = ['pending','confirmed','processing','shipped','delivered'];
+    // sent_to_delivery has to be here: it's the state an order sits in from the
+    // moment it's handed to RoadFN until a driver picks it up. Leaving it out
+    // made array_search return false, so the whole timeline went blank for the
+    // customer exactly when they were most likely to check it.
+    $statuses = ['pending','confirmed','processing','sent_to_delivery','shipped','delivered'];
     $statusLabels = [
-      'pending'    => __('tracking_status_pending'),
-      'confirmed'  => __('tracking_status_confirmed'),
-      'processing' => __('tracking_status_processing'),
-      'shipped'    => __('tracking_status_shipped'),
-      'delivered'  => __('tracking_status_delivered'),
+      'pending'          => __('tracking_status_pending'),
+      'confirmed'        => __('tracking_status_confirmed'),
+      'processing'       => __('tracking_status_processing'),
+      'sent_to_delivery' => __('tracking_status_sent_to_delivery'),
+      'shipped'          => __('tracking_status_shipped'),
+      'delivered'        => __('tracking_status_delivered'),
     ];
-    $statusIcons = ['pending'=>'🕐','confirmed'=>'✓','processing'=>'📦','shipped'=>'🚚','delivered'=>'🏠'];
+    $statusIcons = ['pending'=>'🕐','confirmed'=>'✓','processing'=>'📦','sent_to_delivery'=>'📤','shipped'=>'🚚','delivered'=>'🏠'];
     $currentIndex = array_search($order->status, $statuses);
-    if($currentIndex === false) $currentIndex = -1;
+
+    // cancelled/returned aren't points on this line. Keep the bar filled to the
+    // last step the order actually reached instead of blanking it out.
+    if($currentIndex === false) {
+      $currentIndex = in_array($order->status, ['cancelled','returned'], true)
+        ? array_search('processing', $statuses)
+        : -1;
+    }
   @endphp
 
   <div style="background:#fff;border-radius:20px;padding:36px;box-shadow:0 4px 20px rgba(27,59,140,.08);margin-bottom:24px;">
@@ -56,6 +68,10 @@
     @elseif($order->status === 'delivered')
       <div style="background:#ECFDF5;border:1px solid #6EE7B7;border-radius:12px;padding:16px;text-align:center;margin-top:24px;">
         <span style="color:#059669;font-weight:600;">{{ __('tracking_delivered_msg') }}</span>
+      </div>
+    @elseif($order->status === 'sent_to_delivery')
+      <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:16px;text-align:center;margin-top:24px;">
+        <span style="color:#1B3B8C;font-weight:600;">{{ __('tracking_sent_to_delivery_msg') }}</span>
       </div>
     @elseif($order->status === 'shipped')
       <div style="background:#EFF6FF;border:1px solid #BFDBFE;border-radius:12px;padding:16px;text-align:center;margin-top:24px;">

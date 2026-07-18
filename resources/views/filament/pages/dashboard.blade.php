@@ -1,7 +1,7 @@
 <x-filament-panels::page>
 @php
-  $statusColors = ['pending'=>'#F59E0B','confirmed'=>'#3B82F6','processing'=>'#3B82F6','shipped'=>'#8B5CF6','delivered'=>'#10B981','cancelled'=>'#EF4444','returned'=>'#EF4444'];
-  $statusLabels = ['pending'=>'بانتظار التأكيد','confirmed'=>'تم التأكيد','processing'=>'قيد التجهيز','shipped'=>'في الطريق','delivered'=>'تم التوصيل','cancelled'=>'ملغي','returned'=>'مُرجَّع'];
+  $statusColors = ['pending'=>'#F59E0B','confirmed'=>'#3B82F6','processing'=>'#3B82F6','sent_to_delivery'=>'#1B3B8C','shipped'=>'#8B5CF6','delivered'=>'#10B981','cancelled'=>'#EF4444','returned'=>'#EF4444'];
+  $statusLabels = ['pending'=>'بانتظار التأكيد','confirmed'=>'تم التأكيد','processing'=>'قيد التجهيز','sent_to_delivery'=>'مرسل للتوصيل','shipped'=>'في الطريق','delivered'=>'تم التوصيل','cancelled'=>'ملغي','returned'=>'مُرجَّع'];
 @endphp
 
 <style>

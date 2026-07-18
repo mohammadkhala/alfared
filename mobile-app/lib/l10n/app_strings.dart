@@ -126,6 +126,7 @@ class S {
   String get trackOrder        => _t('trackOrder');
   String get orderConfirmed    => _t('orderConfirmed');
   String get orderProcessing   => _t('orderProcessing');
+  String get orderSentToDelivery => _t('orderSentToDelivery');
   String get orderShipped      => _t('orderShipped');
   String get orderDelivered    => _t('orderDelivered');
   String get orderCancelled    => _t('orderCancelled');
@@ -449,6 +450,7 @@ class AppStrings {
     'trackOrder':         {'ar': 'تتبع الطلب',        'he': 'מעקב הזמנה',     'en': 'Track Order'},
     'orderConfirmed':     {'ar': 'تم تأكيد الطلب',   'he': 'ההזמנה אושרה',   'en': 'Order Confirmed'},
     'orderProcessing':    {'ar': 'جاري تجهيز الطلب', 'he': 'ההזמנה בהכנה',   'en': 'Order Processing'},
+    'orderSentToDelivery':{'ar': 'مرسل للتوصيل',    'he': 'נשלח לשליחות',   'en': 'Sent to Courier'},
     'orderShipped':       {'ar': 'مع المندوب',       'he': 'עם השליח',       'en': 'With Courier'},
     'orderDelivered':     {'ar': 'تم التوصيل',        'he': 'נמסר',           'en': 'Delivered'},
     'orderCancelled':     {'ar': '❌ تم إلغاء هذا الطلب', 'he': '❌ ההזמנה בוטלה', 'en': '❌ This order was cancelled'},

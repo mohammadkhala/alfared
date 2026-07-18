@@ -35,6 +35,7 @@ class _OrdersScreenState extends State<OrdersScreen> {
     'pending'    => Colors.amber.shade700,
     'confirmed'  => AppColors.blue,
     'processing' => Colors.deepPurple,
+    'sent_to_delivery' => AppColors.blue,
     'shipped'    => AppColors.success,
     'delivered'  => AppColors.success,
     'cancelled'  => AppColors.danger,

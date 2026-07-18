@@ -86,7 +86,11 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
     }
   }
 
-  static const _steps = ['pending', 'confirmed', 'processing', 'shipped', 'delivered'];
+  // sent_to_delivery is where an order sits from the moment it's handed to the
+  // courier until a driver picks it up. Without it indexOf returns -1 and the
+  // whole timeline renders as untouched — blank exactly when the customer is
+  // most likely to be checking.
+  static const _steps = ['pending', 'confirmed', 'processing', 'sent_to_delivery', 'shipped', 'delivered'];
 
   @override
   Widget build(BuildContext context) {
@@ -164,8 +168,9 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                   child: Column(children: [
                     _TimelineRow(icon: '✓', title: s.orderConfirmed, sub: o.createdAtHuman ?? '', state: idx >= 1 ? _TS.done : (idx == 0 ? _TS.active : _TS.pending), isLast: false),
                     _TimelineRow(icon: '📦', title: s.orderProcessing, state: idx >= 2 ? _TS.done : (idx == 1 ? _TS.active : _TS.pending), isLast: false),
-                    _TimelineRow(icon: '🚚', title: s.orderShipped, state: idx >= 3 ? _TS.done : (idx == 2 ? _TS.active : _TS.pending), isLast: false),
-                    _TimelineRow(icon: '🏠', title: s.orderDelivered, state: idx >= 4 ? _TS.done : (idx == 3 ? _TS.active : _TS.pending), isLast: true),
+                    _TimelineRow(icon: '📤', title: s.orderSentToDelivery, state: idx >= 3 ? _TS.done : (idx == 2 ? _TS.active : _TS.pending), isLast: false),
+                    _TimelineRow(icon: '🚚', title: s.orderShipped, state: idx >= 4 ? _TS.done : (idx == 3 ? _TS.active : _TS.pending), isLast: false),
+                    _TimelineRow(icon: '🏠', title: s.orderDelivered, state: idx >= 5 ? _TS.done : (idx == 4 ? _TS.active : _TS.pending), isLast: true),
                   ]),
                 ),
 

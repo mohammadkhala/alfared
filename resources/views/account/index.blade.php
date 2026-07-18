@@ -68,7 +68,7 @@
               <tbody>
                 @foreach($recentOrders as $order)
                   @php
-                    $colors = ['pending'=>'#FEF3C7|#D97706','confirmed'=>'#DBEAFE|#1D4ED8','processing'=>'#E0E7FF|#7C3AED','shipped'=>'#D1FAE5|#059669','delivered'=>'#D1FAE5|#059669','cancelled'=>'#FEE2E2|#DC2626'];
+                    $colors = ['pending'=>'#FEF3C7|#D97706','confirmed'=>'#DBEAFE|#1D4ED8','processing'=>'#E0E7FF|#7C3AED','sent_to_delivery'=>'#DBEAFE|#1B3B8C','shipped'=>'#D1FAE5|#059669','delivered'=>'#D1FAE5|#059669','cancelled'=>'#FEE2E2|#DC2626'];
                     [$bg,$tc] = explode('|', $colors[$order->status] ?? '#F3F4F6|#374151');
                   @endphp
                   <tr style="border-bottom:1px solid #F3F4F6;">
