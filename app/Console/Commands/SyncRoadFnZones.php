@@ -47,6 +47,12 @@ class SyncRoadFnZones extends Command
         $unmatched = [];
 
         DB::transaction(function () use ($destinations, $roadFn, $areasByCity, &$matched, &$unmatched) {
+            // Two passes, because RoadFN mixes cities and whole regions in one
+            // list ("القدس" next to "ضواحي القدس"). Region entries are greedy —
+            // they claim every unmapped city under them — so named cities must
+            // be settled first or "ضواحي القدس" would swallow القدس itself.
+            $leftovers = [];
+
             foreach ($destinations as $d) {
                 $cityId   = (string) $d['ToCityId'];
                 $cityName = trim($d['ToCity']);
@@ -57,28 +63,8 @@ class SyncRoadFnZones extends Command
                 $zone = DeliveryZone::where('roadfn_city_id', $cityId)->orderBy('id')->first()
                     ?? $this->matchCityByName($cityName);
 
-                // No single city matched — this may be a whole-region entry
-                // such as "مناطق الداخل", which covers all of its cities.
                 if (! $zone) {
-                    if ($region = $this->matchRegion($cityName)) {
-                        $cities = $region->children()->where('is_active', true)
-                            ->whereNull('roadfn_city_id')->get();
-
-                        if ($cities->isNotEmpty()) {
-                            $defaultArea = $roadFn->pickDefaultAreaId($areas);
-                            foreach ($cities as $c) {
-                                $c->roadfn_city_id = $cityId;
-                                $c->roadfn_area_id = $c->roadfn_area_id ?: $defaultArea;
-                                $c->save();
-                                $this->syncAreas($c, $areas);
-                                $matched++;
-                            }
-                            $this->line("✓ {$region->name_ar}: رُبطت {$cities->count()} مدينة ← RoadFN {$cityId}");
-                            continue;
-                        }
-                    }
-
-                    $unmatched[] = $cityName;
+                    $leftovers[] = [$cityId, $cityName, $areas];
                     continue;
                 }
 
@@ -93,6 +79,31 @@ class SyncRoadFnZones extends Command
                 $matched++;
 
                 $this->line("✓ {$zone->name_ar} ← RoadFN {$cityId} — " . count($areas) . ' حي');
+            }
+
+            // Pass 2: whatever matched no single city may be a regional entry
+            // covering many of ours — "مناطق الداخل", "ضواحي القدس".
+            foreach ($leftovers as [$cityId, $cityName, $areas]) {
+                $region = $this->matchRegion($cityName);
+                $cities = $region
+                    ? $region->children()->where('is_active', true)->whereNull('roadfn_city_id')->get()
+                    : collect();
+
+                if ($cities->isEmpty()) {
+                    $unmatched[] = $cityName;
+                    continue;
+                }
+
+                $defaultArea = $roadFn->pickDefaultAreaId($areas);
+                foreach ($cities as $c) {
+                    $c->roadfn_city_id = $cityId;
+                    $c->roadfn_area_id = $c->roadfn_area_id ?: $defaultArea;
+                    $c->save();
+                    $this->syncAreas($c, $areas);
+                    $matched++;
+                }
+
+                $this->line("✓ {$cityName} ← RoadFN {$cityId} — رُبطت {$cities->count()} مدينة تحت {$region->name_ar}");
             }
         });
 
