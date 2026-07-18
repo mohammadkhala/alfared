@@ -55,7 +55,9 @@ return [
         'base_url'    => env('ROADFN_BASE_URL', 'https://api.roadfn.com/'),
         'username'    => env('ROADFN_USERNAME'),
         'password'    => env('ROADFN_PASSWORD'),
-        'device_token' => env('ROADFN_DEVICE_TOKEN'),
+        // RoadFN rejects the login when this is empty; it only labels the
+        // session, so any stable string works.
+        'device_token' => env('ROADFN_DEVICE_TOKEN') ?: 'alfared-server',
 
         // Shipment type sent on creation (RoadFN /ShipmentsTypes). 29 = "اخرى" (other).
         'default_shipment_type' => (int) env('ROADFN_DEFAULT_SHIPMENT_TYPE', 29),

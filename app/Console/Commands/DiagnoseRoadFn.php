@@ -64,9 +64,19 @@ class DiagnoseRoadFn extends Command
             $this->error('✗ رفض الخادم الطلب.');
             $this->line('الرد: '.mb_substr($res->body(), 0, 400));
             $this->newLine();
-            $this->line($res->status() === 401 || $res->status() === 400
-                ? 'الأرجح أن اسم المستخدم أو كلمة المرور غير صحيحة لبيئة الإنتاج.'
-                : 'الأرجح مشكلة في العنوان أو حجب من الاستضافة.');
+
+            // Read the actual validation errors instead of guessing — a 400
+            // here is usually a missing field, not wrong credentials.
+            $fields = array_keys((array) $res->json('errors', []));
+            if ($fields) {
+                $this->error('حقول ناقصة أو غير صالحة: '.implode('، ', $fields));
+                $this->line('اضبط ما يقابلها في .env ثم: php artisan config:clear');
+            } elseif ($res->status() === 401) {
+                $this->line('اسم المستخدم أو كلمة المرور غير صحيحة.');
+            } else {
+                $this->line('راجع العنوان، أو احتمال حجب الاتصالات الصادرة من الاستضافة.');
+            }
+
             return self::FAILURE;
         }
 
