@@ -48,9 +48,14 @@ class AppServiceProvider extends ServiceProvider
         );
 
         // ── Invalidate home cache when any of these models change ──
+        // Must cover every key HomeController caches, otherwise the storefront
+        // keeps serving stale data (e.g. an old price) until the TTL expires.
         $bust = function () {
             foreach (['ar', 'he', 'en'] as $loc) {
-                foreach (['hero','categories','featured','new','bestsellers','brands'] as $key) {
+                foreach ([
+                    'hero','categories','featured','new','bestsellers','brands',
+                    'sale','offer_banners','promo_banners',
+                ] as $key) {
                     Cache::forget("home:{$loc}:{$key}");
                 }
             }
