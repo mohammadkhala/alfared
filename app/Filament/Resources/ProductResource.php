@@ -265,9 +265,13 @@ class ProductResource extends Resource
                 Tables\Columns\ImageColumn::make('main_image')->label('الصورة')->circular(),
 
                 Tables\Columns\TextColumn::make('name_ar')->label('اسم المنتج')
-                    ->searchable()->sortable()->weight('bold'),
+                    ->searchable()->sortable()->weight('bold')
+                    ->limit(32)->tooltip(fn ($state) => $state)
+                    ->wrap(false),
 
-                Tables\Columns\TextColumn::make('category.name_ar')->label('القسم')->badge(),
+                Tables\Columns\TextColumn::make('category.name_ar')->label('القسم')->badge()
+                    ->limit(18)
+                    ->toggleable(),
 
                 Tables\Columns\TextColumn::make('price')->label('السعر')->money('ILS')->sortable(),
 
@@ -278,7 +282,8 @@ class ProductResource extends Resource
                         default => 'success',
                     }),
 
-                Tables\Columns\TextColumn::make('sales_count')->label('مبيعات')->sortable(),
+                Tables\Columns\TextColumn::make('sales_count')->label('مبيعات')->sortable()
+                    ->toggleable(isToggledHiddenByDefault: true),
 
                 Tables\Columns\IconColumn::make('is_featured')->label('مميز')->boolean(),
 
@@ -296,13 +301,14 @@ class ProductResource extends Resource
                 Tables\Filters\Filter::make('out_of_stock')->label('نفد المخزون')
                     ->query(fn(Builder $q) => $q->where('stock_quantity', 0)),
             ])
-            // Actions first in the row so they stay visible without scrolling
-            // the wide products table sideways.
+            // Compact icon buttons so the whole table fits without sideways scroll.
             ->actions([
                 Tables\Actions\Action::make('quick_price')
-                    ->label('السعر')
+                    ->label('تعديل السعر')
                     ->icon('heroicon-o-currency-dollar')
                     ->color('warning')
+                    ->iconButton()
+                    ->tooltip('تعديل السعر')
                     ->modalHeading(fn (Product $record) => 'تعديل سعر: '.$record->name_ar)
                     ->modalSubmitActionLabel('حفظ')
                     ->modalCancelActionLabel('إلغاء')
@@ -339,9 +345,9 @@ class ProductResource extends Resource
                             ->success()
                             ->send();
                     }),
-                Tables\Actions\EditAction::make()->label('تعديل'),
-                Tables\Actions\DeleteAction::make()->label('حذف'),
-            ], position: Tables\Enums\ActionsPosition::BeforeCells)
+                Tables\Actions\EditAction::make()->label('تعديل')->iconButton()->tooltip('تعديل'),
+                Tables\Actions\DeleteAction::make()->label('حذف')->iconButton()->tooltip('حذف'),
+            ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()->label('حذف المحدد'),
