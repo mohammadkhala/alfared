@@ -502,7 +502,11 @@ class OrderResource extends Resource
                 // ── الحالة (select مباشر) ─────────────────────────────
                 Tables\Columns\SelectColumn::make('status')
                     ->label('الحالة')
-                    ->options(Order::$statusLabels),
+                    ->options(Order::$statusLabels)
+                    // Otherwise it stretches to the longest label ("بانتظار
+                    // التأكيد") and eats width the rest of the row needs.
+                    ->width('130px')
+                    ->extraAttributes(['style' => 'font-size:12px;']),
             ])
             ->filters([
                 Tables\Filters\SelectFilter::make('city')->label('المنطقة')
