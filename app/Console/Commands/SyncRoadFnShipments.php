@@ -34,30 +34,59 @@ class SyncRoadFnShipments extends Command
 
         $this->info("مزامنة {$orders->count()} شحنة مفتوحة...");
 
-        // One precise call for all shipments we track by internal id.
+        // createShipment resolves the internal id by searching the recent-shipment
+        // list right after creating, which comes back empty if RoadFN hasn't
+        // indexed it yet. Those orders keep a tracking number but no id, and
+        // since this sync keys on the id they would never update again — the
+        // customer would sit on a stale status forever. Recover them by tracking
+        // number and backfill the id so later runs take the fast path.
+        [$byId, $byTracking] = $orders->partition(fn ($o) => filled($o->roadfn_shipment_id));
+
         try {
-            $ids     = $orders->pluck('roadfn_shipment_id')->filter()->values()->all();
-            $records = collect($roadFn->shipmentsByIds($ids))->keyBy('ID');
+            $records = collect($roadFn->shipmentsByIds(
+                $byId->pluck('roadfn_shipment_id')->values()->all()
+            ))->keyBy('ID');
+
+            $trackingRecords = $byTracking->isEmpty()
+                ? collect()
+                : collect($roadFn->listShipments())->keyBy('ShipmentTrackingNo');
         } catch (\Throwable $e) {
             Log::error('RoadFN sync: failed to fetch shipments', ['error' => $e->getMessage()]);
             $this->error('فشل جلب الشحنات من RoadFN: ' . $e->getMessage());
             return self::FAILURE;
         }
 
+        $synced = 0;
+        $healed = 0;
+
         foreach ($orders as $order) {
-            $record = $records->get($order->roadfn_shipment_id);
+            $record = filled($order->roadfn_shipment_id)
+                ? $records->get($order->roadfn_shipment_id)
+                : $trackingRecords->get($order->roadfn_tracking_number);
+
             if (! $record) {
                 Log::warning('RoadFN sync: shipment not returned by RoadFN', [
                     'order'    => $order->order_number,
                     'shipment' => $order->roadfn_shipment_id,
                     'tracking' => $order->roadfn_tracking_number,
                 ]);
+                $this->warn("  ⚠️ {$order->order_number}: لم تُرجعه RoadFN");
                 continue;
             }
+
+            if (blank($order->roadfn_shipment_id) && isset($record['ID'])) {
+                $order->update(['roadfn_shipment_id' => $record['ID']]);
+                $this->line("  ↻ {$order->order_number}: استُرجع المعرّف {$record['ID']}");
+                $healed++;
+            }
+
             $roadFn->applyShipmentRecord($order, $record);
+            $synced++;
         }
 
-        $this->info('تمت المزامنة.');
+        $this->newLine();
+        $this->info("تمت مزامنة {$synced} شحنة." . ($healed ? " (استُرجع معرّف {$healed} منها)" : ''));
+
         return self::SUCCESS;
     }
 }

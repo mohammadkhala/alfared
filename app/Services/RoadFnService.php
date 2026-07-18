@@ -201,8 +201,8 @@ class RoadFnService
             ->post("{$this->baseUrl}api/Business/ShipmentListWithIds", array_values(array_map('intval', $ids))));
     }
 
-    /** The just-created shipment, found by the tracking number we reserved. */
-    private function findShipmentByTracking(string $tracking): ?array
+    /** A shipment found by the tracking number we reserved. */
+    public function findShipmentByTracking(string $tracking): ?array
     {
         return collect($this->listShipments())->firstWhere('ShipmentTrackingNo', $tracking);
     }
