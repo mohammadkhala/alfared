@@ -99,6 +99,7 @@ class S {
   String get couponAndPoints   => _t('couponAndPoints');
   String get loyaltyDiscount   => _t('loyaltyDiscount');
   String get selectZoneMsg     => _t('selectZoneMsg');
+  String get searchNeighborhood => _t('searchNeighborhood');
   String loyaltyMaxHint(int max) => _t('loyaltyMaxHintBase').replaceFirst('%d', '$max');
 
   // ── success ──────────────────────────────────────────────────────
@@ -426,6 +427,7 @@ class AppStrings {
     'couponAndPoints':    {'ar': '🎟️ الكوبون والنقاط',  'he': '🎟️ קופון ונקודות',  'en': '🎟️ Coupon & Points'},
     'loyaltyDiscount':    {'ar': '⭐ نقاط الولاء',       'he': '⭐ נקודות נאמנות',  'en': '⭐ Loyalty Points'},
     'selectZoneMsg':      {'ar': 'اختر منطقة التوصيل',  'he': 'בחר אזור משלוח',   'en': 'Select delivery zone'},
+    'searchNeighborhood': {'ar': 'ابحث عن الحي',        'he': 'חפש שכונה',         'en': 'Search for your area'},
     'loyaltyMaxHintBase': {'ar': 'الحد الأقصى: %d نقطة','he': 'מקסימום: %d נקודות','en': 'Max: %d points'},
 
     // ── success ──────────────────────────────────────────────────

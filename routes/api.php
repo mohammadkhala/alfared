@@ -37,6 +37,7 @@ Route::prefix('v1')->group(function () {
     Route::get('products/{slug}', [CatalogController::class, 'show']);
 
     Route::get ('delivery-zones',                         [CartController::class,  'deliveryZones']);
+    Route::get ('delivery-zones/areas',                   [CartController::class,  'zoneAreas']);
     Route::get ('orders/{orderNumber}/track',             [OrderController::class, 'track'])->middleware('throttle:20,1');
     Route::post('orders/{orderNumber}/verify-payment',    [OrderController::class, 'verifyPayment'])->middleware('throttle:10,1');
 

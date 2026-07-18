@@ -7,6 +7,7 @@ use App\Mail\OrderConfirmationMail;
 use App\Models\Coupon;
 use App\Models\DeliveryZone;
 use App\Models\Order;
+use App\Models\RoadFnArea;
 use App\Models\Product;
 use App\Models\User;
 use App\Services\LoyaltyService;
@@ -18,6 +19,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Validation\Rule;
 
 /**
  * Server-side cart for authenticated users. Stored as a JSON blob in cache
@@ -206,6 +208,21 @@ class CartController extends Controller
         ]);
     }
 
+    /**
+     * Neighbourhoods of one city, for the checkout area picker. Loaded per
+     * city on demand — all of them at once would be a heavy payload on mobile.
+     */
+    public function zoneAreas(Request $request): JsonResponse
+    {
+        $areas = RoadFnArea::where('delivery_zone_id', $request->zone_id)
+            ->ordered()
+            ->get(['roadfn_area_id', 'name_ar', 'name_he', 'name_en'])
+            ->map(fn ($a) => ['id' => $a->roadfn_area_id, 'name' => $a->name])
+            ->values();
+
+        return response()->json(['areas' => $areas]);
+    }
+
     /** Compute totals given a zone + optional coupon + optional loyalty */
     public function preview(Request $request): JsonResponse
     {
@@ -251,9 +268,19 @@ class CartController extends Controller
             'building'         => 'nullable|string|max:100',
             'notes'            => 'nullable|string|max:1000',
             'delivery_zone_id' => 'required|exists:delivery_zones,id',
+            // Must be a neighbourhood of the chosen city — otherwise the
+            // shipment would be addressed to another city's area.
+            'roadfn_area_id'   => [
+                'required', 'string', 'max:50',
+                Rule::exists('roadfn_areas', 'roadfn_area_id')
+                    ->where('delivery_zone_id', $request->delivery_zone_id),
+            ],
             'coupon_code'      => 'nullable|string',
             'loyalty_points'   => 'nullable|integer|min:0',
             'payment_method'   => 'nullable|in:cod,lahza',
+        ], [
+            'roadfn_area_id.required' => 'يرجى اختيار الحي من القائمة.',
+            'roadfn_area_id.exists'   => 'الحي المختار لا يتبع المدينة المحددة.',
         ]);
 
         $user = $request->user();
@@ -299,6 +326,7 @@ class CartController extends Controller
                 'customer_email'           => $data['email'] ?? $user->email,
                 'city'                     => $data['city'],
                 'area'                     => $data['area'] ?? null,
+                'roadfn_area_id'           => $data['roadfn_area_id'],
                 'address_line'             => $data['address_line'],
                 'building'                 => $data['building'] ?? null,
                 'delivery_notes'           => $data['notes'] ?? null,

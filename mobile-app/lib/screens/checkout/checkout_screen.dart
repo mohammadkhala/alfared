@@ -35,33 +35,120 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
   String _phonePrefix = '+970';
   String _payment    = 'cod';
 
-  /// Main regions, each carrying its cities under `children`.
+  /// Destination cities — RoadFN is flat, each city carries its own fee.
   List<Map<String, dynamic>> _zones = [];
-  int? _mainZoneId;
   /// Selected city — this is the id sent to the backend.
   int? _zoneId;
 
-  /// Cities of the selected region.
-  List<Map<String, dynamic>> get _subZones {
-    if (_mainZoneId == null) return const [];
-    final main = _zones.firstWhere((z) => z['id'] == _mainZoneId, orElse: () => {});
-    return List<Map<String, dynamic>>.from((main['children'] as List?) ?? const []);
-  }
+  /// Neighbourhoods of the selected city, and the one the customer picked.
+  /// RoadFN needs a real area id, so this is required at checkout.
+  List<Map<String, dynamic>> _areas = [];
+  String? _roadfnAreaId;
+  bool _areasLoading = false;
 
-  void _onMainZone(int? id) {
+  void _onCity(int? id) {
     setState(() {
-      _mainZoneId = id;
-      final subs = _subZones;
-      // A region with no cities (older server) is itself the delivery zone.
-      _zoneId = subs.isEmpty ? id : null;
-      if (subs.isEmpty) {
-        final main = _zones.firstWhere((z) => z['id'] == id, orElse: () => {});
-        _city.text = _zoneName(main);
-      } else {
-        _city.clear();
-      }
+      _zoneId = id;
+      // City text follows the picked zone so it can never disagree with the fee.
+      _city.text = id == null
+          ? ''
+          : _zoneName(_zones.firstWhere((z) => z['id'] == id, orElse: () => {}));
+      // Any previously picked neighbourhood belongs to the old city.
+      _areas = [];
+      _roadfnAreaId = null;
+      _area.clear();
     });
     _preview();
+    if (id != null) _loadAreas(id);
+  }
+
+  Future<void> _loadAreas(int zoneId) async {
+    setState(() => _areasLoading = true);
+    try {
+      final res = await ApiService.instance.get('/delivery-zones/areas?zone_id=$zoneId');
+      final list = ((res as Map)['areas'] as List?) ?? const [];
+      if (!mounted) return;
+      setState(() => _areas = list
+          .map<Map<String, dynamic>>((a) => (a as Map).cast<String, dynamic>())
+          .toList());
+    } catch (_) {
+      if (mounted) Fluttertoast.showToast(msg: 'تعذر تحميل الأحياء');
+    } finally {
+      if (mounted) setState(() => _areasLoading = false);
+    }
+  }
+
+  /// Searchable picker — a city can have hundreds of neighbourhoods, so a
+  /// plain dropdown would be unusable on a phone.
+  Future<void> _pickArea(S s) async {
+    if (_zoneId == null) {
+      Fluttertoast.showToast(msg: s.selectZoneMsg);
+      return;
+    }
+    if (_areas.isEmpty) {
+      await _loadAreas(_zoneId!);
+      if (_areas.isEmpty) return;
+    }
+
+    final picked = await showModalBottomSheet<Map<String, dynamic>>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.white,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+      ),
+      builder: (ctx) {
+        var filtered = _areas;
+        return StatefulBuilder(builder: (ctx, setSheet) {
+          return Padding(
+            padding: EdgeInsets.only(bottom: MediaQuery.of(ctx).viewInsets.bottom),
+            child: SizedBox(
+              height: MediaQuery.of(ctx).size.height * 0.75,
+              child: Column(children: [
+                const SizedBox(height: 10),
+                Container(width: 40, height: 4, decoration: BoxDecoration(
+                  color: const Color(0xFFE5E7EB), borderRadius: BorderRadius.circular(2))),
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: TextField(
+                    autofocus: true,
+                    decoration: InputDecoration(
+                      hintText: s.searchNeighborhood,
+                      hintStyle: const TextStyle(fontFamily: 'Cairo'),
+                      prefixIcon: const Icon(Icons.search),
+                      border: const OutlineInputBorder(),
+                    ),
+                    onChanged: (q) {
+                      final t = q.trim();
+                      setSheet(() => filtered = t.isEmpty
+                          ? _areas
+                          : _areas.where((a) => '${a['name']}'.contains(t)).toList());
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    itemCount: filtered.length,
+                    itemBuilder: (_, i) => ListTile(
+                      title: Text('${filtered[i]['name']}',
+                          style: const TextStyle(fontFamily: 'Cairo', fontSize: 13)),
+                      onTap: () => Navigator.pop(ctx, filtered[i]),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+          );
+        });
+      },
+    );
+
+    if (picked != null) {
+      setState(() {
+        _roadfnAreaId = '${picked['id']}';
+        _area.text = '${picked['name']}';
+      });
+    }
   }
   Map<String, dynamic> _totals = {};
   bool _loading = false;
@@ -111,30 +198,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
 
       int toId(dynamic v) => v is int ? v : int.tryParse('$v') ?? 0;
 
-      // `tree` gives main regions with their cities. Older servers only send
-      // the flat `zones` list, which still works as a single-level picker.
-      final tree = (map['tree'] as List?) ?? [];
-      if (tree.isNotEmpty) {
-        _zones = tree.map<Map<String, dynamic>>((z) {
-          final m = z as Map<String, dynamic>;
-          return {
-            ...m,
-            'id': toId(m['id']),
-            'children': ((m['children'] as List?) ?? [])
-                .map<Map<String, dynamic>>((c) {
-                  final cm = c as Map<String, dynamic>;
-                  return {...cm, 'id': toId(cm['id'])};
-                })
-                .where((c) => (c['id'] as int) > 0)
-                .toList(),
-          };
-        }).where((z) => (z['id'] as int) > 0).toList();
-      } else {
-        _zones = ((map['zones'] as List?) ?? []).map<Map<String, dynamic>>((z) {
-          final m = z as Map<String, dynamic>;
-          return {...m, 'id': toId(m['id']), 'children': <Map<String, dynamic>>[]};
-        }).where((z) => (z['id'] as int) > 0).toList();
-      }
+      // RoadFN destinations are a flat list of cities, each with its own fee.
+      _zones = ((map['zones'] as List?) ?? []).map<Map<String, dynamic>>((z) {
+        final m = z as Map<String, dynamic>;
+        return {...m, 'id': toId(m['id'])};
+      }).where((z) => (z['id'] as int) > 0).toList();
     } catch (e) {
       Fluttertoast.showToast(msg: 'تعذر تحميل مناطق التوصيل');
     }
@@ -173,6 +241,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         'building':         _building.text.trim(),
         'notes':            _notes.text.trim(),
         'delivery_zone_id': _zoneId,
+        'roadfn_area_id':   _roadfnAreaId,
         'coupon_code':      _coupon.text.trim(),
         'loyalty_points':   int.tryParse(_loyalty.text) ?? 0,
         'payment_method':   _payment,
@@ -341,28 +410,13 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   final a = await Navigator.of(context).push<Map<String, dynamic>>(
                     MaterialPageRoute(builder: (_) => const AddressesScreen(selectMode: true)));
                   if (a == null) return;
+                  // Safe int cast — MySQL may return IDs as String on some hosts
+                  final zid = a['delivery_zone_id'];
+                  final savedZone = zid is int ? zid : int.tryParse(zid?.toString() ?? '');
+                  // Only keep it if it is still a city we ship to.
+                  final known = _zones.any((z) => z['id'] == savedZone);
+
                   setState(() {
-                    // Safe int cast — MySQL may return IDs as String on some hosts
-                    final zid = a['delivery_zone_id'];
-                    _zoneId = zid is int
-                        ? zid
-                        : int.tryParse(zid?.toString() ?? '');
-
-                    // A saved address stores the city zone, so walk back up to
-                    // its region to fill the first dropdown too.
-                    _mainZoneId = null;
-                    for (final m in _zones) {
-                      if (m['id'] == _zoneId) { _mainZoneId = m['id'] as int; break; }
-                      final kids = (m['children'] as List?) ?? const [];
-                      if (kids.any((c) => c['id'] == _zoneId)) {
-                        _mainZoneId = m['id'] as int;
-                        break;
-                      }
-                    }
-                    if (_mainZoneId == null) _zoneId = null;
-
-                    _city.text     = a['city']?.toString() ?? '';
-                    _area.text     = a['area']?.toString() ?? '';
                     _address.text  = a['address_line']?.toString() ?? '';
                     _building.text = a['building']?.toString() ?? '';
                     _notes.text    = a['notes']?.toString() ?? '';
@@ -370,7 +424,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     if (p.startsWith('+972'))      { _phonePrefix = '+972'; _phone.text = p.substring(4); }
                     else if (p.startsWith('+970')) { _phonePrefix = '+970'; _phone.text = p.substring(4); }
                   });
-                  _preview();
+
+                  // The saved address predates the neighbourhood picker, so the
+                  // customer still has to choose one — _onCity clears it.
+                  _onCity(known ? savedZone : null);
                 },
                 style: OutlinedButton.styleFrom(
                   side: const BorderSide(color: AppColors.orange),
@@ -385,11 +442,11 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
             ),
             const SizedBox(height: 12),
 
-            // Region — this is what sets the delivery fee.
+            // City — sets the delivery fee and is what the shipment maps to.
             DropdownButtonFormField<int>(
-              value: _mainZoneId,
+              value: _zoneId,
               isExpanded: true,
-              decoration: InputDecoration(labelText: 'المنطقة *'),
+              decoration: InputDecoration(labelText: '${s.city} *'),
               items: _zones.map((z) => DropdownMenuItem<int>(
                 value: z['id'] as int,
                 child: Text(
@@ -397,33 +454,28 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   style: const TextStyle(fontFamily: 'Cairo'),
                 ),
               )).toList(),
-              onChanged: _onMainZone,
+              onChanged: _onCity,
+              validator: (v) => v == null ? s.required : null,
             ),
             const SizedBox(height: 10),
 
-            // City within that region.
-            DropdownButtonFormField<int>(
-              value: _zoneId,
-              isExpanded: true,
+            // Neighbourhood — required, and must come from RoadFN's own list.
+            TextFormField(
+              controller: _area,
+              readOnly: true,
+              onTap: () => _pickArea(s),
               decoration: InputDecoration(
-                labelText: 'المدينة / المحافظة *',
-                hintText: _mainZoneId == null ? 'اختر المنطقة أولاً' : null,
+                labelText: '${s.neighborhood} *',
+                hintText: _zoneId == null ? s.selectZoneMsg : s.searchNeighborhood,
+                hintStyle: const TextStyle(fontFamily: 'Cairo', fontSize: 12),
+                suffixIcon: _areasLoading
+                    ? const Padding(
+                        padding: EdgeInsets.all(12),
+                        child: SizedBox(width: 16, height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2)))
+                    : const Icon(Icons.search),
               ),
-              items: _subZones.map((z) => DropdownMenuItem<int>(
-                value: z['id'] as int,
-                child: Text(_zoneName(z), style: const TextStyle(fontFamily: 'Cairo')),
-              )).toList(),
-              onChanged: _subZones.isEmpty ? null : (v) {
-                setState(() {
-                  _zoneId = v;
-                  // City is derived from the picked zone so it can never
-                  // disagree with the fee.
-                  _city.text = _zoneName(
-                      _subZones.firstWhere((z) => z['id'] == v, orElse: () => {}));
-                });
-                _preview();
-              },
-              validator: (v) => v == null ? s.required : null,
+              validator: (_) => _roadfnAreaId == null ? s.required : null,
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -432,13 +484,8 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               validator: (v) => v == null || v.isEmpty ? s.required : null,
             ),
             const SizedBox(height: 10),
-            Row(children: [
-              Expanded(child: TextFormField(
-                  controller: _area, decoration: InputDecoration(labelText: s.neighborhood))),
-              const SizedBox(width: 10),
-              Expanded(child: TextFormField(
-                  controller: _building, decoration: InputDecoration(labelText: s.building))),
-            ]),
+            TextFormField(
+                controller: _building, decoration: InputDecoration(labelText: s.building)),
             const SizedBox(height: 10),
             TextFormField(
               controller: _notes, maxLines: 2,
