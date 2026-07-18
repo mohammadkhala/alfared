@@ -331,6 +331,10 @@ class CatalogController extends Controller
                 'free_shipping_above'   => (float) ($s->get('free_shipping_above', '0')),
                 'store_phone'           => $s->get('store_phone', ''),
                 'social_whatsapp'       => $s->get('social_whatsapp', ''),
+                // Store logo, so the app's splash/branding follows the website
+                // without needing a new build. The launcher icon can't come
+                // from here — the OS bakes it into the installed package.
+                'store_logo'            => \App\Support\SiteBranding::logo(),
             ];
         });
 
