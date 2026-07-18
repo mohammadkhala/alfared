@@ -14,6 +14,16 @@ class ListOrders extends ListRecords
 {
     protected static string $resource = OrderResource::class;
 
+    public function mount(): void
+    {
+        parent::mount();
+
+        // Pulls anything RoadFN has changed since the last check, so the list is
+        // current without the admin pressing anything. Rate-limited internally
+        // and swallows its own errors — see RoadFnAutoSync.
+        \App\Support\RoadFnAutoSync::runIfDue();
+    }
+
     protected function getHeaderActions(): array
     {
         return [
@@ -66,8 +76,11 @@ class ListOrders extends ListRecords
                 ->badge(Order::whereIn('status', ['confirmed', 'processing'])->count())
                 ->badgeColor('info'),
             'shipped' => Tab::make('🚚 شحن')
-                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', 'shipped'))
-                ->badge(Order::where('status', 'shipped')->count())
+                // Includes sent_to_delivery: an order handed to RoadFN but not
+                // yet picked up by a driver belongs in this tab, and was
+                // appearing in none of them.
+                ->modifyQueryUsing(fn(Builder $query) => $query->whereIn('status', ['sent_to_delivery', 'shipped']))
+                ->badge(Order::whereIn('status', ['sent_to_delivery', 'shipped'])->count())
                 ->badgeColor('primary'),
             'delivered' => Tab::make('✓ مُسلَّم')
                 ->modifyQueryUsing(fn(Builder $query) => $query->where('status', 'delivered'))
