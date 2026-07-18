@@ -4,9 +4,11 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../l10n/app_strings.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/cart_provider.dart';
 import '../../providers/locale_provider.dart';
 import '../../services/api_service.dart' show ApiService, ApiException;
 import '../../theme/app_theme.dart';
+import '../home/main_navigation.dart';
 import 'otp_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -65,7 +67,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
       // Network error — continue
     }
 
-    // ── Step 2: Send OTP via WhatsApp ───────────────────────────
+    // ── Step 2: Is phone verification switched on server-side? ──
+    // Lets the store disable the WhatsApp OTP step remotely (e.g. if the
+    // sender number gets banned) without shipping a new build.
+    bool verificationOn = true;
+    try {
+      final cfg = await ApiService.instance
+          .get('/app-config')
+          .timeout(const Duration(seconds: 8));
+      final data = (cfg as Map)['data'] as Map?;
+      verificationOn = data?['phone_verification_enabled'] != false;
+    } catch (_) {
+      // Config unreachable — keep the default (verify) behaviour.
+    }
+
+    if (!verificationOn) {
+      await _registerDirectly();
+      return;
+    }
+
+    // ── Step 3: Send OTP via WhatsApp ───────────────────────────
     try {
       await ApiService.instance.post('/auth/send-otp', data: {
         'phone': _fullPhone,
@@ -88,6 +109,45 @@ class _RegisterScreenState extends State<RegisterScreen> {
       final s2 = context.read<LocaleProvider>().s;
       Fluttertoast.showToast(
         msg: e.message ?? s2.registerOtpFailed,
+        backgroundColor: AppColors.danger, textColor: Colors.white,
+        toastLength: Toast.LENGTH_LONG,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _sending = false);
+      Fluttertoast.showToast(
+        msg: 'Error: $e',
+        backgroundColor: AppColors.danger, textColor: Colors.white,
+      );
+    }
+  }
+
+  /// Creates the account without the OTP step (verification disabled server-side).
+  Future<void> _registerDirectly() async {
+    try {
+      await context.read<AuthProvider>().register(
+        name:     _name.text.trim(),
+        email:    _email.text.trim(),
+        phone:    _fullPhone,
+        password: _pass.text,
+      );
+      if (!mounted) return;
+      await context.read<CartProvider>().load();
+      if (!mounted) return;
+
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const MainNavigation()),
+        (_) => false,
+      );
+      Fluttertoast.showToast(
+        msg: 'مرحباً بك في أبناء الفريد! 🎉',
+        backgroundColor: AppColors.success, textColor: Colors.white,
+      );
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() => _sending = false);
+      Fluttertoast.showToast(
+        msg: e.message ?? 'تعذّر إنشاء الحساب، حاول مجدداً',
         backgroundColor: AppColors.danger, textColor: Colors.white,
         toastLength: Toast.LENGTH_LONG,
       );

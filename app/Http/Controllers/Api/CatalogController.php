@@ -323,6 +323,10 @@ class CatalogController extends Controller
                 'cod_enabled'           => ($s->get('cod_enabled', '1') === '1'),
                 'online_payment_enabled'=> ($s->get('online_payment_enabled', '0') === '1'),
                 'loyalty_enabled'       => ($s->get('loyalty_enabled', '1') === '1'),
+                // When false the app skips the WhatsApp OTP step on signup —
+                // lets us disable verification instantly if the sender number
+                // gets banned, without shipping a new build.
+                'phone_verification_enabled' => ($s->get('phone_verification_enabled', '1') === '1'),
                 'min_order_amount'      => (float) ($s->get('min_order_amount', '0')),
                 'free_shipping_above'   => (float) ($s->get('free_shipping_above', '0')),
                 'store_phone'           => $s->get('store_phone', ''),

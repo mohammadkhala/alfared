@@ -156,6 +156,18 @@ class AccountController extends Controller
             'privacy_policy.accepted' => 'يجب الموافقة على سياسة الخصوصية وشروط الاستخدام للمتابعة.',
         ]);
 
+        // Phone verification can be switched off from Site Settings (e.g. when
+        // the sender WhatsApp number is banned) — then create the account now.
+        if (! \App\Support\PhoneVerification::enabled()) {
+            return $this->createVerifiedUser(
+                $request,
+                $request->name,
+                $request->phone,
+                $request->email,
+                bcrypt($request->password),
+            );
+        }
+
         // Per-phone limit — protects the sender WhatsApp number from spam bans.
         if ($wait = \App\Support\OtpThrottle::retryAfter($request->phone)) {
             return back()->withErrors(['phone' => \App\Support\OtpThrottle::message($wait)])->withInput();
@@ -224,21 +236,45 @@ class AccountController extends Controller
 
         $otp->update(['used' => true]);
 
-        // Check again in case phone was taken during OTP wait
+        // createVerifiedUser() re-checks the phone in case it was taken
+        // while the OTP was pending.
+        return $this->createVerifiedUser(
+            $request,
+            session('reg_name'),
+            $phone,
+            session('reg_email'),
+            session('reg_password'),
+        );
+    }
+
+    /**
+     * Creates the customer, grants the signup bonus, logs them in.
+     * Shared by the OTP flow and the direct flow (verification disabled).
+     *
+     * @param string $hashedPassword already bcrypt-hashed
+     */
+    private function createVerifiedUser(
+        Request $request,
+        string $name,
+        string $phone,
+        ?string $email,
+        string $hashedPassword,
+    ) {
+        // Guard against the phone being taken while the OTP was pending.
         if (User::where('phone', $phone)->exists()) {
             session()->forget(['reg_name','reg_phone','reg_email','reg_password','reg_sent_at']);
             return redirect()->route('login')->withErrors(['phone' => 'رقم الهاتف مسجل مسبقاً، سجّل دخولك.']);
         }
 
         $user = new User([
-            'name'  => session('reg_name'),
+            'name'  => $name,
             'phone' => $phone,
-            'email' => session('reg_email') ?: null,
+            'email' => $email ?: null,
             'role'  => 'customer',
         ]);
         // Write hashed password directly to bypass the 'hashed' cast re-hashing
         $user->setRawAttributes(array_merge($user->getAttributes(), [
-            'password' => session('reg_password'),
+            'password' => $hashedPassword,
         ]));
         $user->save();
 

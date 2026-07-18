@@ -44,6 +44,9 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
             'store_country'  => $s['store_country']  ?? 'Palestine',
             'store_logo'     => $s['store_logo']     ?? null,
             'store_favicon'  => $s['store_favicon']  ?? null,
+            'phone_verification_enabled' => isset($s['phone_verification_enabled'])
+                ? ($s['phone_verification_enabled'] === '1' || $s['phone_verification_enabled'] === 'true')
+                : true,
 
             // ── Social ──
             'social_whatsapp'   => $s['social_whatsapp']   ?? '+970598191312',
@@ -162,6 +165,13 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
                                     ->maxSize(256)
                                     ->acceptedFileTypes(['image/png','image/x-icon','image/vnd.microsoft.icon'])
                                     ->helperText('📐 32 × 32 بكسل · 📁 PNG أو ICO'),
+                            ]),
+
+                            Forms\Components\Section::make('التحقق من الهاتف')->schema([
+                                Forms\Components\Toggle::make('phone_verification_enabled')
+                                    ->label('طلب رمز تحقق واتساب عند التسجيل')
+                                    ->default(true)
+                                    ->helperText('⚠️ أطفئه فوراً إذا حُظر رقم واتساب المرسِل — عندها ينشئ المستخدمون حساباتهم مباشرة دون رمز، في الموقع والتطبيق معاً، وبلا حاجة لنشر نسخة جديدة. أعد تفعيله بعد حل المشكلة.'),
                             ]),
                         ]),
 
@@ -511,7 +521,7 @@ class SiteSettings extends Page implements Forms\Contracts\HasForms
         }
 
         $groups = [
-            'store'         => ['store_name','store_name_he','store_tagline','store_phone','store_email','store_address','store_city','store_country','store_logo','store_favicon'],
+            'store'         => ['store_name','store_name_he','store_tagline','store_phone','store_email','store_address','store_city','store_country','store_logo','store_favicon','phone_verification_enabled'],
             'social'        => ['social_whatsapp','social_instagram','social_facebook','social_tiktok','social_youtube'],
             'shipping'      => ['min_order_amount','free_shipping_above','default_delivery_fee','cod_enabled','online_payment_enabled','payment_gateway_key'],
             'seo'           => ['meta_title','meta_description','meta_keywords','google_analytics_id','google_tag_manager_id','facebook_pixel_id'],
