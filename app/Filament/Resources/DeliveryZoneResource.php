@@ -37,7 +37,7 @@ class DeliveryZoneResource extends Resource
             ]),
 
             Forms\Components\Section::make('رسوم الشحن')
-                ->description('السعر يُزامَن من RoadFN. "شحن مجاني فوق" عرض اختياري يضبطه المتجر.')
+                ->description('السعر يُزامَن من رودفنتي. "شحن مجاني فوق" عرض اختياري يضبطه المتجر.')
                 ->schema([
                     Forms\Components\Grid::make(3)->schema([
                         Forms\Components\TextInput::make('base_fee')->label('رسوم التوصيل (₪)')
@@ -57,8 +57,8 @@ class DeliveryZoneResource extends Resource
                 ]),
             ]),
 
-            Forms\Components\Section::make('ربط RoadFN')
-                ->description('تُملأ تلقائياً بأمر "مزامنة من RoadFN". City ID = مدينة الوجهة، Area ID = المنطقة الافتراضية للشحنة.')
+            Forms\Components\Section::make('ربط رودفنتي')
+                ->description('تُملأ تلقائياً بأمر "مزامنة من رودفنتي". City ID = مدينة الوجهة، Area ID = المنطقة الافتراضية للشحنة.')
                 ->schema([
                     Forms\Components\Grid::make(2)->schema([
                         Forms\Components\TextInput::make('roadfn_city_id')->label('RoadFN City ID'),
@@ -95,17 +95,17 @@ class DeliveryZoneResource extends Resource
             ])
             ->headerActions([
                 Tables\Actions\Action::make('syncRoadFn')
-                    ->label('مزامنة من RoadFN')
+                    ->label('مزامنة من رودفنتي')
                     ->icon('heroicon-o-arrow-path')
                     ->color('info')
                     ->requiresConfirmation()
-                    ->modalHeading('مزامنة مناطق التوصيل من RoadFN')
-                    ->modalDescription('سيتم بناء المناطق وأسعارها من قائمة أسعار RoadFN، وتعطيل ما لا يخدمه RoadFN.')
+                    ->modalHeading('مزامنة مناطق التوصيل من رودفنتي')
+                    ->modalDescription('سيتم بناء المناطق وأسعارها من قائمة أسعار رودفنتي، وتعطيل ما لا يخدمه رودفنتي.')
                     ->action(function () {
                         try {
                             \Illuminate\Support\Facades\Artisan::call('roadfn:sync-zones');
                             \Filament\Notifications\Notification::make()
-                                ->title('تمت مزامنة المناطق من RoadFN')
+                                ->title('تمت مزامنة المناطق من رودفنتي')
                                 ->body(trim(\Illuminate\Support\Facades\Artisan::output()))
                                 ->success()
                                 ->send();

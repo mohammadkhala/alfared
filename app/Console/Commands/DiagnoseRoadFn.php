@@ -15,7 +15,7 @@ class DiagnoseRoadFn extends Command
 {
     protected $signature = 'roadfn:diagnose {--fresh : تجاهل التوكن المخزّن}';
 
-    protected $description = 'تشخيص فشل الاتصال بـ RoadFN';
+    protected $description = 'تشخيص فشل الاتصال بـ رودفنتي';
 
     public function handle(): int
     {
@@ -103,7 +103,7 @@ class DiagnoseRoadFn extends Command
             return self::SUCCESS;
         }
 
-        $this->error('✗ التوكن لا يعمل على نقاط RoadFN.');
+        $this->error('✗ التوكن لا يعمل على نقاط رودفنتي.');
         $this->line('الرد: '.mb_substr($cities->body(), 0, 300));
 
         return self::FAILURE;

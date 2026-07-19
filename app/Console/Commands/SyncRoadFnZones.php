@@ -24,20 +24,20 @@ class SyncRoadFnZones extends Command
 {
     protected $signature = 'roadfn:sync-zones';
 
-    protected $description = 'بناء مناطق التوصيل وأسعارها من قائمة أسعار RoadFN';
+    protected $description = 'بناء مناطق التوصيل وأسعارها من قائمة أسعار رودفنتي';
 
     public function handle(RoadFnService $roadFn): int
     {
         $fees = collect($roadFn->getShippingFees());
 
         if ($fees->isEmpty()) {
-            $this->error('RoadFN لم يُرجع أي أسعار توصيل — لم يتغيّر شيء.');
+            $this->error('رودفنتي لم يُرجع أي أسعار توصيل — لم يتغيّر شيء.');
             return self::FAILURE;
         }
 
         // One fee row per destination city (dedupe just in case).
         $destinations = $fees->unique('ToCityId')->values();
-        $this->info("مزامنة {$destinations->count()} وجهة من RoadFN...");
+        $this->info("مزامنة {$destinations->count()} وجهة من رودفنتي...");
 
         // Fetch every city's areas up front (network) so the DB transaction stays short.
         $areasByCity = [];
@@ -93,7 +93,7 @@ class SyncRoadFnZones extends Command
 
                 $this->syncAreas($zone, $areas);
 
-                $this->line("✓ {$zone->name_ar} — {$zone->base_fee} ₪ (RoadFN {$cityId}) — " . count($areas) . ' حي');
+                $this->line("✓ {$zone->name_ar} — {$zone->base_fee} ₪ (رودفنتي {$cityId}) — " . count($areas) . ' حي');
             }
 
             // Neighbourhoods left over from zones we no longer ship to.
@@ -106,7 +106,7 @@ class SyncRoadFnZones extends Command
 
         $retired = DeliveryZone::where('is_active', false)->count();
         if ($retired) {
-            $this->warn("مناطق معطّلة (لا يخدمها RoadFN أو قديمة): {$retired} — لم تُحذف، فالطلبات القديمة تبقى سليمة.");
+            $this->warn("مناطق معطّلة (لا يخدمها رودفنتي أو قديمة): {$retired} — لم تُحذف، فالطلبات القديمة تبقى سليمة.");
         }
 
         return self::SUCCESS;

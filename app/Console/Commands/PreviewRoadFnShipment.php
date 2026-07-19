@@ -16,7 +16,7 @@ class PreviewRoadFnShipment extends Command
 {
     protected $signature = 'roadfn:preview {order : رقم الطلب أو order_number} {--reserve : احجز رقم تتبّع فعلي لاختبار الاتصال}';
 
-    protected $description = 'معاينة حمولة شحنة RoadFN دون إنشائها';
+    protected $description = 'معاينة حمولة شحنة رودفنتي دون إنشائها';
 
     public function handle(RoadFnService $roadFn): int
     {
@@ -42,10 +42,10 @@ class PreviewRoadFnShipment extends Command
             return self::FAILURE;
         }
 
-        $this->line('ربط RoadFN : city=' . ($zone->roadfn_city_id ?: '✗') . '  area=' . ($zone->roadfn_area_id ?: '✗'));
+        $this->line('ربط رودفنتي : city=' . ($zone->roadfn_city_id ?: '✗') . '  area=' . ($zone->roadfn_area_id ?: '✗'));
 
         if (! $zone->roadfn_city_id || ! $zone->roadfn_area_id) {
-            $this->error('✗ المنطقة غير مربوطة بـ RoadFN. شغّل roadfn:sync-zones أولاً.');
+            $this->error('✗ المنطقة غير مربوطة بـ رودفنتي. شغّل roadfn:sync-zones أولاً.');
             return self::FAILURE;
         }
 

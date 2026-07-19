@@ -13,7 +13,7 @@ class RoadFnListLocations extends Command
 {
     protected $signature = 'roadfn:list-locations {city_id? : اعرض مناطق مدينة محددة فقط}';
 
-    protected $description = 'عرض مدن ومناطق RoadFN لربطها بمناطق التوصيل عندنا';
+    protected $description = 'عرض مدن ومناطق رودفنتي لربطها بمناطق التوصيل عندنا';
 
     public function handle(RoadFnService $roadFn): int
     {
@@ -27,7 +27,7 @@ class RoadFnListLocations extends Command
         }
 
         $cities = $roadFn->getCities();
-        $this->info('مدن RoadFN:');
+        $this->info('مدن رودفنتي:');
         $this->line(json_encode($cities, JSON_UNESCAPED_UNICODE | JSON_PRETTY_PRINT));
         $this->newLine();
         $this->comment('لعرض مناطق مدينة معينة: php artisan roadfn:list-locations {city_id}');

@@ -19,7 +19,7 @@ class SyncRoadFnShipments extends Command
 {
     protected $signature = 'roadfn:sync-shipments';
 
-    protected $description = 'مزامنة حالة شحنات RoadFN المفتوحة مع حالة الطلب عندنا';
+    protected $description = 'مزامنة حالة شحنات رودفنتي المفتوحة مع حالة الطلب عندنا';
 
     public function handle(RoadFnService $roadFn): int
     {
@@ -52,7 +52,7 @@ class SyncRoadFnShipments extends Command
                 : collect($roadFn->listShipments())->keyBy('ShipmentTrackingNo');
         } catch (\Throwable $e) {
             Log::error('RoadFN sync: failed to fetch shipments', ['error' => $e->getMessage()]);
-            $this->error('فشل جلب الشحنات من RoadFN: ' . $e->getMessage());
+            $this->error('فشل جلب الشحنات من رودفنتي: ' . $e->getMessage());
             return self::FAILURE;
         }
 
@@ -70,7 +70,7 @@ class SyncRoadFnShipments extends Command
                     'shipment' => $order->roadfn_shipment_id,
                     'tracking' => $order->roadfn_tracking_number,
                 ]);
-                $this->warn("  ⚠️ {$order->order_number}: لم تُرجعه RoadFN");
+                $this->warn("  ⚠️ {$order->order_number}: لم تُرجعه رودفنتي");
                 continue;
             }
 

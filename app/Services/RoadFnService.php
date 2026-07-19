@@ -33,13 +33,13 @@ class RoadFnService
 
         if (! $response->successful()) {
             Log::error('RoadFN login failed', ['status' => $response->status(), 'body' => $response->body()]);
-            throw new \RuntimeException('فشل تسجيل الدخول إلى RoadFN.');
+            throw new \RuntimeException('فشل تسجيل الدخول إلى رودفنتي.');
         }
 
         $token = $response->json('Token');
         if (! $token) {
             Log::error('RoadFN login: no token in response', ['body' => $response->json()]);
-            throw new \RuntimeException('استجابة RoadFN لا تحتوي على token.');
+            throw new \RuntimeException('استجابة رودفنتي لا تحتوي على token.');
         }
 
         return $token;
@@ -73,7 +73,7 @@ class RoadFnService
 
         if (! $response->successful()) {
             Log::error('RoadFN request failed', ['status' => $response->status(), 'body' => $response->body()]);
-            throw new \RuntimeException('فشل الاتصال بـ RoadFN: ' . ($response->json('message') ?? "HTTP {$response->status()}"));
+            throw new \RuntimeException('فشل الاتصال بـ رودفنتي: ' . ($response->json('message') ?? "HTTP {$response->status()}"));
         }
 
         return $response->json() ?? [];
@@ -133,7 +133,7 @@ class RoadFnService
     {
         $zone = $order->deliveryZone;
         if (! $zone || ! $zone->roadfn_city_id || ! $zone->roadfn_area_id) {
-            throw new \RuntimeException('منطقة التوصيل لهذا الطلب غير مربوطة بمدينة/منطقة RoadFN بعد.');
+            throw new \RuntimeException('منطقة التوصيل لهذا الطلب غير مربوطة بمدينة/منطقة رودفنتي بعد.');
         }
 
         $order->loadMissing('items');
@@ -204,7 +204,7 @@ class RoadFnService
     {
         $code = $this->post('api/Business/GetShipmentsTrackingGeneratedCode')['GeneratedCode'] ?? null;
         if (! $code) {
-            throw new \RuntimeException('تعذّر حجز رقم تتبّع من RoadFN.');
+            throw new \RuntimeException('تعذّر حجز رقم تتبّع من رودفنتي.');
         }
         return $code;
     }

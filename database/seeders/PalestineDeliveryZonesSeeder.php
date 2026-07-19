@@ -118,7 +118,7 @@ class PalestineDeliveryZonesSeeder extends Seeder
         $city->roadfn_city_id = $legacy->roadfn_city_id;
         $city->roadfn_area_id = $legacy->roadfn_area_id;
 
-        $this->command?->line("  ↳ نُقل ربط RoadFN إلى: {$city->name_ar}");
+        $this->command?->line("  ↳ نُقل ربط رودفنتي إلى: {$city->name_ar}");
     }
 
     /**

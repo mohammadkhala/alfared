@@ -540,7 +540,7 @@ class OrderResource extends Resource
                         ->pluck('city', 'city')
                         ->toArray()),
                 Tables\Filters\TernaryFilter::make('roadfn_sent')
-                    ->label('الإرسال إلى RoadFN')
+                    ->label('الإرسال إلى رودفنتي')
                     ->placeholder('الكل')
                     ->trueLabel('تم الإرسال')
                     ->falseLabel('لم يُرسَل')
@@ -592,7 +592,7 @@ class OrderResource extends Resource
                 // reaches the admin and the customer immediately.
                 Tables\Actions\Action::make('refreshRoadFn')
                     ->label('تحديث الحالة')
-                    ->tooltip('جلب حالة الشحنة الحالية من RoadFN')
+                    ->tooltip('جلب حالة الشحنة الحالية من رودفنتي')
                                         ->icon('heroicon-o-arrow-path')
                     ->color('gray')
                     ->visible(fn (Order $record) => filled($record->roadfn_tracking_number))
@@ -603,8 +603,8 @@ class OrderResource extends Resource
 
                             if (! $found) {
                                 \Filament\Notifications\Notification::make()
-                                    ->title('لم تُرجع RoadFN هذه الشحنة')
-                                    ->body('تأكد أن رقم التتبّع ما زال قائماً لدى RoadFN.')
+                                    ->title('لم تُرجع رودفنتي هذه الشحنة')
+                                    ->body('تأكد أن رقم التتبّع ما زال قائماً لدى رودفنتي.')
                                     ->warning()
                                     ->send();
                                 return;
@@ -615,12 +615,12 @@ class OrderResource extends Resource
 
                             \Filament\Notifications\Notification::make()
                                 ->title($changed ? 'تغيّرت حالة الطلب' : 'الحالة محدّثة أصلاً')
-                                ->body('RoadFN: ' . ($record->roadfn_status ?: '—') . ' • الطلب: ' . $record->status_label)
+                                ->body('رودفنتي: ' . ($record->roadfn_status ?: '—') . ' • الطلب: ' . $record->status_label)
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
                             \Filament\Notifications\Notification::make()
-                                ->title('تعذّر جلب الحالة من RoadFN')
+                                ->title('تعذّر جلب الحالة من رودفنتي')
                                 ->body($e->getMessage())
                                 ->danger()
                                 ->send();
@@ -638,8 +638,8 @@ class OrderResource extends Resource
                 Tables\Actions\Action::make('sendToRoadFn')
                     ->label('إرسال')
                     ->tooltip(fn (Order $record) => $record->deliveryZone?->roadfn_city_id
-                        ? 'إنشاء شحنة فعلية لدى RoadFN'
-                        : 'منطقة هذا الطلب غير مربوطة بـ RoadFN — شغّل roadfn:sync-zones')
+                        ? 'إنشاء شحنة فعلية لدى رودفنتي'
+                        : 'منطقة هذا الطلب غير مربوطة بـ رودفنتي — شغّل roadfn:sync-zones')
                     ->button()
                     ->size('sm')
                     ->icon('heroicon-o-truck')
@@ -648,13 +648,13 @@ class OrderResource extends Resource
                     ->disabled(fn (Order $record) => blank($record->deliveryZone?->roadfn_city_id) || blank($record->deliveryZone?->roadfn_area_id))
                     ->requiresConfirmation()
                     ->modalIcon('heroicon-o-truck')
-                    ->modalHeading('إرسال الطلب كشحنة إلى RoadFN')
+                    ->modalHeading('إرسال الطلب كشحنة إلى رودفنتي')
                     ->modalDescription(fn (Order $record) => new HtmlString(
                         '<div style="line-height:1.9;font-size:13px;">'
                         . '<div><strong>الزبون:</strong> ' . e($record->customer_name) . ' — ' . e($record->customer_phone) . '</div>'
                         . '<div><strong>الوجهة:</strong> ' . e($record->deliveryZone?->full_name ?? '—') . '</div>'
                         . '<div><strong>يُحصّل المندوب:</strong> ' . number_format((float) $record->total, 2) . ' ₪ نقداً</div>'
-                        . '<div style="margin-top:8px;color:#B45309;">شحنة فعلية لدى RoadFN — لا يمكن التراجع عنها من هنا.</div>'
+                        . '<div style="margin-top:8px;color:#B45309;">شحنة فعلية لدى رودفنتي — لا يمكن التراجع عنها من هنا.</div>'
                         . '</div>'
                     ))
                     ->modalSubmitActionLabel('نعم، أنشئ الشحنة')
@@ -663,13 +663,13 @@ class OrderResource extends Resource
                             app(\App\Services\RoadFnService::class)->createShipment($record);
 
                             \Filament\Notifications\Notification::make()
-                                ->title('تم إرسال الشحنة إلى RoadFN')
+                                ->title('تم إرسال الشحنة إلى رودفنتي')
                                 ->body("رقم التتبّع: {$record->roadfn_tracking_number} • الحالة: {$record->roadfn_status}")
                                 ->success()
                                 ->send();
                         } catch (\Throwable $e) {
                             \Filament\Notifications\Notification::make()
-                                ->title('فشل إرسال الشحنة إلى RoadFN')
+                                ->title('فشل إرسال الشحنة إلى رودفنتي')
                                 ->body($e->getMessage())
                                 ->danger()
                                 ->send();
