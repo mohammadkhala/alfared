@@ -532,10 +532,14 @@ class OrderResource extends Resource
                     // dropdown locks and just shows where the shipment is —
                     // otherwise a manual edit would be silently overwritten by
                     // the next sync.
+                    // Cancelling is offered alongside them but is one-way: the
+                    // status change restores stock and reverses loyalty points,
+                    // and flipping back to pending would not undo either, so a
+                    // cancelled order locks like a dispatched one.
                     ->options(function (Order $record) {
                         $labels = Order::$statusLabels;
                         return in_array($record->status, self::ADMIN_STATUSES, true)
-                            ? array_intersect_key($labels, array_flip(self::ADMIN_STATUSES))
+                            ? array_intersect_key($labels, array_flip([...self::ADMIN_STATUSES, 'cancelled']))
                             : array_intersect_key($labels, array_flip([$record->status]));
                     })
                     ->disabled(fn (Order $record) => ! in_array($record->status, self::ADMIN_STATUSES, true))
