@@ -212,6 +212,12 @@ class CheckoutController extends Controller
 
         $order = Order::find(session('last_order'));
 
+        // The app checkout has always emailed a confirmation; the website never
+        // did, so a web customer got nothing at all.
+        if ($order) {
+            \App\Services\OrderMailer::sendConfirmation($order);
+        }
+
         // The buyer may be a guest, so let this session through the order pages
         // it just created without having to prove the phone again.
         if ($order) {

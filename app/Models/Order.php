@@ -18,7 +18,7 @@ class Order extends Model
         'loyalty_points_redeemed', 'loyalty_discount',
         'return_requested_at', 'return_reason', 'return_status', 'return_reject_reason',
         'roadfn_tracking_number', 'roadfn_shipment_id', 'roadfn_status', 'roadfn_status_id', 'roadfn_sent_at',
-        'stock_restored_at',
+        'stock_restored_at', 'invoice_sent_at',
     ];
 
     protected $casts = [
@@ -33,6 +33,7 @@ class Order extends Model
         'roadfn_sent_at'       => 'datetime',
         'return_requested_at'  => 'datetime',
         'stock_restored_at'    => 'datetime',
+        'invoice_sent_at'      => 'datetime',
     ];
 
     public static $statusLabels = [
@@ -128,6 +129,20 @@ class Order extends Model
                 && $order->user_id
             ) {
                 \App\Services\LoyaltyService::revokeForOrder($order);
+            }
+
+            // ── Invoice, once the sale is actually settled ──
+            // Cash orders: on delivery, when the driver has collected. Card
+            // orders: as soon as payment clears, since the money is already in.
+            // Not at checkout — a COD order isn't a completed sale, and
+            // invoicing it early means a credit note for every cancellation.
+            $justDelivered = $order->wasChanged('status') && $order->status === 'delivered';
+            $justPaid      = $order->wasChanged('payment_status')
+                && $order->payment_status === 'paid'
+                && in_array($order->payment_method, ['lahza', 'card'], true);
+
+            if ($justDelivered || $justPaid) {
+                \App\Services\OrderMailer::sendInvoice($order);
             }
 
             // ── Push notification to customer on status change ──

@@ -58,6 +58,10 @@ Route::get('/maintenance-preview', function () {
     return view('maintenance', compact('type','title','message','launch','wa'));
 })->middleware('auth')->name('maintenance.preview');
 
+// ── Customer invoice (linked from the invoice email; gated by OrderAccess) ──
+Route::get('/orders/{orderNumber}/receipt', [InvoiceController::class, 'receipt'])
+    ->name('orders.receipt');
+
 // ── Admin Invoices & Export ──
 Route::middleware('auth')->prefix('admin-tools')->group(function () {
     Route::get('invoice/{order}',  [InvoiceController::class, 'single'])->name('orders.invoice');

@@ -396,15 +396,9 @@ class CartController extends Controller
         // Empty the cart
         Cache::forget($this->key($user->id));
 
-        // Send confirmation email (queued — non-blocking)
-        $emailTo = $order->customer_email ?? $user->email;
-        if ($emailTo) {
-            try {
-                Mail::to($emailTo)->queue(new OrderConfirmationMail($order->load('items')));
-            } catch (\Throwable) {
-                // Email failure must not break the order response
-            }
-        }
+        // Same path as the website, so the two checkouts can't drift on which
+        // emails a customer gets. Falls back to the account address itself.
+        \App\Services\OrderMailer::sendConfirmation($order);
 
         // ── Lahza online payment ──
         if (($data['payment_method'] ?? 'cod') === 'lahza') {

@@ -24,6 +24,29 @@ class InvoiceController extends Controller
         );
     }
 
+    /**
+     * The same invoice, for the customer who bought it.
+     *
+     * single() is admin-only; this is the copy linked from the invoice email,
+     * so it goes through OrderAccess — the signed-in owner, staff, or a guest
+     * session that proved it knows the order. The order number alone runs in
+     * sequence and would otherwise expose every customer's basket.
+     */
+    public function receipt(Request $request, string $orderNumber)
+    {
+        $order = Order::with('items', 'deliveryZone.parent')
+            ->where('order_number', $orderNumber)
+            ->firstOrFail();
+
+        \App\Support\OrderAccess::authorize($order);
+
+        $lang = $this->resolveLang($request);
+
+        return $this->renderInLang($lang, fn () =>
+            view('admin.invoices.single', ['order' => $order, 'lang' => $lang])->render()
+        );
+    }
+
     /** Print many invoices at once. ?ids=1,2,3 OR ?ids=all  &  ?lang=ar|he|en */
     public function bulk(Request $request)
     {
