@@ -494,13 +494,15 @@
      with a timer that counted to midnight and restarted every night, so it
      advertised an offer that never ended and that nothing backed. No active
      sale now means no banner. --}}
-@if(isset($flashSale) && $flashSale && $flashSale->ends_at)
+@if(isset($flashSale) && $flashSale)
 <section style="padding:48px 0;">
   <div class="container">
     <div class="flash-banner">
       <div class="flash-text">
         <p>{{ __('flash_tag') }}</p>
         <h2>{{ $flashSale->name_ar }}</h2>
+        {{-- An open-ended sale still deserves the banner; it just has no clock. --}}
+        @if($flashSale->ends_at)
         <div class="flash-timer" data-ends="{{ $flashSale->ends_at->toIso8601String() }}">
           <div class="timer-item"><span id="h">--</span><p>{{ __('flash_hour') }}</p></div>
           <span class="timer-sep">:</span>
@@ -508,6 +510,7 @@
           <span class="timer-sep">:</span>
           <div class="timer-item"><span id="s">--</span><p>{{ __('flash_second') }}</p></div>
         </div>
+        @endif
         <a href="{{ route('products.index', ['on_sale' => 1]) }}" class="btn-orange" style="margin-top:20px;">{{ __('btn_shop_now') }}</a>
       </div>
       <div class="flash-img">💄</div>
