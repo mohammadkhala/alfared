@@ -97,16 +97,16 @@
       <a href="{{ $b->link ?? '#' }}" onclick="closePromoPopup()" style="display:block;text-decoration:none;position:relative;">
         <img src="{{ $b->image ? Storage::url($b->image) : '' }}" alt="{{ $b->title_ar }}"
              style="width:100%;height:360px;object-fit:cover;display:block;"/>
-        <div style="position:absolute;inset:0;background:linear-gradient(to left,transparent 35%,rgba(10,20,60,.8));"></div>
+        <div style="position:absolute;inset:0;background:linear-gradient(to right,transparent 30%,rgba(10,20,60,.55) 60%,rgba(10,20,60,.92) 100%),rgba(10,20,50,.3);"></div>
         <div style="position:absolute;top:50%;right:40px;transform:translateY(-50%);color:#fff;max-width:55%;">
           @if($b->badge_text)
             <span style="display:inline-block;background:#E8711A;color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:12px;">{{ $b->badge_text }}</span>
           @endif
           @if($b->title_ar)
-            <h2 style="font-size:clamp(20px,3.5vw,34px);font-weight:900;margin:0 0 8px;line-height:1.25;">{{ $b->title_ar }}</h2>
+            <h2 style="font-size:clamp(20px,3.5vw,34px);font-weight:900;margin:0 0 8px;line-height:1.25;text-shadow:0 2px 14px rgba(0,0,0,.5);">{{ $b->title_ar }}</h2>
           @endif
           @if($b->subtitle_ar)
-            <p style="font-size:14px;opacity:.88;margin:0 0 18px;line-height:1.5;">{{ $b->subtitle_ar }}</p>
+            <p style="font-size:14px;opacity:1;margin:0 0 18px;line-height:1.5;text-shadow:0 1px 10px rgba(0,0,0,.45);">{{ $b->subtitle_ar }}</p>
           @endif
           @if($b->button_text_ar)
             <span style="display:inline-block;background:#E8711A;color:#fff;padding:12px 26px;border-radius:12px;font-weight:700;font-size:14px;">{{ $b->button_text_ar }} ←</span>
@@ -123,16 +123,16 @@
             <a href="{{ $b->link ?? '#' }}" onclick="closePromoPopup()" style="display:block;text-decoration:none;">
               <img src="{{ $b->image ? Storage::url($b->image) : '' }}" alt="{{ $b->title_ar }}"
                    style="width:100%;height:360px;object-fit:cover;display:block;"/>
-              <div style="position:absolute;inset:0;background:linear-gradient(to left,transparent 35%,rgba(10,20,60,.8));"></div>
+              <div style="position:absolute;inset:0;background:linear-gradient(to right,transparent 30%,rgba(10,20,60,.55) 60%,rgba(10,20,60,.92) 100%),rgba(10,20,50,.3);"></div>
               <div style="position:absolute;top:50%;right:40px;transform:translateY(-50%);color:#fff;max-width:55%;">
                 @if($b->badge_text)
                   <span style="display:inline-block;background:#E8711A;color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:20px;margin-bottom:12px;">{{ $b->badge_text }}</span>
                 @endif
                 @if($b->title_ar)
-                  <h2 style="font-size:clamp(20px,3.5vw,34px);font-weight:900;margin:0 0 8px;line-height:1.25;">{{ $b->title_ar }}</h2>
+                  <h2 style="font-size:clamp(20px,3.5vw,34px);font-weight:900;margin:0 0 8px;line-height:1.25;text-shadow:0 2px 14px rgba(0,0,0,.5);">{{ $b->title_ar }}</h2>
                 @endif
                 @if($b->subtitle_ar)
-                  <p style="font-size:14px;opacity:.88;margin:0 0 18px;line-height:1.5;">{{ $b->subtitle_ar }}</p>
+                  <p style="font-size:14px;opacity:1;margin:0 0 18px;line-height:1.5;text-shadow:0 1px 10px rgba(0,0,0,.45);">{{ $b->subtitle_ar }}</p>
                 @endif
                 @if($b->button_text_ar)
                   <span style="display:inline-block;background:#E8711A;color:#fff;padding:12px 26px;border-radius:12px;font-weight:700;font-size:14px;">{{ $b->button_text_ar }} ←</span>
