@@ -490,25 +490,31 @@
 @endif
 
 {{-- ═══════════════════ FLASH OFFER ═══════════════════ --}}
+{{-- Driven by the flash sale set in the admin panel. It used to be hardcoded
+     with a timer that counted to midnight and restarted every night, so it
+     advertised an offer that never ended and that nothing backed. No active
+     sale now means no banner. --}}
+@if(isset($flashSale) && $flashSale && $flashSale->ends_at)
 <section style="padding:48px 0;">
   <div class="container">
     <div class="flash-banner">
       <div class="flash-text">
         <p>{{ __('flash_tag') }}</p>
-        <h2>{{ __('flash_title') }}</h2>
-        <div class="flash-timer">
-          <div class="timer-item"><span id="h">02</span><p>{{ __('flash_hour') }}</p></div>
+        <h2>{{ $flashSale->name_ar }}</h2>
+        <div class="flash-timer" data-ends="{{ $flashSale->ends_at->toIso8601String() }}">
+          <div class="timer-item"><span id="h">--</span><p>{{ __('flash_hour') }}</p></div>
           <span class="timer-sep">:</span>
-          <div class="timer-item"><span id="m">45</span><p>{{ __('flash_minute') }}</p></div>
+          <div class="timer-item"><span id="m">--</span><p>{{ __('flash_minute') }}</p></div>
           <span class="timer-sep">:</span>
-          <div class="timer-item"><span id="s">30</span><p>{{ __('flash_second') }}</p></div>
+          <div class="timer-item"><span id="s">--</span><p>{{ __('flash_second') }}</p></div>
         </div>
-        <a href="{{ route('products.index') }}" class="btn-orange" style="margin-top:20px;">{{ __('btn_shop_now') }}</a>
+        <a href="{{ route('products.index', ['on_sale' => 1]) }}" class="btn-orange" style="margin-top:20px;">{{ __('btn_shop_now') }}</a>
       </div>
       <div class="flash-img">💄</div>
     </div>
   </div>
 </section>
+@endif
 
 {{-- ═══════════════════ NEW ARRIVALS ═══════════════════ --}}
 @if(isset($newProducts) && $newProducts->count())
@@ -754,23 +760,42 @@
 })();
 </script>
 <script>
-// Countdown Timer
-function updateTimer() {
-  const now = new Date();
-  const end = new Date(now);
-  end.setHours(23,59,59,0);
-  const diff = Math.max(0, end - now);
-  const h = Math.floor(diff/3600000);
-  const m = Math.floor((diff%3600000)/60000);
-  const s = Math.floor((diff%60000)/1000);
-  const pad = n => String(n).padStart(2,'0');
-  ['h','m','s'].forEach((id,i) => {
-    const el = document.getElementById(id);
-    if(el) el.textContent = pad([h,m,s][i]);
-  });
-}
-updateTimer();
-setInterval(updateTimer, 1000);
+// Flash-offer banner countdown — counts to the sale's real end date, set in
+// the admin panel. It previously counted to midnight and restarted nightly.
+(function () {
+  const timer = document.querySelector('.flash-timer[data-ends]');
+  if (!timer) return;
+
+  const ends = new Date(timer.dataset.ends);
+  const pad  = n => String(n).padStart(2, '0');
+
+  function updateTimer() {
+    const diff = Math.max(0, ends - new Date());
+
+    if (diff === 0) {
+      // The sale is over; drop the banner rather than show 00:00:00 until the
+      // next page load.
+      const section = timer.closest('section');
+      if (section) section.remove();
+      clearInterval(handle);
+      return;
+    }
+
+    // Hours accumulate past 24 so a multi-day sale reads honestly.
+    const parts = [
+      Math.floor(diff / 3600000),
+      Math.floor((diff % 3600000) / 60000),
+      Math.floor((diff % 60000) / 1000),
+    ];
+    ['h', 'm', 's'].forEach((id, i) => {
+      const el = document.getElementById(id);
+      if (el) el.textContent = pad(parts[i]);
+    });
+  }
+
+  updateTimer();
+  const handle = setInterval(updateTimer, 1000);
+})();
 </script>
 
 <script>
