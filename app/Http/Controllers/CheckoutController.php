@@ -170,9 +170,13 @@ class CheckoutController extends Controller
                     'total'        => $item['price'] * $item['qty'],
                 ]);
 
-                // Reduce stock
-                Product::where('id', $item['product_id'])
-                    ->decrement('stock_quantity', $item['qty']);
+                // Reduce stock — only for products that track it, matching the
+                // API checkout. Deducting from untracked products made the
+                // figure meaningless and couldn't be reversed symmetrically.
+                $product = Product::find($item['product_id']);
+                if ($product && $product->track_quantity) {
+                    $product->decrement('stock_quantity', $item['qty']);
+                }
             }
 
             // Mark coupon used

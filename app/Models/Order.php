@@ -18,6 +18,7 @@ class Order extends Model
         'loyalty_points_redeemed', 'loyalty_discount',
         'return_requested_at', 'return_reason', 'return_status', 'return_reject_reason',
         'roadfn_tracking_number', 'roadfn_shipment_id', 'roadfn_status', 'roadfn_status_id', 'roadfn_sent_at',
+        'stock_restored_at',
     ];
 
     protected $casts = [
@@ -31,6 +32,7 @@ class Order extends Model
         'last_edited_at'       => 'datetime',
         'roadfn_sent_at'       => 'datetime',
         'return_requested_at'  => 'datetime',
+        'stock_restored_at'    => 'datetime',
     ];
 
     public static $statusLabels = [
@@ -105,6 +107,16 @@ class Order extends Model
                 && $order->user_id
             ) {
                 \App\Services\LoyaltyService::awardForOrder($order);
+            }
+
+            // ── Put the goods back on the shelf ──
+            // Stock leaves the moment an order is created, so a cancelled order
+            // would otherwise hold quantity that was never sold.
+            if (
+                $order->wasChanged('status')
+                && in_array($order->status, ['cancelled', 'returned'], true)
+            ) {
+                \App\Services\StockService::restoreForOrder($order);
             }
 
             // ── Take them back if the order is cancelled or returned ──
