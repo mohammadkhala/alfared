@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Order;
+use App\Services\OrderCancellation;
 use App\Models\LoyaltyTransaction;
 use App\Models\OtpCode;
 use App\Models\Wishlist;
@@ -34,6 +35,26 @@ class AccountController extends Controller
             ->paginate(10);
 
         return view('account.orders', compact('orders'));
+    }
+
+    /** Customer cancelling their own order from the account page. */
+    public function cancelOrder(Request $request, string $orderNumber)
+    {
+        $order = Order::where('order_number', $orderNumber)
+            ->where('user_id', auth()->id())
+            ->firstOrFail();
+
+        if (! OrderCancellation::customerMayCancel($order)) {
+            return back()->with('error', OrderCancellation::blockedReason($order));
+        }
+
+        OrderCancellation::cancel(
+            $order,
+            OrderCancellation::BY_CUSTOMER,
+            $request->input('reason'),
+        );
+
+        return back()->with('success', "تم إلغاء الطلب #{$order->order_number}.");
     }
 
     public function wishlist()

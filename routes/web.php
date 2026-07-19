@@ -134,6 +134,8 @@ Route::post('/webhooks/lahza', [LahzaWebhookController::class, 'handle'])->name(
 Route::prefix('account')->name('account.')->middleware('auth')->group(function () {
     Route::get('/', [AccountController::class, 'index'])->name('index');
     Route::get('/orders', [AccountController::class, 'orders'])->name('orders');
+    Route::post('/orders/{orderNumber}/cancel', [AccountController::class, 'cancelOrder'])
+        ->name('orders.cancel');
     Route::get('/wishlist', [AccountController::class, 'wishlist'])->name('wishlist');
     Route::get('/points', [AccountController::class, 'points'])->name('points');
     Route::get('/profile', [AccountController::class, 'profile'])->name('profile');

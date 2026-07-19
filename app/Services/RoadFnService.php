@@ -303,6 +303,15 @@ class RoadFnService
             ]);
         } elseif ($mapped !== $order->status) {
             $update['status'] = $mapped;
+
+            // Claim it explicitly: the auto-sync runs inside an admin's page
+            // request, so anything inferred from auth() would credit the admin
+            // with a cancellation the courier made.
+            if ($mapped === 'cancelled' && blank($order->cancelled_by)) {
+                $update['cancelled_at'] = now();
+                $update['cancelled_by'] = \App\Services\OrderCancellation::BY_COURIER;
+                $update['cancellation_reason'] = $record['StatusAr'] ?? $record['StatusEn'] ?? null;
+            }
             // Stamp the matching timestamp on first transition, if not already set.
             $stamp = ['confirmed' => 'confirmed_at', 'shipped' => 'shipped_at', 'delivered' => 'delivered_at'][$mapped] ?? null;
             if ($stamp && ! $order->{$stamp}) {

@@ -73,6 +73,24 @@
                     style="padding:9px 18px;font-size:13px;background:#25D366;color:#fff;border-radius:8px;text-decoration:none;font-weight:600;">
                     {{ __('my_orders_inquire') }}
                   </a>
+
+                  {{-- Only while the order is still ours to stop: once a
+                       shipment exists at the courier a parcel is physically
+                       moving, and cancelling here would desync the two. --}}
+                  @if(\App\Services\OrderCancellation::customerMayCancel($order))
+                    <form method="POST" action="{{ route('account.orders.cancel', $order->order_number) }}"
+                          onsubmit="return confirm(@js(__('my_orders_cancel_confirm')))"
+                          style="display:inline-flex;gap:8px;align-items:center;">
+                      @csrf
+                      <input type="text" name="reason" maxlength="500"
+                             placeholder="{{ __('my_orders_cancel_reason') }}"
+                             style="padding:8px 12px;font-size:12px;border:1px solid #E5E7EB;border-radius:8px;width:170px;font-family:inherit;"/>
+                      <button type="submit"
+                              style="padding:9px 18px;font-size:13px;background:#fff;color:#DC2626;border:1px solid #FCA5A5;border-radius:8px;font-weight:600;cursor:pointer;font-family:inherit;">
+                        {{ __('my_orders_cancel') }}
+                      </button>
+                    </form>
+                  @endif
                 </div>
               </div>
             @endforeach

@@ -367,5 +367,8 @@
   "checkout_pick_neighborhood": "חפש ובחר את האזור שלך מהרשימה",
   "checkout_neighborhood_required": "נא לבחור אזור מהרשימה",
   "checkout_pick_city_first": "בחר עיר תחילה",
-  "checkout_city_required": "נא לבחור עיר"
+  "checkout_city_required": "נא לבחור עיר",
+  "my_orders_cancel": "ביטול הזמנה",
+  "my_orders_cancel_confirm": "לבטל את ההזמנה? לא ניתן לבטל פעולה זו.",
+  "my_orders_cancel_reason": "סיבת הביטול (לא חובה)"
 }

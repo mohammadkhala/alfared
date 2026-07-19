@@ -19,6 +19,7 @@ class Order extends Model
         'return_requested_at', 'return_reason', 'return_status', 'return_reject_reason',
         'roadfn_tracking_number', 'roadfn_shipment_id', 'roadfn_status', 'roadfn_status_id', 'roadfn_sent_at',
         'stock_restored_at', 'invoice_sent_at',
+        'cancelled_at', 'cancelled_by', 'cancellation_reason',
     ];
 
     protected $casts = [
@@ -34,6 +35,7 @@ class Order extends Model
         'return_requested_at'  => 'datetime',
         'stock_restored_at'    => 'datetime',
         'invoice_sent_at'      => 'datetime',
+        'cancelled_at'         => 'datetime',
     ];
 
     public static $statusLabels = [
@@ -86,6 +88,13 @@ class Order extends Model
 
             // Skip if this update is from the EditOrder page (it sets last_edited_at)
             if ($order->isDirty('last_edited_at')) return;
+
+            // A status flipped straight to cancelled (the admin's inline
+            // dropdown) still needs attribution, or the column reads blank.
+            if (($changes['status']['after'] ?? null) === 'cancelled' && blank($order->cancelled_by)) {
+                $order->cancelled_at = now();
+                $order->cancelled_by = \App\Services\OrderCancellation::BY_ADMIN;
+            }
 
             $action = (count($changes) === 1 && isset($changes['status'])) ? 'status_change' : 'edit';
 

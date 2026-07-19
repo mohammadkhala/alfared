@@ -507,6 +507,22 @@ class OrderResource extends Resource
                     ->tooltip(fn (Order $record) => $record->roadfn_tracking_number)
                     ->width('110px'),
 
+                // Who cancelled matters: a customer backing out before dispatch
+                // is routine, one coming back from the courier is a failed
+                // delivery worth chasing.
+                Tables\Columns\TextColumn::make('cancelled_by')
+                    ->label('مصدر الإلغاء')
+                    ->badge()
+                    ->color(fn (Order $record) => match ($record->cancelled_by) {
+                        'customer' => 'warning',
+                        'courier'  => 'danger',
+                        default    => 'gray',
+                    })
+                    ->state(fn (Order $record) => \App\Services\OrderCancellation::byLabel($record->cancelled_by))
+                    ->description(fn (Order $record) => $record->cancellation_reason)
+                    ->placeholder('—')
+                    ->toggleable(isToggledHiddenByDefault: true),
+
                 // ── الحالة (select مباشر) ─────────────────────────────
                 Tables\Columns\SelectColumn::make('status')
                     ->label('الحالة')
@@ -539,6 +555,13 @@ class OrderResource extends Resource
                         ->distinct()
                         ->pluck('city', 'city')
                         ->toArray()),
+                Tables\Filters\SelectFilter::make('cancelled_by')
+                    ->label('مصدر الإلغاء')
+                    ->options([
+                        'customer' => 'ألغاه الزبون',
+                        'admin'    => 'ألغاه الأدمن',
+                        'courier'  => 'ألغته شركة التوصيل',
+                    ]),
                 Tables\Filters\TernaryFilter::make('roadfn_sent')
                     ->label('الإرسال إلى رودفنتي')
                     ->placeholder('الكل')

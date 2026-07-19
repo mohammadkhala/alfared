@@ -367,5 +367,8 @@
   "checkout_pick_neighborhood": "Search and pick your area from the list",
   "checkout_neighborhood_required": "Please pick your area from the list",
   "checkout_pick_city_first": "Choose a city first",
-  "checkout_city_required": "Please choose a city"
+  "checkout_city_required": "Please choose a city",
+  "my_orders_cancel": "Cancel order",
+  "my_orders_cancel_confirm": "Cancel this order? This cannot be undone.",
+  "my_orders_cancel_reason": "Reason for cancelling (optional)"
 }

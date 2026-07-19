@@ -93,6 +93,37 @@ class OrderController extends Controller
     }
 
     /** ── Return request ───────────────────────────────────── */
+    /**
+     * The customer cancelling their own order, before it goes to the courier.
+     */
+    public function cancel(Request $request, string $orderNumber): JsonResponse
+    {
+        $data = $request->validate([
+            'reason' => 'nullable|string|max:500',
+        ]);
+
+        $order = Order::where('order_number', $orderNumber)
+            ->where('user_id', $request->user()->id)
+            ->firstOrFail();
+
+        if (! \App\Services\OrderCancellation::customerMayCancel($order)) {
+            return response()->json([
+                'error' => \App\Services\OrderCancellation::blockedReason($order),
+            ], 422);
+        }
+
+        \App\Services\OrderCancellation::cancel(
+            $order,
+            \App\Services\OrderCancellation::BY_CUSTOMER,
+            $data['reason'] ?? null,
+        );
+
+        return response()->json([
+            'message' => 'تم إلغاء الطلب.',
+            'order'   => $this->formatOrder($order->refresh(), true),
+        ]);
+    }
+
     public function returnRequest(Request $request, string $orderNumber): JsonResponse
     {
         $data = $request->validate([
