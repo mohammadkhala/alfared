@@ -87,9 +87,33 @@ class HomeController extends Controller
             Brand::where('is_active', true)->orderBy('sort_order')->limit(12)->get()
         );
 
+        // The three cards floating over the hero image: real products, so they
+        // carry a real photo, price and link instead of hardcoded brand names
+        // and made-up prices. Prefer on-sale items, fall back to featured.
+        $heroProducts = Cache::remember("home:{$loc}:hero_cards", $ttl, function () {
+            // "On sale" is compare_price > price — is_on_sale is a computed
+            // accessor, not a column, so it can't be queried directly.
+            $onSale = Product::active()
+                ->whereColumn('compare_price', '>', 'price')
+                ->whereNotNull('main_image')->where('stock_quantity', '>', 0)
+                ->inRandomOrder()->limit(3)->get();
+
+            if ($onSale->count() === 3) {
+                return $onSale;
+            }
+
+            // Top up from featured so there are always three.
+            return $onSale->merge(
+                Product::active()->featured()
+                    ->whereNotNull('main_image')->where('stock_quantity', '>', 0)
+                    ->whereNotIn('id', $onSale->pluck('id'))
+                    ->limit(3 - $onSale->count())->get()
+            );
+        });
+
         return view('home', compact(
             'heroBanners', 'categories', 'featuredProducts',
-            'newProducts', 'bestSellers', 'brands',
+            'newProducts', 'bestSellers', 'brands', 'heroProducts',
             'offerProducts', 'offerBanners', 'promoBanners', 'flashSale'
         ));
     }

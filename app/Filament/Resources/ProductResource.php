@@ -334,7 +334,7 @@ class ProductResource extends Resource
                         // Home listings are cached — bust them so the new price
                         // shows immediately instead of after the TTL expires.
                         foreach (['ar', 'en', 'he'] as $loc) {
-                            foreach (['featured', 'new', 'bestsellers', 'sale'] as $key) {
+                            foreach (['featured', 'new', 'bestsellers', 'sale', 'hero_cards'] as $key) {
                                 \Illuminate\Support\Facades\Cache::forget("home:{$loc}:{$key}");
                             }
                         }

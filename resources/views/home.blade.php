@@ -51,21 +51,22 @@
   <div class="hero-right">
     <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=700&q=85" alt="{{ __('company_name') }}"/>
     <div class="hero-img-overlay"></div>
-    <div class="float-card fc-top">
-      <div class="fc-icon">💄</div>
-      <div class="fc-name">Charlotte Tilbury</div>
-      <div class="fc-price">89 ₪</div>
-    </div>
-    <div class="float-card fc-mid">
-      <div class="fc-icon">🧴</div>
-      <div class="fc-name">La Roche-Posay</div>
-      <div class="fc-price">65 ₪</div>
-    </div>
-    <div class="float-card fc-bot">
-      <div class="fc-icon">🌸</div>
-      <div class="fc-name">Dior Perfume</div>
-      <div class="fc-price">195 ₪</div>
-    </div>
+    {{-- Real products, so the photo, price and link are all genuine. Falls
+         back to nothing rather than showing invented brands if the store has
+         no products yet. --}}
+    @foreach(($heroProducts ?? collect())->take(3) as $i => $hp)
+      @php
+        $pos = ['fc-top','fc-mid','fc-bot'][$i] ?? 'fc-bot';
+        $img = $hp->main_image
+          ? (str_starts_with($hp->main_image,'http') ? $hp->main_image : asset('storage/'.$hp->main_image))
+          : asset('images/placeholder.svg');
+      @endphp
+      <a href="{{ route('products.show', $hp->slug) }}" class="float-card {{ $pos }}">
+        <img class="fc-img" src="{{ $img }}" alt="{{ $hp->name }}" loading="lazy"/>
+        <div class="fc-name">{{ \Illuminate\Support\Str::limit($hp->name, 20) }}</div>
+        <div class="fc-price">{{ number_format($hp->price, 0) }} ₪</div>
+      </a>
+    @endforeach
     <div class="sale-ribbon">{{ __('sale_ribbon') }}</div>
   </div>
 </div>

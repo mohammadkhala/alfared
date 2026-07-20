@@ -54,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
             foreach (['ar', 'he', 'en'] as $loc) {
                 foreach ([
                     'hero','categories','featured','new','bestsellers','brands',
-                    'sale','offer_banners','promo_banners',
+                    'sale','hero_cards','offer_banners','promo_banners',
                 ] as $key) {
                     Cache::forget("home:{$loc}:{$key}");
                 }
