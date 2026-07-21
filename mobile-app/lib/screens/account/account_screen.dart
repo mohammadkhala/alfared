@@ -46,7 +46,8 @@ class _AccountScreenState extends State<AccountScreen> {
     try {
       final info = await PackageInfo.fromPlatform();
       if (mounted) {
-        setState(() => _version = 'الإصدار ${info.version} (${info.buildNumber})');
+        final v = context.mounted ? context.read<LocaleProvider>().s.versionLabel : 'الإصدار';
+        setState(() => _version = '$v ${info.version} (${info.buildNumber})');
       }
     } catch (_) {
       // Plugin unavailable — leave the line empty rather than showing a lie.
@@ -387,7 +388,7 @@ class _AccountScreenState extends State<AccountScreen> {
               _MenuItem(
                 icon: '🔒',
                 iconBg: const Color(0xFFE8F0FF),
-                label: 'سياسة الخصوصية',
+                label: s.privacyPolicy,
                 onTap: () async {
                   final url = Uri.parse('https://alfared.ps/privacy-policy');
                   await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -397,7 +398,7 @@ class _AccountScreenState extends State<AccountScreen> {
               _MenuItem(
                 icon: '📜',
                 iconBg: const Color(0xFFE8F0FF),
-                label: 'شروط الاستخدام',
+                label: s.termsOfUse,
                 onTap: () async {
                   final url = Uri.parse('https://alfared.ps/terms');
                   await launchUrl(url, mode: LaunchMode.externalApplication);
@@ -445,7 +446,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Row(mainAxisSize: MainAxisSize.min, children: [
-                  const Text('صُنع بواسطة ',
+                  Text(s.madeBy,
                     style: TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 12)),
                   const Text('mohammad khallaf',
                     style: TextStyle(

@@ -72,7 +72,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
           .map<Map<String, dynamic>>((a) => (a as Map).cast<String, dynamic>())
           .toList());
     } catch (_) {
-      if (mounted) Fluttertoast.showToast(msg: 'تعذر تحميل الأحياء');
+      if (mounted) Fluttertoast.showToast(msg: context.read<LocaleProvider>().s.loadAreasError);
     } finally {
       if (mounted) setState(() => _areasLoading = false);
     }
@@ -204,7 +204,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
         return {...m, 'id': toId(m['id'])};
       }).where((z) => (z['id'] as int) > 0).toList();
     } catch (e) {
-      Fluttertoast.showToast(msg: 'تعذر تحميل مناطق التوصيل');
+      if (mounted) Fluttertoast.showToast(msg: context.read<LocaleProvider>().s.loadZonesError);
     }
 
     if (mounted) setState(() => _loading = false);
@@ -535,7 +535,7 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                   Text(s.cod,
                       style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
                 ]),
-                subtitle: const Text('ادفع عند استلام الطلب',
+                subtitle: Text(s.payCodDesc,
                     style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: Colors.grey)),
                 activeColor: AppColors.orange,
                 dense: true,
@@ -549,10 +549,10 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                 onChanged: (v) => setState(() => _payment = v!),
                 title: Row(children: [
                   const Text('💳 ', style: TextStyle(fontSize: 18)),
-                  const Text('بطاقة بنكية (Visa / Mastercard)',
+                  Text(s.payCardTitle,
                       style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
                 ]),
-                subtitle: const Text('دفع آمن عبر بوابة لحظة',
+                subtitle: Text(s.payCardDesc,
                     style: TextStyle(fontFamily: 'Cairo', fontSize: 11, color: Colors.grey)),
                 activeColor: AppColors.orange,
                 dense: true,

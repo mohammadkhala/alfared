@@ -145,6 +145,15 @@ class S {
   String get whatsapp             => _t('whatsapp');
   String get addedToCartShort     => _t('addedToCartShort');
   String get orderInquiry         => _t('orderInquiry');
+  String get loadAreasError => _t('loadAreasError');
+  String get loadZonesError => _t('loadZonesError');
+  String get payCodDesc => _t('payCodDesc');
+  String get payCardTitle => _t('payCardTitle');
+  String get payCardDesc => _t('payCardDesc');
+  String get versionLabel => _t('versionLabel');
+  String get privacyPolicy => _t('privacyPolicy');
+  String get termsOfUse => _t('termsOfUse');
+  String get madeBy => _t('madeBy');
   String get trackIntro        => _t('trackIntro');
   String get trackNumberLabel  => _t('trackNumberLabel');
   String get trackSubmit       => _t('trackSubmit');
@@ -491,6 +500,15 @@ class AppStrings {
     'whatsapp':         {'ar': 'واتساب', 'he': 'וואטסאפ', 'en': 'WhatsApp'},
     'addedToCartShort': {'ar': 'تمت الإضافة ✓', 'he': 'נוסף ✓', 'en': 'Added ✓'},
     'orderInquiry':     {'ar': 'استفسار عن طلب', 'he': 'בירור לגבי הזמנה', 'en': 'Inquiry about order'},
+    'loadAreasError': {'ar': 'تعذر تحميل الأحياء', 'he': 'טעינת השכונות נכשלה', 'en': 'Failed to load areas'},
+    'loadZonesError': {'ar': 'تعذر تحميل مناطق التوصيل', 'he': 'טעינת אזורי המשלוח נכשלה', 'en': 'Failed to load delivery areas'},
+    'payCodDesc': {'ar': 'ادفع عند استلام الطلب', 'he': 'שלם בעת קבלת ההזמנה', 'en': 'Pay on delivery'},
+    'payCardTitle': {'ar': 'بطاقة بنكية (Visa / Mastercard)', 'he': 'כרטיס אשראי (Visa / Mastercard)', 'en': 'Bank card (Visa / Mastercard)'},
+    'payCardDesc': {'ar': 'دفع آمن عبر بوابة لحظة', 'he': 'תשלום מאובטח דרך Lahza', 'en': 'Secure payment via Lahza'},
+    'versionLabel': {'ar': 'الإصدار', 'he': 'גרסה', 'en': 'Version'},
+    'privacyPolicy': {'ar': 'سياسة الخصوصية', 'he': 'מדיניות פרטיות', 'en': 'Privacy policy'},
+    'termsOfUse': {'ar': 'شروط الاستخدام', 'he': 'תנאי שימוש', 'en': 'Terms of use'},
+    'madeBy': {'ar': 'صُنع بواسطة ', 'he': 'נבנה על ידי ', 'en': 'Made by '},
     'trackIntro':         {'ar': 'أدخل رقم الطلب لعرض حالة الشحنة.', 'he': 'הזינו את מספר ההזמנה כדי לראות את סטטוס המשלוח.', 'en': 'Enter your order number to see the shipment status.'},
     'trackNumberLabel':   {'ar': 'رقم الطلب',       'he': 'מספר הזמנה',     'en': 'Order Number'},
     'trackSubmit':        {'ar': 'عرض حالة الطلب',  'he': 'הצג סטטוס',      'en': 'Show Status'},
