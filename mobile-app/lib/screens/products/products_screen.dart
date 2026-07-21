@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../models/category.dart';
 import '../../models/product.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
 import '../../theme/theme_ext.dart';
@@ -154,8 +155,9 @@ class _ProductsScreenState extends State<ProductsScreen> {
               scrollDirection: Axis.horizontal,
               padding: const EdgeInsets.symmetric(horizontal: 12),
               children: [
-                _categoryChip('الكل', null),
-                ..._categories.map((c) => _categoryChip(c.name, c.slug)),
+                _categoryChip(context.watch<LocaleProvider>().s.all, null),
+                ..._categories.map((c) => _categoryChip(
+                      c.nameFor(context.watch<LocaleProvider>().code), c.slug)),
               ],
             ),
           ),

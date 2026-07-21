@@ -80,10 +80,38 @@ class CartController extends Controller
     public function index(Request $request): JsonResponse
     {
         $cart = $this->getCart($request->user()->id);
+
         return response()->json([
-            'items' => array_values($cart),
+            'items' => array_values($this->withLocalizedNames($cart)),
             'totals'=> $this->computeTotals($cart),
         ]);
+    }
+
+    /**
+     * Adds name_en/name_he to each cart line so the app can show the product in
+     * the user's language.
+     *
+     * The stored 'name' is an Arabic snapshot from when the item was added, and
+     * older carts have only that — so the translations are read from the live
+     * product, in one query for the whole cart, and fall back to the snapshot.
+     */
+    protected function withLocalizedNames(array $cart): array
+    {
+        $ids = collect($cart)->pluck('product_id')->filter()->unique();
+        if ($ids->isEmpty()) {
+            return $cart;
+        }
+
+        $products = Product::whereIn('id', $ids)->get(['id', 'name_ar', 'name_en', 'name_he'])->keyBy('id');
+
+        foreach ($cart as $key => $item) {
+            $p = $products->get($item['product_id'] ?? null);
+            $cart[$key]['name']    = $p->name_ar ?? $item['name'];
+            $cart[$key]['name_en'] = $p->name_en ?? null;
+            $cart[$key]['name_he'] = $p->name_he ?? null;
+        }
+
+        return $cart;
     }
 
     public function add(Request $request): JsonResponse

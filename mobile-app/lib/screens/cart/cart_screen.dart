@@ -242,6 +242,18 @@ class _CartItemCard extends StatelessWidget {
   final VoidCallback onRemove;
   final VoidCallback onSaveForLater;
 
+  /// The API sends name (Arabic), name_en and name_he per line; pick the one
+  /// for the active language, falling back to Arabic.
+  static String _localizedName(Map<String, dynamic> item, String code) {
+    final localized = switch (code) {
+      'he' => item['name_he'],
+      'en' => item['name_en'],
+      _ => null,
+    };
+    final value = localized?.toString().trim() ?? '';
+    return value.isNotEmpty ? value : (item['name']?.toString() ?? '');
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dismissible(
@@ -286,7 +298,7 @@ class _CartItemCard extends StatelessWidget {
             Row(crossAxisAlignment: CrossAxisAlignment.start, children: [
               Expanded(
                 child: Text(
-                  item['name']?.toString() ?? '',
+                  _localizedName(item, context.read<LocaleProvider>().code),
                   maxLines: 2, overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontSize: 13, fontWeight: FontWeight.w800,
