@@ -1,5 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../models/category.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
@@ -39,9 +41,10 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loc = context.watch<LocaleProvider>();
     return Scaffold(
       backgroundColor: AppColors.grayBg,
-      appBar: AppBar(title: const Text('الأقسام')),
+      appBar: AppBar(title: Text(loc.s.categoriesTitle)),
       body: _loading
         ? const Center(child: CircularProgressIndicator(color: AppColors.orange))
         : RefreshIndicator(
@@ -61,7 +64,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                 final colors = _gradients[i % _gradients.length];
                 return GestureDetector(
                   onTap: () => Navigator.of(context).push(MaterialPageRoute(
-                    builder: (_) => ProductsScreen(categorySlug: c.slug, categoryName: c.name))),
+                    builder: (_) => ProductsScreen(categorySlug: c.slug, categoryName: c.nameFor(loc.code)))),
                   child: Container(
                     decoration: BoxDecoration(
                       gradient: LinearGradient(begin: Alignment.topRight, end: Alignment.bottomLeft, colors: colors),
@@ -96,7 +99,7 @@ class _CategoriesScreenState extends State<CategoriesScreen> {
                             ),
                             // Bottom: name + arrow
                             Row(children: [
-                              Expanded(child: Text(c.name,
+                              Expanded(child: Text(c.nameFor(loc.code),
                                 style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w900, color: AppColors.blueDark, fontFamily: 'Cairo'),
                                 maxLines: 2, overflow: TextOverflow.ellipsis,
                               )),

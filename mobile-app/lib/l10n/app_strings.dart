@@ -129,6 +129,7 @@ class S {
   String get orderProcessing   => _t('orderProcessing');
   String get orderSentToDelivery => _t('orderSentToDelivery');
   String get all               => _t('all');
+  String get categoriesTitle   => _t('categoriesTitle');
   String get trackIntro        => _t('trackIntro');
   String get trackNumberLabel  => _t('trackNumberLabel');
   String get trackSubmit       => _t('trackSubmit');
@@ -459,6 +460,7 @@ class AppStrings {
     'orderProcessing':    {'ar': 'جاري تجهيز الطلب', 'he': 'ההזמנה בהכנה',   'en': 'Order Processing'},
     'orderSentToDelivery':{'ar': 'مرسل للتوصيل',    'he': 'נשלח לשליחות',   'en': 'Sent to Courier'},
     'all':                {'ar': 'الكل',           'he': 'הכול',           'en': 'All'},
+    'categoriesTitle':    {'ar': 'الأقسام',        'he': 'קטגוריות',       'en': 'Categories'},
     'trackIntro':         {'ar': 'أدخل رقم الطلب لعرض حالة الشحنة.', 'he': 'הזינו את מספר ההזמנה כדי לראות את סטטוס המשלוח.', 'en': 'Enter your order number to see the shipment status.'},
     'trackNumberLabel':   {'ar': 'رقم الطلب',       'he': 'מספר הזמנה',     'en': 'Order Number'},
     'trackSubmit':        {'ar': 'عرض حالة الطلب',  'he': 'הצג סטטוס',      'en': 'Show Status'},
