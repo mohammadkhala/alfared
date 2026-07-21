@@ -105,17 +105,17 @@ class _HomeScreenState extends State<HomeScreen> {
                   child: Column(mainAxisSize: MainAxisSize.min, children: [
                     const Icon(Icons.wifi_off_rounded, size: 56, color: AppColors.grayLight),
                     const SizedBox(height: 16),
-                    Text('تعذّر تحميل الصفحة',
+                    Text(s.loadPageError,
                       style: TextStyle(fontSize: 16, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: context.text)),
                     const SizedBox(height: 6),
-                    Text('تحقّق من اتصالك بالإنترنت وحاول مجدداً',
+                    Text(s.checkInternet,
                       textAlign: TextAlign.center,
                       style: TextStyle(fontSize: 13, fontFamily: 'Cairo', color: context.muted)),
                     const SizedBox(height: 20),
                     ElevatedButton.icon(
                       onPressed: _load,
                       icon: const Icon(Icons.refresh, size: 18),
-                      label: const Text('إعادة المحاولة', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800)),
+                      label: Text(s.retry, style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w800)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppColors.orange, foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(horizontal: 28, vertical: 12),
@@ -213,7 +213,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           itemBuilder: (_, i) => SizedBox(width: 155,
                             child: ProductCard(
                               product: _newArrivals[i],
-                              badgeLabel: '✨ جديد',
+                              badgeLabel: s.newBadge,
                               badgeColor: AppColors.blue,
                             )),
                         ),
@@ -223,7 +223,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
                     // 9) Brands carousel
                     if (_brands.length >= 3) ...[
-                      _SectionHeader(title: '🏪 الماركات المتوفرة'),
+                      _SectionHeader(title: s.availableBrands),
                       const SizedBox(height: 10),
                       _BrandsCarousel(brands: _brands),
                       const SizedBox(height: 24),
@@ -297,7 +297,7 @@ class _Header extends StatelessWidget {
                   const SizedBox(height: 2),
                   Row(children: [
                     Flexible(
-                      child: Text(name ?? 'مرحباً',
+                      child: Text(name ?? context.watch<LocaleProvider>().s.greetingHello,
                         overflow: TextOverflow.ellipsis,
                         style: const TextStyle(color: Colors.white, fontSize: 15, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
                     ),
@@ -1234,10 +1234,10 @@ class _WhatsAppFab extends StatelessWidget {
             blurRadius: 12, offset: const Offset(0, 4),
           )],
         ),
-        child: const Row(mainAxisSize: MainAxisSize.min, children: [
-          Text('💬', style: TextStyle(fontSize: 18)),
-          SizedBox(width: 6),
-          Text('واتساب', style: TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800, fontFamily: 'Cairo')),
+        child: Row(mainAxisSize: MainAxisSize.min, children: [
+          const Text('💬', style: TextStyle(fontSize: 18)),
+          const SizedBox(width: 6),
+          Text(context.watch<LocaleProvider>().s.whatsapp, style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.w800, fontFamily: 'Cairo')),
         ]),
       ),
     );

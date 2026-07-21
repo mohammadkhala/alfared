@@ -130,6 +130,21 @@ class S {
   String get orderSentToDelivery => _t('orderSentToDelivery');
   String get all               => _t('all');
   String get categoriesTitle   => _t('categoriesTitle');
+  String get storeTitle           => _t('storeTitle');
+  String get noProducts           => _t('noProducts');
+  String get sortNewest           => _t('sortNewest');
+  String get sortPriceAsc         => _t('sortPriceAsc');
+  String get sortPriceDesc        => _t('sortPriceDesc');
+  String get sortRating           => _t('sortRating');
+  String get sortBestseller       => _t('sortBestseller');
+  String get loadPageError        => _t('loadPageError');
+  String get checkInternet        => _t('checkInternet');
+  String get newBadge             => _t('newBadge');
+  String get availableBrands      => _t('availableBrands');
+  String get greetingHello        => _t('greetingHello');
+  String get whatsapp             => _t('whatsapp');
+  String get addedToCartShort     => _t('addedToCartShort');
+  String get orderInquiry         => _t('orderInquiry');
   String get trackIntro        => _t('trackIntro');
   String get trackNumberLabel  => _t('trackNumberLabel');
   String get trackSubmit       => _t('trackSubmit');
@@ -461,6 +476,21 @@ class AppStrings {
     'orderSentToDelivery':{'ar': 'مرسل للتوصيل',    'he': 'נשלח לשליחות',   'en': 'Sent to Courier'},
     'all':                {'ar': 'الكل',           'he': 'הכול',           'en': 'All'},
     'categoriesTitle':    {'ar': 'الأقسام',        'he': 'קטגוריות',       'en': 'Categories'},
+    'storeTitle':       {'ar': 'المتجر', 'he': 'חנות', 'en': 'Store'},
+    'noProducts':       {'ar': 'لا توجد منتجات', 'he': 'אין מוצרים', 'en': 'No products'},
+    'sortNewest':       {'ar': 'الأحدث', 'he': 'החדש ביותר', 'en': 'Newest'},
+    'sortPriceAsc':     {'ar': 'السعر ↑', 'he': 'מחיר ↑', 'en': 'Price ↑'},
+    'sortPriceDesc':    {'ar': 'السعر ↓', 'he': 'מחיר ↓', 'en': 'Price ↓'},
+    'sortRating':       {'ar': 'الأعلى تقييماً', 'he': 'הדירוג הגבוה', 'en': 'Top rated'},
+    'sortBestseller':   {'ar': 'الأكثر مبيعاً', 'he': 'הנמכר ביותר', 'en': 'Best selling'},
+    'loadPageError':    {'ar': 'تعذّر تحميل الصفحة', 'he': 'טעינת העמוד נכשלה', 'en': 'Failed to load page'},
+    'checkInternet':    {'ar': 'تحقّق من اتصالك بالإنترنت وحاول مجدداً', 'he': 'בדוק את חיבור האינטרנט ונסה שוב', 'en': 'Check your connection and try again'},
+    'newBadge':         {'ar': '✨ جديد', 'he': '✨ חדש', 'en': '✨ New'},
+    'availableBrands':  {'ar': '🏪 الماركات المتوفرة', 'he': '🏪 מותגים זמינים', 'en': '🏪 Available brands'},
+    'greetingHello':    {'ar': 'مرحباً', 'he': 'שלום', 'en': 'Hello'},
+    'whatsapp':         {'ar': 'واتساب', 'he': 'וואטסאפ', 'en': 'WhatsApp'},
+    'addedToCartShort': {'ar': 'تمت الإضافة ✓', 'he': 'נוסף ✓', 'en': 'Added ✓'},
+    'orderInquiry':     {'ar': 'استفسار عن طلب', 'he': 'בירור לגבי הזמנה', 'en': 'Inquiry about order'},
     'trackIntro':         {'ar': 'أدخل رقم الطلب لعرض حالة الشحنة.', 'he': 'הזינו את מספר ההזמנה כדי לראות את סטטוס המשלוח.', 'en': 'Enter your order number to see the shipment status.'},
     'trackNumberLabel':   {'ar': 'رقم الطلب',       'he': 'מספר הזמנה',     'en': 'Order Number'},
     'trackSubmit':        {'ar': 'عرض حالة الطلب',  'he': 'הצג סטטוס',      'en': 'Show Status'},

@@ -230,7 +230,7 @@ class _OrderDetailScreenState extends State<OrderDetailScreen> {
                     const SizedBox(width: 8),
                     GestureDetector(
                       onTap: () => launchUrl(
-                        Uri.parse('https://wa.me/970598191312?text=' + Uri.encodeComponent('استفسار عن طلب #${o.orderNumber}')),
+                        Uri.parse('https://wa.me/970598191312?text=' + Uri.encodeComponent('${s.orderInquiry} #${o.orderNumber}')),
                         mode: LaunchMode.externalApplication),
                       child: Container(
                         width: 36, height: 36,

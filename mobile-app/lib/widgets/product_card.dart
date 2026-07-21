@@ -352,7 +352,7 @@ class _ProductCardState extends State<ProductCard> with SingleTickerProviderStat
                                     ),
                                     const SizedBox(width: 6),
                                     Text(
-                                      _added ? 'تمت الإضافة ✓' : s.addToCart,
+                                      _added ? s.addedToCartShort : s.addToCart,
                                       style: const TextStyle(
                                         color: Colors.white, fontSize: 11,
                                         fontWeight: FontWeight.w800, fontFamily: 'Cairo',

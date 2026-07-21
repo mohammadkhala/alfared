@@ -107,7 +107,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
     return Scaffold(
       backgroundColor: context.bg,
       appBar: AppBar(
-        title: Text(widget.categoryName ?? 'المتجر'),
+        title: Text(widget.categoryName ?? context.watch<LocaleProvider>().s.storeTitle),
         actions: [
           Builder(builder: (ctx) {
             final count = ctx.watch<CartProvider>().count;
@@ -137,7 +137,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
             controller: _search,
             onSubmitted: (_) => _load(reset: true),
             decoration: InputDecoration(
-              hintText: 'ابحث عن منتج...',
+              hintText: context.watch<LocaleProvider>().s.searchHint,
               prefixIcon: const Icon(Icons.search, color: AppColors.gray),
               suffixIcon: _search.text.isEmpty ? null : IconButton(
                 icon: const Icon(Icons.close, color: AppColors.gray),
@@ -169,11 +169,11 @@ class _ProductsScreenState extends State<ProductsScreen> {
             scrollDirection: Axis.horizontal,
             padding: const EdgeInsets.symmetric(horizontal: 12),
             children: [
-              _sortChip('الأحدث',          'newest'),
-              _sortChip('السعر ↑',         'price_asc'),
-              _sortChip('السعر ↓',         'price_desc'),
-              _sortChip('الأعلى تقييماً',   'rating'),
-              _sortChip('الأكثر مبيعاً',    'bestseller'),
+              _sortChip(context.watch<LocaleProvider>().s.sortNewest, 'newest'),
+              _sortChip(context.watch<LocaleProvider>().s.sortPriceAsc, 'price_asc'),
+              _sortChip(context.watch<LocaleProvider>().s.sortPriceDesc, 'price_desc'),
+              _sortChip(context.watch<LocaleProvider>().s.sortRating, 'rating'),
+              _sortChip(context.watch<LocaleProvider>().s.sortBestseller, 'bestseller'),
             ],
           ),
         ),
@@ -183,7 +183,7 @@ class _ProductsScreenState extends State<ProductsScreen> {
           child: _items.isEmpty && _loading
             ? const Center(child: CircularProgressIndicator(color: AppColors.orange))
             : _items.isEmpty
-              ? const Center(child: Text('لا توجد منتجات', style: TextStyle(color: AppColors.gray, fontFamily: 'Cairo')))
+              ? Center(child: Text(context.watch<LocaleProvider>().s.noProducts, style: const TextStyle(color: AppColors.gray, fontFamily: 'Cairo')))
               : RefreshIndicator(
                   color: AppColors.orange,
                   onRefresh: () => _load(reset: true),
