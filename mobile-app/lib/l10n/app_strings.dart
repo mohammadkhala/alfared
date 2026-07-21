@@ -154,6 +154,19 @@ class S {
   String get privacyPolicy => _t('privacyPolicy');
   String get termsOfUse => _t('termsOfUse');
   String get madeBy => _t('madeBy');
+  String get selectAllOptions => _t('selectAllOptions');
+  String get addYourReview => _t('addYourReview');
+  String get yourCommentOptional => _t('yourCommentOptional');
+  String get reviewThanks => _t('reviewThanks');
+  String get productNotFound => _t('productNotFound');
+  String get priceLabel => _t('priceLabel');
+  String get shareStoreLine => _t('shareStoreLine');
+  String get soldSuffix => _t('soldSuffix');
+  String get saveLabel => _t('saveLabel');
+  String get customerReviews => _t('customerReviews');
+  String get addReviewShort => _t('addReviewShort');
+  String get noReviewsFirst => _t('noReviewsFirst');
+  String get addedToCartLong => _t('addedToCartLong');
   String get trackIntro        => _t('trackIntro');
   String get trackNumberLabel  => _t('trackNumberLabel');
   String get trackSubmit       => _t('trackSubmit');
@@ -509,6 +522,19 @@ class AppStrings {
     'privacyPolicy': {'ar': 'سياسة الخصوصية', 'he': 'מדיניות פרטיות', 'en': 'Privacy policy'},
     'termsOfUse': {'ar': 'شروط الاستخدام', 'he': 'תנאי שימוש', 'en': 'Terms of use'},
     'madeBy': {'ar': 'صُنع بواسطة ', 'he': 'נבנה על ידי ', 'en': 'Made by '},
+    'selectAllOptions': {'ar': 'يرجى اختيار جميع الخيارات', 'he': 'אנא בחר את כל האפשרויות', 'en': 'Please select all options'},
+    'addYourReview': {'ar': 'أضف تقييمك', 'he': 'הוסף ביקורת', 'en': 'Add your review'},
+    'yourCommentOptional': {'ar': 'تعليقك (اختياري)', 'he': 'התגובה שלך (רשות)', 'en': 'Your comment (optional)'},
+    'reviewThanks': {'ar': 'شكراً! سيظهر تقييمك بعد المراجعة.', 'he': 'תודה! הביקורת תופיע לאחר בדיקה.', 'en': 'Thanks! Your review will appear after moderation.'},
+    'productNotFound': {'ar': 'المنتج غير موجود', 'he': 'המוצר לא נמצא', 'en': 'Product not found'},
+    'priceLabel': {'ar': 'السعر', 'he': 'מחיר', 'en': 'Price'},
+    'shareStoreLine': {'ar': 'متجر شركة ابناء الفريد', 'he': 'חנות אבנא אלפריד', 'en': 'Alfared store'},
+    'soldSuffix': {'ar': 'مبيعة', 'he': 'נמכרו', 'en': 'sold'},
+    'saveLabel': {'ar': 'وفّر', 'he': 'חסוך', 'en': 'Save'},
+    'customerReviews': {'ar': 'تقييمات العملاء', 'he': 'ביקורות לקוחות', 'en': 'Customer reviews'},
+    'addReviewShort': {'ar': '+ أضف تقييم', 'he': '+ הוסף ביקורת', 'en': '+ Add review'},
+    'noReviewsFirst': {'ar': 'لا توجد تقييمات بعد. كن أول من يقيّم!', 'he': 'אין ביקורות עדיין. היה הראשון!', 'en': 'No reviews yet. Be the first!'},
+    'addedToCartLong': {'ar': 'تمت الإضافة للسلة ✓', 'he': 'נוסף לעגלה ✓', 'en': 'Added to cart ✓'},
     'trackIntro':         {'ar': 'أدخل رقم الطلب لعرض حالة الشحنة.', 'he': 'הזינו את מספר ההזמנה כדי לראות את סטטוס המשלוח.', 'en': 'Enter your order number to see the shipment status.'},
     'trackNumberLabel':   {'ar': 'رقم الطلب',       'he': 'מספר הזמנה',     'en': 'Order Number'},
     'trackSubmit':        {'ar': 'عرض حالة الطلب',  'he': 'הצג סטטוס',      'en': 'Show Status'},

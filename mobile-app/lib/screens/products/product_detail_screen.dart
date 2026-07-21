@@ -8,6 +8,7 @@ import 'package:url_launcher/url_launcher.dart';
 import '../../models/product.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../services/api_service.dart';
 import '../cart/cart_screen.dart';
 import '../../services/recently_viewed_service.dart';
@@ -82,7 +83,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return;
     }
     if (_product!.hasVariants && !_allGroupsSelected) {
-      Fluttertoast.showToast(msg: 'يرجى اختيار جميع الخيارات');
+      Fluttertoast.showToast(msg: context.read<LocaleProvider>().s.selectAllOptions);
       return;
     }
     setState(() => _cartAdding = true);
@@ -109,7 +110,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       context: context,
       builder: (ctx) => StatefulBuilder(
         builder: (ctx, setDlg) => AlertDialog(
-          title: const Text('أضف تقييمك', style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
+          title: Text(context.read<LocaleProvider>().s.addYourReview, style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900)),
           content: Column(mainAxisSize: MainAxisSize.min, children: [
             Row(mainAxisAlignment: MainAxisAlignment.center, children: List.generate(5, (i) {
               return GestureDetector(
@@ -122,17 +123,17 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
             TextField(
               controller: commentCtrl,
               maxLines: 3,
-              decoration: const InputDecoration(
-                labelText: 'تعليقك (اختياري)',
-                labelStyle: TextStyle(fontFamily: 'Cairo'),
+              decoration: InputDecoration(
+                labelText: context.read<LocaleProvider>().s.yourCommentOptional,
+                labelStyle: const TextStyle(fontFamily: 'Cairo'),
                 border: OutlineInputBorder(),
               ),
             ),
           ]),
           actions: [
-            TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('إلغاء', style: TextStyle(fontFamily: 'Cairo'))),
+            TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(context.read<LocaleProvider>().s.cancel, style: const TextStyle(fontFamily: 'Cairo'))),
             ElevatedButton(onPressed: () => Navigator.pop(ctx, true),
-              child: const Text('إرسال', style: TextStyle(fontFamily: 'Cairo'))),
+              child: Text(context.read<LocaleProvider>().s.send, style: const TextStyle(fontFamily: 'Cairo'))),
           ],
         ),
       ),
@@ -144,7 +145,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
         'comment': commentCtrl.text.trim().isEmpty ? null : commentCtrl.text.trim(),
       });
       setState(() => _reviewSubmitted = true);
-      Fluttertoast.showToast(msg: 'شكراً! سيظهر تقييمك بعد المراجعة.', backgroundColor: AppColors.success, textColor: Colors.white);
+      Fluttertoast.showToast(msg: context.read<LocaleProvider>().s.reviewThanks, backgroundColor: AppColors.success, textColor: Colors.white);
     } catch (e) {
       Fluttertoast.showToast(msg: e.toString(), backgroundColor: AppColors.danger, textColor: Colors.white);
     }
@@ -169,7 +170,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       return const Scaffold(body: Center(child: CircularProgressIndicator(color: AppColors.orange)));
     }
     if (_product == null) {
-      return Scaffold(appBar: AppBar(), body: const Center(child: Text('المنتج غير موجود', style: TextStyle(fontFamily: 'Cairo'))));
+      return Scaffold(appBar: AppBar(), body: Center(child: Text(context.read<LocaleProvider>().s.productNotFound, style: const TextStyle(fontFamily: 'Cairo'))));
     }
 
     final p = _product!;
@@ -190,7 +191,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
               _CircleIconButton(icon: Icons.share_outlined, onTap: () async {
                 final p = _product;
                 if (p == null) return;
-                final text = '${p.name}\n💰 السعر: ${p.price.toStringAsFixed(0)} ₪\n\nمتجر شركة ابناء الفريد 🛍️';
+                final text = '${p.name}\n💰 ${context.read<LocaleProvider>().s.priceLabel}: ${p.price.toStringAsFixed(0)} ₪\n\n${context.read<LocaleProvider>().s.shareStoreLine} 🛍️';
                 final url = Uri.parse('https://wa.me/?text=${Uri.encodeComponent(text)}');
                 await launchUrl(url, mode: LaunchMode.externalApplication);
               }),
@@ -292,7 +293,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                   const SizedBox(width: 10),
                   Container(width: 1, height: 12, color: context.line),
                   const SizedBox(width: 10),
-                  Text('${p.reviewsCount}+ مبيعة', style: const TextStyle(fontSize: 11, color: AppColors.gray, fontFamily: 'Cairo')),
+                  Text('${p.reviewsCount}+ ${context.watch<LocaleProvider>().s.soldSuffix}', style: const TextStyle(fontSize: 11, color: AppColors.gray, fontFamily: 'Cairo')),
                 ]),
                 const SizedBox(height: 14),
 
@@ -311,7 +312,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(color: AppColors.successLight, borderRadius: BorderRadius.circular(8)),
-                      child: Text('وفّر ${saveAmount.toStringAsFixed(0)} ₪',
+                      child: Text('${context.watch<LocaleProvider>().s.saveLabel} ${saveAmount.toStringAsFixed(0)} ₪',
                         style: const TextStyle(color: AppColors.success, fontSize: 10, fontWeight: FontWeight.w800, fontFamily: 'Cairo')),
                     ),
                   ],
@@ -330,7 +331,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 // Quantity row
                 Row(children: [
-                  Text('الكمية', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: context.text)),
+                  Text(context.watch<LocaleProvider>().s.quantity, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: context.text)),
                   const Spacer(),
                   _QtyButton(icon: Icons.remove, onTap: () => setState(() => _qty = (_qty - 1).clamp(1, 99))),
                   Padding(padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -341,7 +342,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 if ((p.descriptionHtml != null && p.descriptionHtml!.isNotEmpty) ||
                     (p.description != null && p.description!.trim().isNotEmpty)) ...[
-                  Text('الوصف', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: context.text)),
+                  Text(context.watch<LocaleProvider>().s.description, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: context.text)),
                   const SizedBox(height: 8),
                   Container(
                     width: double.infinity,
@@ -357,7 +358,7 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
 
                 // Reviews section
                 Row(children: [
-                  Text('تقييمات العملاء', style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: context.text)),
+                  Text(context.watch<LocaleProvider>().s.customerReviews, style: TextStyle(fontSize: 12, fontWeight: FontWeight.w900, fontFamily: 'Cairo', color: context.text)),
                   const Spacer(),
                   if (!_reviewSubmitted && context.read<AuthProvider>().isLoggedIn)
                     GestureDetector(
@@ -365,16 +366,16 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                       child: Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                         decoration: BoxDecoration(color: AppColors.orangeLight, borderRadius: BorderRadius.circular(8)),
-                        child: const Text('+ أضف تقييم', style: TextStyle(color: AppColors.orange, fontFamily: 'Cairo', fontSize: 11, fontWeight: FontWeight.w800)),
+                        child: Text(context.watch<LocaleProvider>().s.addReviewShort, style: const TextStyle(color: AppColors.orange, fontFamily: 'Cairo', fontSize: 11, fontWeight: FontWeight.w800)),
                       ),
                     ),
                 ]),
                 const SizedBox(height: 8),
                 if (p.reviews.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    child: Text('لا توجد تقييمات بعد. كن أول من يقيّم!',
-                      style: TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 12)),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(context.watch<LocaleProvider>().s.noReviewsFirst,
+                      style: const TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 12)),
                   )
                 else
                   ...p.reviews.map((r) => Container(
@@ -446,10 +447,10 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
                           const SizedBox(width: 8),
                           Text(
                             !p.inStock
-                              ? 'نفد المخزون'
+                              ? context.watch<LocaleProvider>().s.outOfStock
                               : _cartAdded
-                                ? 'تمت الإضافة للسلة ✓'
-                                : 'أضف للسلة — ${((p.price + _variantPriceModifier) * _qty).toStringAsFixed(0)} ₪',
+                                ? context.watch<LocaleProvider>().s.addedToCartLong
+                                : '${context.watch<LocaleProvider>().s.addToCart} — ${((p.price + _variantPriceModifier) * _qty).toStringAsFixed(0)} ₪',
                             style: const TextStyle(color: Colors.white, fontSize: 13, fontWeight: FontWeight.w800, fontFamily: 'Cairo'),
                           ),
                         ]),
