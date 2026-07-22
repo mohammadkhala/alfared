@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:provider/provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../services/api_service.dart';
 import '../../theme/app_theme.dart';
 import 'success_screen.dart';
@@ -120,22 +122,22 @@ class _LahzaWebViewScreenState extends State<LahzaWebViewScreen> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text('إلغاء الدفع؟',
+        title: Text(context.read<LocaleProvider>().s.cancelPaymentQ,
             style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
-        content: const Text(
-            'إذا أتممت الدفع بالفعل فالطلب سيُسجَّل تلقائياً. هل تريد العودة؟',
-            style: TextStyle(fontFamily: 'Cairo')),
+        content: Text(
+            context.read<LocaleProvider>().s.cancelPaymentMsg,
+            style: const TextStyle(fontFamily: 'Cairo')),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text('لا، انتظر', style: TextStyle(fontFamily: 'Cairo')),
+            child: Text(context.read<LocaleProvider>().s.noWait, style: const TextStyle(fontFamily: 'Cairo')),
           ),
           TextButton(
             onPressed: () {
               Navigator.pop(ctx);
               Navigator.pop(context, {'success': false});
             },
-            child: const Text('نعم، ارجع',
+            child: Text(context.read<LocaleProvider>().s.yesBack,
                 style: TextStyle(fontFamily: 'Cairo', color: Colors.red)),
           ),
         ],
@@ -155,9 +157,9 @@ class _LahzaWebViewScreenState extends State<LahzaWebViewScreen> {
     if (!mounted) return;
     Navigator.of(context).pop({'success': false});
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('فشلت عملية الدفع. يمكنك المحاولة مجدداً.',
-            style: TextStyle(fontFamily: 'Cairo')),
+      SnackBar(
+        content: Text(context.read<LocaleProvider>().s.paymentFailed,
+            style: const TextStyle(fontFamily: 'Cairo')),
         backgroundColor: AppColors.danger,
       ),
     );
@@ -176,7 +178,7 @@ class _LahzaWebViewScreenState extends State<LahzaWebViewScreen> {
       appBar: AppBar(
         backgroundColor: const Color(0xFF0B1A3B),
         foregroundColor: Colors.white,
-        title: const Text('💳 الدفع عبر لحظة',
+        title: Text(context.watch<LocaleProvider>().s.payViaLahza,
             style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w700)),
         leading: _checking
             ? const Padding(
@@ -198,14 +200,14 @@ class _LahzaWebViewScreenState extends State<LahzaWebViewScreen> {
           if (_loading)
             Container(
               color: const Color(0xFF080810),
-              child: const Center(
+              child: Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    CircularProgressIndicator(color: AppColors.orange),
-                    SizedBox(height: 16),
-                    Text('جاري تحميل بوابة الدفع...',
-                        style: TextStyle(
+                    const CircularProgressIndicator(color: AppColors.orange),
+                    const SizedBox(height: 16),
+                    Text(context.watch<LocaleProvider>().s.loadingGateway,
+                        style: const TextStyle(
                             fontFamily: 'Cairo',
                             color: Colors.white70,
                             fontSize: 14)),

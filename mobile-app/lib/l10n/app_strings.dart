@@ -167,6 +167,27 @@ class S {
   String get addReviewShort => _t('addReviewShort');
   String get noReviewsFirst => _t('noReviewsFirst');
   String get addedToCartLong => _t('addedToCartLong');
+  String get enter6DigitCode => _t('enter6DigitCode');
+  String get welcomeToStore => _t('welcomeToStore');
+  String get codeInvalidExpired => _t('codeInvalidExpired');
+  String get newCodeSentEmail => _t('newCodeSentEmail');
+  String get resendFailed => _t('resendFailed');
+  String get confirmEmail => _t('confirmEmail');
+  String get enterVerifyCode => _t('enterVerifyCode');
+  String get codeSentToEmail => _t('codeSentToEmail');
+  String get checkSpam => _t('checkSpam');
+  String get verifyAndCreate => _t('verifyAndCreate');
+  String get didntReceiveCode => _t('didntReceiveCode');
+  String get resend => _t('resend');
+  String get cancelPaymentQ => _t('cancelPaymentQ');
+  String get cancelPaymentMsg => _t('cancelPaymentMsg');
+  String get noWait => _t('noWait');
+  String get yesBack => _t('yesBack');
+  String get paymentFailed => _t('paymentFailed');
+  String get payViaLahza => _t('payViaLahza');
+  String get loadingGateway => _t('loadingGateway');
+  String get brandTagline => _t('brandTagline');
+  String get forgotPasswordQ => _t('forgotPasswordQ');
   String get trackIntro        => _t('trackIntro');
   String get trackNumberLabel  => _t('trackNumberLabel');
   String get trackSubmit       => _t('trackSubmit');
@@ -535,6 +556,27 @@ class AppStrings {
     'addReviewShort': {'ar': '+ أضف تقييم', 'he': '+ הוסף ביקורת', 'en': '+ Add review'},
     'noReviewsFirst': {'ar': 'لا توجد تقييمات بعد. كن أول من يقيّم!', 'he': 'אין ביקורות עדיין. היה הראשון!', 'en': 'No reviews yet. Be the first!'},
     'addedToCartLong': {'ar': 'تمت الإضافة للسلة ✓', 'he': 'נוסף לעגלה ✓', 'en': 'Added to cart ✓'},
+    'enter6DigitCode': {'ar': 'أدخل الرمز المكوّن من 6 أرقام', 'he': 'הזן את הקוד בן 6 הספרות', 'en': 'Enter the 6-digit code'},
+    'welcomeToStore': {'ar': 'مرحباً بك في أبناء الفريد! 🎉', 'he': 'ברוך הבא לאבנא אלפריד! 🎉', 'en': 'Welcome to Alfared! 🎉'},
+    'codeInvalidExpired': {'ar': 'الرمز غير صحيح أو منتهي الصلاحية', 'he': 'הקוד שגוי או פג תוקף', 'en': 'Code is incorrect or expired'},
+    'newCodeSentEmail': {'ar': '✅ تم إرسال رمز جديد إلى بريدك', 'he': '✅ קוד חדש נשלח לאימייל שלך', 'en': '✅ A new code was sent to your email'},
+    'resendFailed': {'ar': 'فشل إعادة الإرسال', 'he': 'שליחה חוזרת נכשלה', 'en': 'Resend failed'},
+    'confirmEmail': {'ar': 'تأكيد البريد الإلكتروني', 'he': 'אימות אימייל', 'en': 'Confirm email'},
+    'enterVerifyCode': {'ar': 'أدخل رمز التحقق', 'he': 'הזן קוד אימות', 'en': 'Enter verification code'},
+    'codeSentToEmail': {'ar': 'تم إرسال رمز مكوّن من 6 أرقام إلى بريدك', 'he': 'קוד בן 6 ספרות נשלח לאימייל שלך', 'en': 'A 6-digit code was sent to your email'},
+    'checkSpam': {'ar': 'لم تجده؟ تفقّد مجلد الرسائل غير المرغوبة (Spam)', 'he': 'לא מצאת? בדוק את תיקיית הספאם', 'en': 'Not there? Check your spam folder'},
+    'verifyAndCreate': {'ar': 'تحقق وأنشئ الحساب', 'he': 'אמת וצור חשבון', 'en': 'Verify and create account'},
+    'didntReceiveCode': {'ar': 'لم تستلم الرمز؟ ', 'he': 'לא קיבלת קוד? ', 'en': 'Didn\'t get the code? '},
+    'resend': {'ar': 'إعادة الإرسال', 'he': 'שלח שוב', 'en': 'Resend'},
+    'cancelPaymentQ': {'ar': 'إلغاء الدفع؟', 'he': 'לבטל תשלום?', 'en': 'Cancel payment?'},
+    'cancelPaymentMsg': {'ar': 'إذا أتممت الدفع بالفعل فالطلب سيُسجَّل تلقائياً. هل تريد العودة؟', 'he': 'אם כבר שילמת, ההזמנה תירשם אוטומטית. לחזור?', 'en': 'If you already paid, the order is recorded automatically. Go back?'},
+    'noWait': {'ar': 'لا، انتظر', 'he': 'לא, המתן', 'en': 'No, wait'},
+    'yesBack': {'ar': 'نعم، ارجع', 'he': 'כן, חזור', 'en': 'Yes, go back'},
+    'paymentFailed': {'ar': 'فشلت عملية الدفع. يمكنك المحاولة مجدداً.', 'he': 'התשלום נכשל. אפשר לנסות שוב.', 'en': 'Payment failed. You can try again.'},
+    'payViaLahza': {'ar': '💳 الدفع عبر لحظة', 'he': '💳 תשלום דרך Lahza', 'en': '💳 Pay via Lahza'},
+    'loadingGateway': {'ar': 'جاري تحميل بوابة الدفع...', 'he': 'טוען את שער התשלום...', 'en': 'Loading payment gateway…'},
+    'brandTagline': {'ar': 'شركة ابناء الفريد التجارية', 'he': 'חברת אבנא אלפריד', 'en': 'Alfared Trading Co.'},
+    'forgotPasswordQ': {'ar': 'نسيت كلمة المرور؟', 'he': 'שכחת סיסמה?', 'en': 'Forgot password?'},
     'trackIntro':         {'ar': 'أدخل رقم الطلب لعرض حالة الشحنة.', 'he': 'הזינו את מספר ההזמנה כדי לראות את סטטוס המשלוח.', 'en': 'Enter your order number to see the shipment status.'},
     'trackNumberLabel':   {'ar': 'رقم الطلب',       'he': 'מספר הזמנה',     'en': 'Order Number'},
     'trackSubmit':        {'ar': 'عرض حالة الطلب',  'he': 'הצג סטטוס',      'en': 'Show Status'},

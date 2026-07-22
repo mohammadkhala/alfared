@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../services/api_service.dart' show ApiService, ApiException;
+import '../../providers/locale_provider.dart';
 import '../../theme/app_theme.dart';
 import '../home/main_navigation.dart';
 
@@ -80,7 +81,7 @@ class _OTPScreenState extends State<OTPScreen> {
   Future<void> _verify() async {
     if (_otp.length != 6) {
       Fluttertoast.showToast(
-        msg: 'أدخل الرمز المكوّن من 6 أرقام',
+        msg: context.read<LocaleProvider>().s.enter6DigitCode,
         backgroundColor: AppColors.danger, textColor: Colors.white,
       );
       return;
@@ -104,13 +105,13 @@ class _OTPScreenState extends State<OTPScreen> {
         (_) => false,
       );
       Fluttertoast.showToast(
-        msg: 'مرحباً بك في أبناء الفريد! 🎉',
+        msg: context.read<LocaleProvider>().s.welcomeToStore,
         backgroundColor: AppColors.success, textColor: Colors.white,
       );
     } on ApiException catch (e) {
       setState(() => _loading = false);
       Fluttertoast.showToast(
-        msg: e.message ?? 'الرمز غير صحيح أو منتهي الصلاحية',
+        msg: e.message ?? context.read<LocaleProvider>().s.codeInvalidExpired,
         backgroundColor: AppColors.danger, textColor: Colors.white,
         toastLength: Toast.LENGTH_LONG,
       );
@@ -137,14 +138,14 @@ class _OTPScreenState extends State<OTPScreen> {
       _startTimer();
       _focus[0].requestFocus();
       Fluttertoast.showToast(
-        msg: '✅ تم إرسال رمز جديد إلى بريدك',
+        msg: context.read<LocaleProvider>().s.newCodeSentEmail,
         backgroundColor: AppColors.success, textColor: Colors.white,
       );
     } on ApiException catch (e) {
       if (!mounted) return;
       setState(() => _loading = false);
       Fluttertoast.showToast(
-        msg: e.message ?? 'فشل إعادة الإرسال',
+        msg: e.message ?? context.read<LocaleProvider>().s.resendFailed,
         backgroundColor: AppColors.danger, textColor: Colors.white,
       );
     } catch (_) {
@@ -157,7 +158,7 @@ class _OTPScreenState extends State<OTPScreen> {
     return Scaffold(
       backgroundColor: AppColors.grayBg,
       appBar: AppBar(
-        title: const Text('تأكيد البريد الإلكتروني'),
+        title: Text(context.watch<LocaleProvider>().s.confirmEmail),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_rounded),
           onPressed: () => Navigator.of(context).pop(),
@@ -188,19 +189,19 @@ class _OTPScreenState extends State<OTPScreen> {
               ),
               const SizedBox(height: 22),
 
-              const Text('أدخل رمز التحقق',
+              Text(context.watch<LocaleProvider>().s.enterVerifyCode,
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.w900,
                     color: AppColors.blueDark, fontFamily: 'Cairo'),
               ),
               const SizedBox(height: 8),
               Text(
-                'تم إرسال رمز مكوّن من 6 أرقام إلى بريدك\n${widget.email}',
+                '${context.watch<LocaleProvider>().s.codeSentToEmail}\n${widget.email}',
                 style: const TextStyle(fontSize: 13, color: AppColors.gray,
                     fontFamily: 'Cairo', height: 1.7),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 6),
-              const Text('لم تجده؟ تفقّد مجلد الرسائل غير المرغوبة (Spam)',
+              Text(context.watch<LocaleProvider>().s.checkSpam,
                 style: TextStyle(fontSize: 11, color: AppColors.grayLight, fontFamily: 'Cairo'),
                 textAlign: TextAlign.center,
               ),
@@ -225,7 +226,7 @@ class _OTPScreenState extends State<OTPScreen> {
                   child: _loading
                     ? const SizedBox(width: 22, height: 22,
                         child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white))
-                    : const Text('تحقق وأنشئ الحساب',
+                    : Text(context.watch<LocaleProvider>().s.verifyAndCreate,
                         style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 15)),
                 ),
               ),
@@ -233,12 +234,12 @@ class _OTPScreenState extends State<OTPScreen> {
 
               // ── Resend ─────────────────────────────────────────
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-                const Text('لم تستلم الرمز؟ ',
+                Text(context.watch<LocaleProvider>().s.didntReceiveCode,
                   style: TextStyle(color: AppColors.gray, fontFamily: 'Cairo', fontSize: 13)),
                 TextButton(
                   onPressed: _seconds == 0 && !_loading ? _resend : null,
                   child: Text(
-                    _seconds > 0 ? 'إعادة الإرسال (${_seconds}s)' : 'إعادة الإرسال',
+                    _seconds > 0 ? '${context.watch<LocaleProvider>().s.resend} (${_seconds}s)' : context.watch<LocaleProvider>().s.resend,
                     style: TextStyle(
                       color: _seconds == 0 ? AppColors.orange : AppColors.grayLight,
                       fontWeight: FontWeight.w900, fontFamily: 'Cairo', fontSize: 13,

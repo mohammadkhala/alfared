@@ -100,9 +100,9 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                 ),
                 const SizedBox(height: 14),
-                const Center(child: Text(
-                  'شركة ابناء الفريد التجارية',
-                  style: TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.orange, fontFamily: 'Cairo'),
+                Center(child: Text(
+                  s.brandTagline,
+                  style: const TextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: AppColors.orange, fontFamily: 'Cairo'),
                 )),
                 const SizedBox(height: 20),
 
@@ -256,7 +256,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: TextButton(
                         onPressed: () => Navigator.of(context).push(
                           MaterialPageRoute(builder: (_) => const ForgotPasswordScreen())),
-                        child: const Text('نسيت كلمة المرور؟',
+                        child: Text(s.forgotPasswordQ,
                           style: TextStyle(fontFamily: 'Cairo', fontSize: 13,
                               fontWeight: FontWeight.w700, color: AppColors.blue)),
                       ),
