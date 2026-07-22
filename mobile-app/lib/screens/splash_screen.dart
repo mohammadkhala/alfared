@@ -3,7 +3,9 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../l10n/app_strings.dart';
 import '../providers/auth_provider.dart';
+import '../providers/locale_provider.dart';
 import '../providers/cart_provider.dart';
 import '../services/api_service.dart';
 import '../theme/app_theme.dart';
@@ -96,6 +98,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final s = context.watch<LocaleProvider>().s;
     return Scaffold(
       body: Stack(children: [
         // Background gradient
@@ -158,35 +161,35 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                     border: Border.all(color: AppColors.orange.withValues(alpha: 0.4)),
                     borderRadius: BorderRadius.circular(20),
                   ),
-                  child: const Text('✦ متجر التجميل الأول',
-                    style: TextStyle(color: Color(0xFFFFA76B), fontSize: 11, fontWeight: FontWeight.w800, fontFamily: 'Cairo', letterSpacing: 1)),
+                  child: Text(s.splashTagline1,
+                    style: const TextStyle(color: Color(0xFFFFA76B), fontSize: 11, fontWeight: FontWeight.w800, fontFamily: 'Cairo', letterSpacing: 1)),
                 ),
               ),
               const SizedBox(height: 14),
 
-              const Text('شركة ابناء الفريد التجارية',
+              Text(s.brandTagline,
                 textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
+                style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900, fontFamily: 'Cairo')),
               const SizedBox(height: 10),
-              const Padding(
-                padding: EdgeInsets.symmetric(horizontal: 28),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 28),
                 child: Column(children: [
                   Text(
-                    'الصين بين يديك في أضخم معرض للمنتجات في البلاد',
+                    s.splashChina,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'Cairo', height: 1.8, fontWeight: FontWeight.w700),
+                    style: const TextStyle(color: Colors.white, fontSize: 13, fontFamily: 'Cairo', height: 1.8, fontWeight: FontWeight.w700),
                   ),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Text(
-                    'أكثر من 5000 منتج للمحلات والمتاجر وصفحات التسويق الإلكتروني',
+                    s.splashProducts,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'Cairo', height: 1.7),
+                    style: const TextStyle(color: Colors.white70, fontSize: 11, fontFamily: 'Cairo', height: 1.7),
                   ),
-                  SizedBox(height: 6),
+                  const SizedBox(height: 6),
                   Text(
-                    'توصيل سريع لجميع مناطق فلسطين والداخل 🇵🇸',
+                    s.splashDelivery,
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Color(0xFFFFA76B), fontSize: 11, fontFamily: 'Cairo', height: 1.7, fontWeight: FontWeight.w700),
+                    style: const TextStyle(color: Color(0xFFFFA76B), fontSize: 11, fontFamily: 'Cairo', height: 1.7, fontWeight: FontWeight.w700),
                   ),
                 ]),
               ),

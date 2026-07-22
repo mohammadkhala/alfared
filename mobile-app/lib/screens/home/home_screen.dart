@@ -290,7 +290,7 @@ class _Header extends StatelessWidget {
               Expanded(
                 child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
                   Builder(builder: (_) {
-                    final g = Greeting.now();
+                    final g = Greeting.now(context.read<LocaleProvider>().s);
                     return Text('${g.text} ${g.emoji}',
                       style: const TextStyle(color: Colors.white60, fontSize: 11, fontFamily: 'Cairo'));
                   }),

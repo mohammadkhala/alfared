@@ -211,6 +211,14 @@ class S {
   String get retypeIt => _t('retypeIt');
   String get changePassword => _t('changePassword');
   String get codeNotArrivedRetry => _t('codeNotArrivedRetry');
+  String get splashTagline1 => _t('splashTagline1');
+  String get splashChina => _t('splashChina');
+  String get splashProducts => _t('splashProducts');
+  String get splashDelivery => _t('splashDelivery');
+  String get greetingMorning => _t('greetingMorning');
+  String get greetingAfternoon => _t('greetingAfternoon');
+  String get greetingEvening => _t('greetingEvening');
+  String get greetingNight => _t('greetingNight');
   String get trackIntro        => _t('trackIntro');
   String get trackNumberLabel  => _t('trackNumberLabel');
   String get trackSubmit       => _t('trackSubmit');
@@ -623,6 +631,14 @@ class AppStrings {
     'retypeIt': {'ar': 'أعد كتابتها', 'he': 'הקלד שוב', 'en': 'Re-enter it'},
     'changePassword': {'ar': 'تغيير كلمة المرور', 'he': 'שנה סיסמה', 'en': 'Change password'},
     'codeNotArrivedRetry': {'ar': 'لم يصلك الرمز؟ إعادة المحاولة', 'he': 'לא קיבלת קוד? נסה שוב', 'en': 'No code? Try again'},
+    'splashTagline1': {'ar': '✦ متجر التجميل الأول', 'he': '✦ חנות היופי הראשונה', 'en': '✦ The #1 beauty store'},
+    'splashChina': {'ar': 'الصين بين يديك في أضخم معرض للمنتجات في البلاد', 'he': 'סין בהישג יד בתערוכת המוצרים הגדולה בארץ', 'en': 'China at your fingertips — the largest product showcase around'},
+    'splashProducts': {'ar': 'أكثر من 5000 منتج للمحلات والمتاجر وصفحات التسويق الإلكتروني', 'he': 'יותר מ-5000 מוצרים לחנויות ולעמודי שיווק', 'en': 'Over 5000 products for shops and online sellers'},
+    'splashDelivery': {'ar': 'توصيل سريع لجميع مناطق فلسطين والداخل 🇵🇸', 'he': 'משלוח מהיר לכל אזורי פלסטין והפנים 🇵🇸', 'en': 'Fast delivery across Palestine 🇵🇸'},
+    'greetingMorning': {'ar': 'صباح الخير', 'he': 'בוקר טוב', 'en': 'Good morning'},
+    'greetingAfternoon': {'ar': 'مساء الخير', 'he': 'צהריים טובים', 'en': 'Good afternoon'},
+    'greetingEvening': {'ar': 'مساء النور', 'he': 'ערב טוב', 'en': 'Good evening'},
+    'greetingNight': {'ar': 'مساء الخير', 'he': 'לילה טוב', 'en': 'Good evening'},
     'trackIntro':         {'ar': 'أدخل رقم الطلب لعرض حالة الشحنة.', 'he': 'הזינו את מספר ההזמנה כדי לראות את סטטוס המשלוח.', 'en': 'Enter your order number to see the shipment status.'},
     'trackNumberLabel':   {'ar': 'رقم الطلب',       'he': 'מספר הזמנה',     'en': 'Order Number'},
     'trackSubmit':        {'ar': 'عرض حالة الطلب',  'he': 'הצג סטטוס',      'en': 'Show Status'},
