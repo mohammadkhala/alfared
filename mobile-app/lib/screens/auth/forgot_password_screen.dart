@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
+import '../../providers/locale_provider.dart';
 import '../../providers/cart_provider.dart';
 import '../../services/api_service.dart' show ApiService, ApiException;
 import '../../theme/app_theme.dart';
@@ -59,14 +60,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   }
 
   Future<void> _sendCode() async {
+    final s = context.read<LocaleProvider>().s;
     if (_useEmail) {
       final e = _email.text.trim();
       if (e.isEmpty || !e.contains('@')) {
-        _toast('أدخل بريداً إلكترونياً صحيحاً');
+        _toast(s.enterValidEmail);
         return;
       }
     } else if (_phone.text.trim().isEmpty) {
-      _toast('أدخل رقم هاتفك');
+      _toast(s.enterPhone);
       return;
     }
 
@@ -78,29 +80,30 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       });
       if (!mounted) return;
       setState(() { _busy = false; _codeSent = true; });
-      _toast('إذا كان الحساب مسجّلاً فستصلك رسالة بالرمز', error: false);
+      _toast(s.ifRegisteredCode, error: false);
     } on ApiException catch (e) {
       if (!mounted) return;
       setState(() => _busy = false);
-      _toast(e.message ?? 'تعذّر إرسال الرمز، حاول مجدداً');
+      _toast(e.message ?? s.sendCodeFailed);
     } catch (_) {
       if (!mounted) return;
       setState(() => _busy = false);
-      _toast('تعذّر الاتصال بالخادم');
+      _toast(s.serverConnectFailed);
     }
   }
 
   Future<void> _resetPassword() async {
+    final s = context.read<LocaleProvider>().s;
     if (_code.text.trim().length != 6) {
-      _toast('أدخل الرمز المكوّن من 6 أرقام');
+      _toast(s.enter6DigitCode);
       return;
     }
     if (_pass.text.length < 8) {
-      _toast('كلمة المرور يجب أن تكون 8 أحرف على الأقل');
+      _toast(s.passwordMin8);
       return;
     }
     if (_pass.text != _confirm.text) {
-      _toast('كلمة المرور وتأكيدها غير متطابقتين');
+      _toast(s.passwordMismatch);
       return;
     }
 
@@ -128,25 +131,26 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
         MaterialPageRoute(builder: (_) => const MainNavigation()),
         (_) => false,
       );
-      _toast('تم تغيير كلمة المرور بنجاح ✓', error: false);
+      _toast(s.passwordChanged, error: false);
     } on ApiException catch (e) {
       if (!mounted) return;
       setState(() => _busy = false);
-      _toast(e.message ?? 'الرمز غير صحيح أو منتهي الصلاحية');
+      _toast(e.message ?? s.codeInvalidExpired);
     } catch (_) {
       if (!mounted) return;
       setState(() => _busy = false);
-      _toast('تعذّر الاتصال بالخادم');
+      _toast(s.serverConnectFailed);
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final s = context.watch<LocaleProvider>().s;
     return Scaffold(
       backgroundColor: AppColors.grayBg,
       appBar: AppBar(
-        title: const Text('استعادة كلمة المرور',
-          style: TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16)),
+        title: Text(s.resetPassword,
+          style: const TextStyle(fontFamily: 'Cairo', fontWeight: FontWeight.w900, fontSize: 16)),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -172,7 +176,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              _codeSent ? 'أدخل الرمز وكلمة المرور الجديدة' : 'استعادة كلمة المرور',
+              _codeSent ? s.enterCodeAndNewPassword : s.resetPassword,
               textAlign: TextAlign.center,
               style: const TextStyle(
                 fontFamily: 'Cairo', fontWeight: FontWeight.w900,
@@ -183,9 +187,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
             Text(
               _codeSent
                   ? (_useEmail
-                      ? 'إذا كان الحساب مسجّلاً فستصلك رسالة على $_label'
-                      : 'إذا كان الحساب مسجّلاً فستصلك رسالة واتساب على $_label')
-                  : 'اختر طريقة استلام رمز التحقق',
+                      ? '${s.ifRegisteredVia} $_label'
+                      : '${s.ifRegisteredWaVia} $_label')
+                  : s.chooseCodeMethod,
               textAlign: TextAlign.center,
               style: const TextStyle(fontFamily: 'Cairo', fontSize: 12, color: AppColors.gray, height: 1.6),
             ),
@@ -201,15 +205,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   border: Border.all(color: AppColors.border),
                 ),
                 child: Row(children: [
-                  Expanded(child: _methodTab('واتساب', !_useEmail, () => setState(() => _useEmail = false))),
-                  Expanded(child: _methodTab('البريد الإلكتروني', _useEmail, () => setState(() => _useEmail = true))),
+                  Expanded(child: _methodTab(s.whatsapp, !_useEmail, () => setState(() => _useEmail = false))),
+                  Expanded(child: _methodTab(s.emailLabel, _useEmail, () => setState(() => _useEmail = true))),
                 ]),
               ),
               const SizedBox(height: 20),
             ],
 
             if (!_codeSent && _useEmail) ...[
-              _fieldLabel('البريد الإلكتروني'),
+              _fieldLabel(s.emailLabel),
               TextField(
                 controller: _email,
                 keyboardType: TextInputType.emailAddress,
@@ -218,9 +222,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 decoration: const InputDecoration(hintText: 'name@example.com'),
               ),
               const SizedBox(height: 24),
-              _primaryButton('إرسال الرمز', _sendCode),
+              _primaryButton(s.sendCodeBtn, _sendCode),
             ] else if (!_codeSent) ...[
-              _fieldLabel('رقم الهاتف'),
+              _fieldLabel(s.phoneLabel),
               Row(children: [
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 10),
@@ -252,9 +256,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                 ),
               ]),
               const SizedBox(height: 24),
-              _primaryButton('إرسال الرمز', _sendCode),
+              _primaryButton(s.sendCodeBtn, _sendCode),
             ] else ...[
-              _fieldLabel('رمز التحقق'),
+              _fieldLabel(s.verifyCodeLabel),
               TextField(
                 controller: _code,
                 keyboardType: TextInputType.number,
@@ -266,13 +270,13 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               const SizedBox(height: 16),
 
-              _fieldLabel('كلمة المرور الجديدة'),
+              _fieldLabel(s.newPasswordLabel),
               TextField(
                 controller: _pass,
                 obscureText: _obscure,
                 style: const TextStyle(fontFamily: 'Cairo'),
                 decoration: InputDecoration(
-                  hintText: '8 أحرف على الأقل',
+                  hintText: s.min8chars,
                   suffixIcon: IconButton(
                     icon: Icon(_obscure ? Icons.visibility_off : Icons.visibility, size: 20),
                     onPressed: () => setState(() => _obscure = !_obscure),
@@ -281,20 +285,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               const SizedBox(height: 16),
 
-              _fieldLabel('تأكيد كلمة المرور'),
+              _fieldLabel(s.confirmPasswordLabel),
               TextField(
                 controller: _confirm,
                 obscureText: _obscure,
                 style: const TextStyle(fontFamily: 'Cairo'),
-                decoration: const InputDecoration(hintText: 'أعد كتابتها'),
+                decoration: InputDecoration(hintText: s.retypeIt),
               ),
               const SizedBox(height: 24),
 
-              _primaryButton('تغيير كلمة المرور', _resetPassword),
+              _primaryButton(s.changePassword, _resetPassword),
               const SizedBox(height: 8),
               TextButton(
                 onPressed: _busy ? null : () => setState(() => _codeSent = false),
-                child: const Text('لم يصلك الرمز؟ إعادة المحاولة',
+                child: Text(s.codeNotArrivedRetry,
                   style: TextStyle(fontFamily: 'Cairo', fontSize: 13, color: AppColors.blue)),
               ),
             ],

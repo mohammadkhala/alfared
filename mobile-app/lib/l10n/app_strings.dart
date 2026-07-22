@@ -188,6 +188,29 @@ class S {
   String get loadingGateway => _t('loadingGateway');
   String get brandTagline => _t('brandTagline');
   String get forgotPasswordQ => _t('forgotPasswordQ');
+  String get enterValidEmail => _t('enterValidEmail');
+  String get enterPhone => _t('enterPhone');
+  String get ifRegisteredCode => _t('ifRegisteredCode');
+  String get sendCodeFailed => _t('sendCodeFailed');
+  String get serverConnectFailed => _t('serverConnectFailed');
+  String get passwordMin8 => _t('passwordMin8');
+  String get passwordMismatch => _t('passwordMismatch');
+  String get passwordChanged => _t('passwordChanged');
+  String get resetPassword => _t('resetPassword');
+  String get enterCodeAndNewPassword => _t('enterCodeAndNewPassword');
+  String get ifRegisteredVia => _t('ifRegisteredVia');
+  String get ifRegisteredWaVia => _t('ifRegisteredWaVia');
+  String get chooseCodeMethod => _t('chooseCodeMethod');
+  String get emailLabel => _t('emailLabel');
+  String get sendCodeBtn => _t('sendCodeBtn');
+  String get phoneLabel => _t('phoneLabel');
+  String get verifyCodeLabel => _t('verifyCodeLabel');
+  String get newPasswordLabel => _t('newPasswordLabel');
+  String get min8chars => _t('min8chars');
+  String get confirmPasswordLabel => _t('confirmPasswordLabel');
+  String get retypeIt => _t('retypeIt');
+  String get changePassword => _t('changePassword');
+  String get codeNotArrivedRetry => _t('codeNotArrivedRetry');
   String get trackIntro        => _t('trackIntro');
   String get trackNumberLabel  => _t('trackNumberLabel');
   String get trackSubmit       => _t('trackSubmit');
@@ -577,6 +600,29 @@ class AppStrings {
     'loadingGateway': {'ar': 'جاري تحميل بوابة الدفع...', 'he': 'טוען את שער התשלום...', 'en': 'Loading payment gateway…'},
     'brandTagline': {'ar': 'شركة ابناء الفريد التجارية', 'he': 'חברת אבנא אלפריד', 'en': 'Alfared Trading Co.'},
     'forgotPasswordQ': {'ar': 'نسيت كلمة المرور؟', 'he': 'שכחת סיסמה?', 'en': 'Forgot password?'},
+    'enterValidEmail': {'ar': 'أدخل بريداً إلكترونياً صحيحاً', 'he': 'הזן אימייל תקין', 'en': 'Enter a valid email'},
+    'enterPhone': {'ar': 'أدخل رقم هاتفك', 'he': 'הזן את מספר הטלפון', 'en': 'Enter your phone number'},
+    'ifRegisteredCode': {'ar': 'إذا كان الحساب مسجّلاً فستصلك رسالة بالرمز', 'he': 'אם החשבון רשום, יישלח אליך קוד', 'en': 'If the account exists, a code will be sent'},
+    'sendCodeFailed': {'ar': 'تعذّر إرسال الرمز، حاول مجدداً', 'he': 'שליחת הקוד נכשלה, נסה שוב', 'en': 'Could not send the code, try again'},
+    'serverConnectFailed': {'ar': 'تعذّر الاتصال بالخادم', 'he': 'החיבור לשרת נכשל', 'en': 'Could not reach the server'},
+    'passwordMin8': {'ar': 'كلمة المرور يجب أن تكون 8 أحرف على الأقل', 'he': 'הסיסמה חייבת להכיל לפחות 8 תווים', 'en': 'Password must be at least 8 characters'},
+    'passwordMismatch': {'ar': 'كلمة المرور وتأكيدها غير متطابقتين', 'he': 'הסיסמה והאישור אינם תואמים', 'en': 'Password and confirmation do not match'},
+    'passwordChanged': {'ar': 'تم تغيير كلمة المرور بنجاح ✓', 'he': 'הסיסמה שונתה בהצלחה ✓', 'en': 'Password changed successfully ✓'},
+    'resetPassword': {'ar': 'استعادة كلمة المرور', 'he': 'שחזור סיסמה', 'en': 'Reset password'},
+    'enterCodeAndNewPassword': {'ar': 'أدخل الرمز وكلمة المرور الجديدة', 'he': 'הזן את הקוד והסיסמה החדשה', 'en': 'Enter the code and your new password'},
+    'ifRegisteredVia': {'ar': 'إذا كان الحساب مسجّلاً فستصلك رسالة على', 'he': 'אם החשבון רשום, תישלח הודעה אל', 'en': 'If the account exists, a message will be sent to'},
+    'ifRegisteredWaVia': {'ar': 'إذا كان الحساب مسجّلاً فستصلك رسالة واتساب على', 'he': 'אם החשבון רשום, תישלח הודעת וואטסאפ אל', 'en': 'If the account exists, a WhatsApp message will be sent to'},
+    'chooseCodeMethod': {'ar': 'اختر طريقة استلام رمز التحقق', 'he': 'בחר כיצד לקבל את קוד האימות', 'en': 'Choose how to receive the code'},
+    'emailLabel': {'ar': 'البريد الإلكتروني', 'he': 'אימייל', 'en': 'Email'},
+    'sendCodeBtn': {'ar': 'إرسال الرمز', 'he': 'שלח קוד', 'en': 'Send code'},
+    'phoneLabel': {'ar': 'رقم الهاتف', 'he': 'מספר טלפון', 'en': 'Phone number'},
+    'verifyCodeLabel': {'ar': 'رمز التحقق', 'he': 'קוד אימות', 'en': 'Verification code'},
+    'newPasswordLabel': {'ar': 'كلمة المرور الجديدة', 'he': 'סיסמה חדשה', 'en': 'New password'},
+    'min8chars': {'ar': '8 أحرف على الأقل', 'he': 'לפחות 8 תווים', 'en': 'At least 8 characters'},
+    'confirmPasswordLabel': {'ar': 'تأكيد كلمة المرور', 'he': 'אישור סיסמה', 'en': 'Confirm password'},
+    'retypeIt': {'ar': 'أعد كتابتها', 'he': 'הקלד שוב', 'en': 'Re-enter it'},
+    'changePassword': {'ar': 'تغيير كلمة المرور', 'he': 'שנה סיסמה', 'en': 'Change password'},
+    'codeNotArrivedRetry': {'ar': 'لم يصلك الرمز؟ إعادة المحاولة', 'he': 'לא קיבלת קוד? נסה שוב', 'en': 'No code? Try again'},
     'trackIntro':         {'ar': 'أدخل رقم الطلب لعرض حالة الشحنة.', 'he': 'הזינו את מספר ההזמנה כדי לראות את סטטוס המשלוח.', 'en': 'Enter your order number to see the shipment status.'},
     'trackNumberLabel':   {'ar': 'رقم الطلب',       'he': 'מספר הזמנה',     'en': 'Order Number'},
     'trackSubmit':        {'ar': 'عرض حالة الطلب',  'he': 'הצג סטטוס',      'en': 'Show Status'},
