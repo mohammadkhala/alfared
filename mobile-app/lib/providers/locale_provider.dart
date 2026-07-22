@@ -9,6 +9,10 @@ class LocaleProvider extends ChangeNotifier {
 
   String _code = 'ar';
 
+  /// Mirrors the active code for non-widget code (e.g. the API singleton),
+  /// which has no BuildContext to reach a provider through.
+  static String currentCode = 'ar';
+
   String get code => _code;
   Locale get locale => Locale(_code);
   S get s => AppStrings.from(_code);
@@ -18,6 +22,7 @@ class LocaleProvider extends ChangeNotifier {
     final saved = prefs.getString(_key);
     if (saved != null && supported.contains(saved)) {
       _code = saved;
+      currentCode = saved;
       notifyListeners();
     }
   }
@@ -25,6 +30,7 @@ class LocaleProvider extends ChangeNotifier {
   Future<void> setLocale(String code) async {
     if (!supported.contains(code) || code == _code) return;
     _code = code;
+    currentCode = code;
     notifyListeners();
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_key, code);

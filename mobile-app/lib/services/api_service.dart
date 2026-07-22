@@ -1,4 +1,6 @@
 import 'dart:io' show Platform;
+import '../l10n/app_strings.dart';
+import '../providers/locale_provider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import '../config/api_config.dart';
@@ -115,8 +117,8 @@ class ApiService {
         }
         final msg = _extractErrorMessage(e.response?.data) ??
             (isTimeout
-                ? 'انتهت مهلة الاتصال. تحقّق من الإنترنت.'
-                : 'تعذّر الاتصال بالخادم.');
+                ? AppStrings.from(LocaleProvider.currentCode).connectionTimeout
+                : AppStrings.from(LocaleProvider.currentCode).serverUnreachable);
         throw ApiException(msg, statusCode: e.response?.statusCode, raw: e.response?.data);
       }
     }
@@ -157,5 +159,5 @@ class ApiException implements Exception {
   const ApiException(this.message, {this.statusCode, this.raw});
 
   @override
-  String toString() => message ?? 'خطأ غير معروف';
+  String toString() => message ?? AppStrings.from(LocaleProvider.currentCode).unknownError;
 }

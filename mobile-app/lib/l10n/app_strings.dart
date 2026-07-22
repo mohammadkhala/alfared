@@ -219,6 +219,9 @@ class S {
   String get greetingAfternoon => _t('greetingAfternoon');
   String get greetingEvening => _t('greetingEvening');
   String get greetingNight => _t('greetingNight');
+  String get connectionTimeout => _t('connectionTimeout');
+  String get serverUnreachable => _t('serverUnreachable');
+  String get unknownError => _t('unknownError');
   String get trackIntro        => _t('trackIntro');
   String get trackNumberLabel  => _t('trackNumberLabel');
   String get trackSubmit       => _t('trackSubmit');
@@ -639,6 +642,9 @@ class AppStrings {
     'greetingAfternoon': {'ar': 'مساء الخير', 'he': 'צהריים טובים', 'en': 'Good afternoon'},
     'greetingEvening': {'ar': 'مساء النور', 'he': 'ערב טוב', 'en': 'Good evening'},
     'greetingNight': {'ar': 'مساء الخير', 'he': 'לילה טוב', 'en': 'Good evening'},
+    'connectionTimeout': {'ar': 'انتهت مهلة الاتصال. تحقّق من الإنترنت.', 'he': 'תם הזמן הקצוב לחיבור. בדוק את האינטרנט.', 'en': 'Connection timed out. Check your internet.'},
+    'serverUnreachable': {'ar': 'تعذّر الاتصال بالخادم.', 'he': 'לא ניתן להתחבר לשרת.', 'en': 'Could not reach the server.'},
+    'unknownError': {'ar': 'خطأ غير معروف', 'he': 'שגיאה לא ידועה', 'en': 'Unknown error'},
     'trackIntro':         {'ar': 'أدخل رقم الطلب لعرض حالة الشحنة.', 'he': 'הזינו את מספר ההזמנה כדי לראות את סטטוס המשלוח.', 'en': 'Enter your order number to see the shipment status.'},
     'trackNumberLabel':   {'ar': 'رقم الطلب',       'he': 'מספר הזמנה',     'en': 'Order Number'},
     'trackSubmit':        {'ar': 'عرض حالة الطلب',  'he': 'הצג סטטוס',      'en': 'Show Status'},
