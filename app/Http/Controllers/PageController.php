@@ -44,17 +44,32 @@ class PageController extends Controller
 
     public function sendContact(Request $request)
     {
+        // ── Bot traps ──
+        // A filled honeypot, or a form returned in under two seconds, is a
+        // script. Pretend it worked so the bot doesn't learn it was caught, but
+        // save nothing.
+        $tooFast = (int) $request->input('loaded_at', 0) > (time() - 2);
+        if (filled($request->input('website')) || $tooFast) {
+            return redirect()->route('contact')->with('success', 'تم إرسال رسالتك بنجاح.');
+        }
+
         $data = $request->validate([
             'name'    => 'required|string|max:100',
-            'phone'   => 'required|string|max:30',
+            // Digits, spaces and + only — a real phone, not a link or a script.
+            'phone'   => ['required', 'string', 'max:30', 'regex:/^[0-9+\s()\-]{6,30}$/'],
             'subject' => 'required|string|max:200',
             'message' => 'required|string|max:2000',
+        ], [
+            'phone.regex' => 'يرجى إدخال رقم هاتف صحيح.',
         ]);
 
-        // Save to database
+        // Only ever the four validated fields — status/admin_reply/read_at in
+        // the model's fillable are never taken from the request.
         Inquiry::create($data);
 
-        // Also open WhatsApp for quick reply
+        // Open WhatsApp for a quick reply. urlencode() neutralises any newline
+        // or control character in the user's text, so it can't forge extra
+        // parameters onto the wa.me URL.
         $text = "رسالة جديدة من الموقع\n"
               . "الاسم: {$data['name']}\n"
               . "الهاتف: {$data['phone']}\n"

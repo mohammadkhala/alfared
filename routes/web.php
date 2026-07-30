@@ -144,7 +144,11 @@ Route::prefix('account')->name('account.')->middleware('auth')->group(function (
 
 // ── Static Pages ──
 Route::get('/contact', [PageController::class, 'contact'])->name('contact');
-Route::post('/contact', [PageController::class, 'sendContact'])->name('contact.send');
+// Rate-limited: a handful of genuine inquiries a minute is plenty; anything
+// above is a flood. Keyed per IP by the throttle middleware.
+Route::post('/contact', [PageController::class, 'sendContact'])
+    ->middleware('throttle:5,1')
+    ->name('contact.send');
 Route::get('/about', [PageController::class, 'about'])->name('about');
 
 // ── Legal Pages ──

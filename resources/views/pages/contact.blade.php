@@ -236,6 +236,13 @@
 
       <form action="{{ route('contact.send') }}" method="POST">
         @csrf
+        {{-- Honeypot: hidden from people, tempting to bots. A real user never
+             fills it, so any value here means the submission is automated. --}}
+        <input type="text" name="website" tabindex="-1" autocomplete="off"
+               style="position:absolute;left:-9999px;width:1px;height:1px;opacity:0;" aria-hidden="true"/>
+        {{-- When the page was rendered — a form submitted in under 2s was filled
+             by a script, not a human. --}}
+        <input type="hidden" name="loaded_at" value="{{ now()->timestamp }}"/>
         <div class="form-row">
           <div class="form-group">
             <label>الاسم الكامل *</label>
