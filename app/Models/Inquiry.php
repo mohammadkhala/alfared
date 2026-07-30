@@ -15,11 +15,6 @@ class Inquiry extends Model
         'read_at' => 'datetime',
     ];
 
-    /* ── Scopes ── */
-    public function scopeNew($q)     { return $q->where('status', 'new'); }
-    public function scopeRead($q)    { return $q->where('status', 'read'); }
-    public function scopeReplied($q) { return $q->where('status', 'replied'); }
-
     /* ── Helpers ── */
     public function getStatusLabelAttribute(): string
     {

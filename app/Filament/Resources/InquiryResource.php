@@ -101,19 +101,23 @@ class InquiryResource extends Resource
                 Tables\Columns\TextColumn::make('subject')
                     ->label('الموضوع')->searchable()->limit(40),
 
-                Tables\Columns\BadgeColumn::make('status')
+                // TextColumn::badge() — BadgeColumn is deprecated; this matches
+                // the working OrderResource.
+                Tables\Columns\TextColumn::make('status')
                     ->label('الحالة')
+                    ->badge()
                     ->formatStateUsing(fn($state) => match($state) {
                         'new'     => 'جديد',
                         'read'    => 'مقروء',
                         'replied' => 'تم الرد',
                         default   => $state,
                     })
-                    ->colors([
-                        'danger'  => 'new',
-                        'warning' => 'read',
-                        'success' => 'replied',
-                    ]),
+                    ->color(fn($state) => match($state) {
+                        'new'     => 'danger',
+                        'read'    => 'warning',
+                        'replied' => 'success',
+                        default   => 'gray',
+                    }),
 
                 Tables\Columns\TextColumn::make('created_at')
                     ->label('التاريخ')->dateTime('d/m/Y H:i')->sortable(),
