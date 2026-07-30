@@ -8,16 +8,25 @@ Artisan::command('inspire', function () {
     $this->comment(Inspiring::quote());
 })->purpose('Display an inspiring quote');
 
-// Prune expired OTP codes every hour
-Schedule::command('model:prune', ['--model' => [\App\Models\OtpCode::class]])->hourly();
+// NOTE: this host has proc_open disabled, so Schedule::command() — which runs
+// each task as a subprocess — throws every time the scheduler fires. Everything
+// below therefore runs in-process via Schedule::call(fn () => Artisan::call()),
+// which needs no subprocess. Don't switch these back to Schedule::command().
+
+// Prune expired OTP codes every hour.
+Schedule::call(fn () => Artisan::call('model:prune', [
+    '--model' => [\App\Models\OtpCode::class],
+]))->hourly();
 
 // Drain queued mail. Mail::queue() writes to the jobs table and waits for a
-// worker; shared hosting has no long-running process, so without this every
-// order confirmation sat in the queue forever. --stop-when-empty exits once
-// the table is clear instead of holding the process open.
-Schedule::command('queue:work --stop-when-empty --tries=3 --max-time=50')
-    ->everyMinute()
-    ->withoutOverlapping();
+// worker; this host runs none, so without this every order confirmation would
+// sit in the queue forever. --stop-when-empty exits once the table is clear.
+Schedule::call(fn () => Artisan::call('queue:work', [
+    '--stop-when-empty' => true,
+    '--tries' => 3,
+    '--max-time' => 50,
+]))->everyMinute()->withoutOverlapping();
 
-// Pull RoadFN shipment status back onto open orders
-Schedule::command('roadfn:sync-shipments')->everyFifteenMinutes();
+// Pull RoadFN shipment status back onto open orders.
+Schedule::call(fn () => Artisan::call('roadfn:sync-shipments'))
+    ->everyFifteenMinutes();
