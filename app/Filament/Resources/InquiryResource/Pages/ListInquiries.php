@@ -21,12 +21,12 @@ class ListInquiries extends ListRecords
         return [
             'all' => Tab::make('الكل'),
             'new' => Tab::make('جديد 🔴')
-                ->modifyQueryUsing(fn(Builder $q) => $q->where('status', 'new'))
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', 'new'))
                 ->badge(\App\Models\Inquiry::where('status', 'new')->count()),
             'read' => Tab::make('مقروء')
-                ->modifyQueryUsing(fn(Builder $q) => $q->where('status', 'read')),
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', 'read')),
             'replied' => Tab::make('تم الرد ✓')
-                ->modifyQueryUsing(fn(Builder $q) => $q->where('status', 'replied')),
+                ->modifyQueryUsing(fn(Builder $query) => $query->where('status', 'replied')),
         ];
     }
 }
