@@ -21,11 +21,13 @@ Schedule::call(fn () => Artisan::call('model:prune', [
 // Drain queued mail. Mail::queue() writes to the jobs table and waits for a
 // worker; this host runs none, so without this every order confirmation would
 // sit in the queue forever. --stop-when-empty exits once the table is clear.
+// A closure event has no command string to derive a mutex key from, so
+// withoutOverlapping() needs an explicit name.
 Schedule::call(fn () => Artisan::call('queue:work', [
     '--stop-when-empty' => true,
     '--tries' => 3,
     '--max-time' => 50,
-]))->everyMinute()->withoutOverlapping();
+]))->name('drain-queued-mail')->everyMinute()->withoutOverlapping();
 
 // Pull RoadFN shipment status back onto open orders.
 Schedule::call(fn () => Artisan::call('roadfn:sync-shipments'))
