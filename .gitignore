@@ -42,3 +42,6 @@ mobile-app/android/app/google-services.json
 storage*.zip
 storage (2).zip
 scan_arabic.txt
+
+# local DB backups
+/storage/app/private/backups

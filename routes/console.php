@@ -32,3 +32,8 @@ Schedule::call(fn () => Artisan::call('queue:work', [
 // Pull RoadFN shipment status back onto open orders.
 Schedule::call(fn () => Artisan::call('roadfn:sync-shipments'))
     ->everyFifteenMinutes();
+
+// Nightly database backup, keeping the last 7 days. Pure PHP (no mysqldump —
+// this host disables proc_open); writes to storage/app/private/backups.
+Schedule::call(fn () => Artisan::call('backup:database', ['--keep' => 7]))
+    ->dailyAt('03:30')->name('db-backup')->withoutOverlapping();
