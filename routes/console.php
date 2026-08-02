@@ -37,3 +37,8 @@ Schedule::call(fn () => Artisan::call('roadfn:sync-shipments'))
 // this host disables proc_open); writes to storage/app/private/backups.
 Schedule::call(fn () => Artisan::call('backup:database', ['--keep' => 7]))
     ->dailyAt('03:30')->name('db-backup')->withoutOverlapping();
+
+// Weekly full backup (database + uploaded images) in one zip, keeping the
+// last 4. Sunday before the nightly DB backup so they don't overlap.
+Schedule::call(fn () => Artisan::call('backup:full', ['--keep' => 4]))
+    ->weeklyOn(0, '03:00')->name('full-backup')->withoutOverlapping();
