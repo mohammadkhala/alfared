@@ -36,10 +36,15 @@ class HomeController extends Controller
                 ->limit(8)->get()
         );
 
+        // "New arrivals" = the most recently added products, so anything just
+        // added shows up on its own. The is_new flag is no longer required
+        // (easy to forget); it only boosts a product to the front when set.
         $newProducts = Cache::remember("home:{$loc}:new", $ttl, fn () =>
-            Product::active()->where('is_new', true)
+            Product::active()
                 ->with(['category:id,name_ar,name_en,name_he,slug', 'brand:id,name,slug'])
                 ->orderByRaw('CASE WHEN stock_quantity > 0 THEN 0 ELSE 1 END')
+                ->orderByDesc('is_new')
+                ->orderByDesc('created_at')
                 ->limit(8)->get()
         );
 
