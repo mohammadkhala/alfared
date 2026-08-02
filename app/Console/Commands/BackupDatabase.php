@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
 use App\Support\DatabaseDumper;
+use App\Support\GoogleDriveUploader;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -50,9 +51,33 @@ class BackupDatabase extends Command
         $sizeMb = round(filesize($path) / 1048576, 2);
         $this->info("✓ نسخة احتياطية: {$dir}/{$name} ({$sizeMb} م.ب)");
 
+        // Push off-site if Google Drive is configured; only then drop the local
+        // copy, so a failed upload never loses the backup.
+        if ($this->offload($path, $name)) {
+            $disk->delete("{$dir}/{$name}");
+            return self::SUCCESS;
+        }
+
         $this->prune($disk, $dir, (int) $this->option('keep'));
 
         return self::SUCCESS;
+    }
+
+    /** Uploads to Google Drive when configured; true means it's safely off-site. */
+    private function offload(string $path, string $name): bool
+    {
+        $uploader = GoogleDriveUploader::fromConfig();
+        if (! $uploader) {
+            return false;   // not configured — keep local, prune as usual
+        }
+        try {
+            $uploader->upload($path, $name);
+            $this->info("☁️  رُفعت إلى Google Drive.");
+            return true;
+        } catch (\Throwable $e) {
+            $this->warn('تعذّر الرفع إلى Google Drive (بقيت النسخة محلياً): ' . $e->getMessage());
+            return false;
+        }
     }
 
     private function prune($disk, string $dir, int $keepDays): void

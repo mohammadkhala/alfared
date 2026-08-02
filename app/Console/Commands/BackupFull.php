@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Support\DatabaseDumper;
+use App\Support\GoogleDriveUploader;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Storage;
 use ZipArchive;
@@ -65,6 +66,11 @@ class BackupFull extends Command
         $sizeMb = round(filesize($path) / 1048576, 2);
         $this->info("✓ نسخة شاملة: {$dir}/{$name} ({$sizeMb} م.ب — قاعدة + {$uploads} ملف)");
 
+        if ($this->offload($path, $name)) {
+            $disk->delete("{$dir}/{$name}");
+            return self::SUCCESS;
+        }
+
         $this->prune($disk, $dir, (int) $this->option('keep'));
 
         return self::SUCCESS;
@@ -91,6 +97,23 @@ class BackupFull extends Command
         }
 
         return $count;
+    }
+
+    /** Uploads to Google Drive when configured; true means it's safely off-site. */
+    private function offload(string $path, string $name): bool
+    {
+        $uploader = GoogleDriveUploader::fromConfig();
+        if (! $uploader) {
+            return false;
+        }
+        try {
+            $uploader->upload($path, $name);
+            $this->info("☁️  رُفعت إلى Google Drive.");
+            return true;
+        } catch (\Throwable $e) {
+            $this->warn('تعذّر الرفع إلى Google Drive (بقيت النسخة محلياً): ' . $e->getMessage());
+            return false;
+        }
     }
 
     private function prune($disk, string $dir, int $keep): void

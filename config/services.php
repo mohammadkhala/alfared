@@ -51,6 +51,14 @@ return [
         'currency'   => env('LAHZA_CURRENCY', 'ILS'),
     ],
 
+    // Off-site backup storage. When both are set, backups upload here and the
+    // local copy is removed. credentials = absolute path to the service-account
+    // JSON key (keep it outside the web root and out of git).
+    'google_drive' => [
+        'credentials' => env('GOOGLE_DRIVE_CREDENTIALS'),
+        'folder_id'   => env('GOOGLE_DRIVE_FOLDER_ID'),
+    ],
+
     'roadfn' => [
         'base_url'    => env('ROADFN_BASE_URL', 'https://api.roadfn.com/'),
         'username'    => env('ROADFN_USERNAME'),
