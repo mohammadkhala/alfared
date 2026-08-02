@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
+use App\Support\DatabaseDumper;
 use Illuminate\Support\Facades\Storage;
 
 /**
@@ -36,7 +37,7 @@ class BackupDatabase extends Command
         }
 
         try {
-            $this->dump($gz);
+            (new DatabaseDumper())->dump(fn (string $s) => gzwrite($gz, $s));
         } catch (\Throwable $e) {
             gzclose($gz);
             @unlink($path);   // never leave a half-written backup behind
@@ -52,77 +53,6 @@ class BackupDatabase extends Command
         $this->prune($disk, $dir, (int) $this->option('keep'));
 
         return self::SUCCESS;
-    }
-
-    private function dump($gz): void
-    {
-        $pdo = DB::connection()->getPdo();
-
-        gzwrite($gz, "-- Alfared database backup — " . now()->toDateTimeString() . "\n");
-        gzwrite($gz, "SET NAMES utf8mb4;\n");
-        gzwrite($gz, "SET FOREIGN_KEY_CHECKS=0;\n\n");
-
-        foreach ($this->tables() as $table) {
-            // Schema, verbatim from the server so column types/indexes are exact.
-            $create = DB::selectOne("SHOW CREATE TABLE `{$table}`");
-            $createSql = $create->{'Create Table'} ?? ($create->{'Create View'} ?? null);
-            if ($createSql === null) {
-                continue;   // skip anything that isn't a plain table
-            }
-
-            gzwrite($gz, "DROP TABLE IF EXISTS `{$table}`;\n");
-            gzwrite($gz, $createSql . ";\n\n");
-
-            // Data — streamed one row at a time so a big table can't exhaust
-            // memory. Batched into multi-row INSERTs for a smaller, faster file.
-            $columns = null;
-            $batch = [];
-            $batchSize = 200;
-
-            foreach (DB::connection()->cursor("SELECT * FROM `{$table}`") as $row) {
-                $row = (array) $row;
-                $columns ??= '`' . implode('`, `', array_keys($row)) . '`';
-
-                $values = array_map(function ($v) use ($pdo) {
-                    if ($v === null) {
-                        return 'NULL';
-                    }
-                    return $pdo->quote((string) $v);
-                }, array_values($row));
-
-                $batch[] = '(' . implode(', ', $values) . ')';
-
-                if (count($batch) >= $batchSize) {
-                    $this->writeBatch($gz, $table, $columns, $batch);
-                    $batch = [];
-                }
-            }
-
-            if ($batch) {
-                $this->writeBatch($gz, $table, $columns, $batch);
-            }
-
-            gzwrite($gz, "\n");
-        }
-
-        gzwrite($gz, "SET FOREIGN_KEY_CHECKS=1;\n");
-        gzwrite($gz, "-- Dump completed on " . now()->toDateTimeString() . "\n");
-    }
-
-    private function writeBatch($gz, string $table, string $columns, array $batch): void
-    {
-        gzwrite($gz, "INSERT INTO `{$table}` ({$columns}) VALUES\n" . implode(",\n", $batch) . ";\n");
-    }
-
-    /** @return string[] */
-    private function tables(): array
-    {
-        // getAllTables() returns rows keyed by a driver-specific column, so pull
-        // the first value of each row rather than guessing the key.
-        return array_map(
-            fn ($row) => array_values((array) $row)[0],
-            DB::select('SHOW TABLES'),
-        );
     }
 
     private function prune($disk, string $dir, int $keepDays): void
