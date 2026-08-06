@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'من نحن — ' . __('company_name'))
-@section('description', 'تعرّف على شركة ابناء الفريد التجارية — قصتنا، قيمنا، ومنتجاتنا')
+@section('title', __('about_meta_title') . ' — ' . __('company_name'))
+@section('description', __('about_meta_desc'))
 
 @push('styles')
 <style>
@@ -176,9 +176,9 @@
 {{-- Hero --}}
 <div class="about-hero">
   <div class="about-hero-bg"></div>
-  <div class="pill">✦ شركة ابناء الفريد التجارية</div>
-  <h1>من نحن</h1>
-  <p>الصين بين يديك — أضخم معرض للمنتجات في فلسطين، نجمع لك آلاف المنتجات في مكان واحد</p>
+  <div class="pill">{{ __('about_pill') }}</div>
+  <h1>{{ __('about_meta_title') }}</h1>
+  <p>{{ __('about_hero_sub') }}</p>
 </div>
 
 <div class="container">
@@ -187,19 +187,19 @@
   <div class="stats-bar">
     <div class="stat-item">
       <div class="stat-num">+5,000</div>
-      <div class="stat-lbl">منتج متوفر</div>
+      <div class="stat-lbl">{{ __('about_stat_products') }}</div>
     </div>
     <div class="stat-item">
       <div class="stat-num">+10K</div>
-      <div class="stat-lbl">عميل راضٍ</div>
+      <div class="stat-lbl">{{ __('about_stat_customers') }}</div>
     </div>
     <div class="stat-item">
       <div class="stat-num">4.9 ⭐</div>
-      <div class="stat-lbl">تقييم العملاء</div>
+      <div class="stat-lbl">{{ __('about_stat_rating') }}</div>
     </div>
     <div class="stat-item">
-      <div class="stat-num">فلسطين 🇵🇸</div>
-      <div class="stat-lbl">نوصّل لكل المناطق</div>
+      <div class="stat-num">🇵🇸</div>
+      <div class="stat-lbl">{{ __('about_stat_region') }}</div>
     </div>
   </div>
 
@@ -207,19 +207,15 @@
   <div class="about-section" style="padding-top:80px;">
     <div class="story-grid">
       <div>
-        <h2>قصتنا</h2>
+        <h2>{{ __('about_story_title') }}</h2>
         <p>
-          شركة ابناء الفريد التجارية — واحدة من أبرز شركات الاستيراد والتجزئة في فلسطين،
-          متخصصون في جلب أفضل المنتجات مباشرةً من الصين وتوفيرها للمحلات التجارية،
-          المتاجر الإلكترونية، وصفحات التسويق بأسعار منافسة وجودة مضمونة.
+          {{ __('about_story_p1') }}
         </p>
         <p>
-          بدأنا رحلتنا برؤية واضحة: أن نجعل المنتجات العالمية في متناول الجميع،
-          وأن نكون الشريك الموثوق لكل من يريد البناء على تجارة ناجحة ومستدامة.
+          {{ __('about_story_p2') }}
         </p>
         <p>
-          اليوم، نفخر بخدمة آلاف العملاء في مختلف مناطق فلسطين والداخل،
-          مع توصيل سريع وخدمة عملاء تضع رضاك فوق كل اعتبار.
+          {{ __('about_story_p3') }}
         </p>
       </div>
       <div class="story-img">
@@ -230,37 +226,37 @@
 
   {{-- Values --}}
   <div class="about-section" style="padding-top:8px;">
-    <h2>قيمنا</h2>
+    <h2>{{ __('about_values_title') }}</h2>
     <div class="values-grid">
       <div class="value-card">
         <div class="value-emoji">🏆</div>
-        <h3>الجودة أولاً</h3>
-        <p>نختار كل منتج بعناية لنضمن لك جودة تليق بثقتك بنا</p>
+        <h3>{{ __('about_val_quality') }}</h3>
+        <p>{{ __('about_val_quality_d') }}</p>
       </div>
       <div class="value-card">
         <div class="value-emoji">🤝</div>
-        <h3>الأمانة والشفافية</h3>
-        <p>نؤمن بالعلاقات طويلة الأمد المبنية على الصدق مع كل عميل</p>
+        <h3>{{ __('about_val_trust') }}</h3>
+        <p>{{ __('about_val_trust_d') }}</p>
       </div>
       <div class="value-card">
         <div class="value-emoji">🚀</div>
-        <h3>السرعة في التوصيل</h3>
-        <p>نلتزم بتوصيل طلباتك في أسرع وقت لجميع مناطق فلسطين</p>
+        <h3>{{ __('about_val_speed') }}</h3>
+        <p>{{ __('about_val_speed_d') }}</p>
       </div>
       <div class="value-card">
         <div class="value-emoji">💰</div>
-        <h3>أسعار تنافسية</h3>
-        <p>نوفر أفضل الأسعار لأن نجاح عملك هو نجاحنا</p>
+        <h3>{{ __('about_val_price') }}</h3>
+        <p>{{ __('about_val_price_d') }}</p>
       </div>
       <div class="value-card">
         <div class="value-emoji">🌍</div>
-        <h3>تنوع المنتجات</h3>
-        <p>أكثر من 5000 منتج في فئات متعددة تلبي كل احتياجاتك</p>
+        <h3>{{ __('about_val_variety') }}</h3>
+        <p>{{ __('about_val_variety_d') }}</p>
       </div>
       <div class="value-card">
         <div class="value-emoji">📞</div>
-        <h3>دعم دائم</h3>
-        <p>فريق خدمة عملاء متاح للإجابة على كل استفساراتك</p>
+        <h3>{{ __('about_val_support') }}</h3>
+        <p>{{ __('about_val_support_d') }}</p>
       </div>
     </div>
   </div>
@@ -270,38 +266,38 @@
 {{-- Why us ── full width --}}
 <div class="container">
   <div class="why-section">
-    <h2>لماذا تختار ابناء الفريد؟</h2>
-    <p>نقدم لك تجربة تسوق متكاملة من أول نقرة حتى وصول المنتج لبابك</p>
+    <h2>{{ __('about_why_title') }}</h2>
+    <p>{{ __('about_why_sub') }}</p>
     <div class="why-grid">
       <div class="why-item">
         <div class="icon">🏭</div>
-        <h4>مباشرة من المصدر</h4>
-        <p>منتجات مستوردة مباشرة من الصين تضمن لك أفضل سعر وأعلى جودة</p>
+        <h4>{{ __('about_why_source') }}</h4>
+        <p>{{ __('about_why_source_d') }}</p>
       </div>
       <div class="why-item">
         <div class="icon">🇵🇸</div>
-        <h4>توصيل لكل فلسطين</h4>
-        <p>نوصّل لجميع مناطق الضفة الغربية والداخل الفلسطيني بسرعة وأمان</p>
+        <h4>{{ __('about_why_delivery') }}</h4>
+        <p>{{ __('about_why_delivery_d') }}</p>
       </div>
       <div class="why-item">
         <div class="icon">📦</div>
-        <h4>مخزون ضخم دائماً</h4>
-        <p>نحتفظ بمخزون كافٍ لضمان توفر المنتجات وتسليمها في أقصر وقت</p>
+        <h4>{{ __('about_why_stock') }}</h4>
+        <p>{{ __('about_why_stock_d') }}</p>
       </div>
       <div class="why-item">
         <div class="icon">💳</div>
-        <h4>دفع آمن ومريح</h4>
-        <p>ادفع عند الاستلام أو عبر الدفع الإلكتروني بأمان تام</p>
+        <h4>{{ __('about_why_pay') }}</h4>
+        <p>{{ __('about_why_pay_d') }}</p>
       </div>
       <div class="why-item">
         <div class="icon">🔄</div>
-        <h4>سياسة استرجاع مرنة</h4>
-        <p>نضمن حقك في استبدال أو إرجاع المنتج في حال وجود أي مشكلة</p>
+        <h4>{{ __('about_why_return') }}</h4>
+        <p>{{ __('about_why_return_d') }}</p>
       </div>
       <div class="why-item">
         <div class="icon">🌟</div>
-        <h4>ثقة آلاف العملاء</h4>
-        <p>أكثر من 10,000 عميل راضٍ يثقون في شركة ابناء الفريد يومياً</p>
+        <h4>{{ __('about_why_trust') }}</h4>
+        <p>{{ __('about_why_trust_d') }}</p>
       </div>
     </div>
   </div>
@@ -310,11 +306,11 @@
 <div class="container">
   {{-- CTA --}}
   <div class="about-cta">
-    <h2>مستعد تبدأ التسوق؟</h2>
-    <p>تصفح آلاف المنتجات الآن واستمتع بتجربة تسوق لا مثيل لها</p>
+    <h2>{{ __('about_cta_title') }}</h2>
+    <p>{{ __('about_cta_sub') }}</p>
     <div class="cta-btns">
-      <a href="{{ route('products.index') }}" class="btn-orange">🛍️ تصفح المنتجات</a>
-      <a href="{{ route('contact') }}" class="btn-blue">📞 اتصل بنا</a>
+      <a href="{{ route('products.index') }}" class="btn-orange">{{ __('about_cta_browse') }}</a>
+      <a href="{{ route('contact') }}" class="btn-blue">{{ __('about_cta_contact') }}</a>
     </div>
   </div>
 </div>

@@ -1,6 +1,6 @@
 @extends('layouts.app')
-@section('title', 'اتصل بنا — ' . __('company_name'))
-@section('description', 'تواصل مع شركة ابناء الفريد — نحن هنا لمساعدتك في أي استفسار')
+@section('title', __('contact_meta_title') . ' — ' . __('company_name'))
+@section('description', __('contact_meta_desc'))
 
 @push('styles')
 <style>
@@ -163,8 +163,8 @@
 
 {{-- Hero --}}
 <div class="page-hero">
-  <h1>📞 اتصل بنا</h1>
-  <p>نحن هنا لمساعدتك في أي استفسار أو طلب — تواصل معنا الآن</p>
+  <h1>{{ __('contact_hero_title') }}</h1>
+  <p>{{ __('contact_hero_sub') }}</p>
 </div>
 
 <div class="container">
@@ -175,14 +175,14 @@
     {{-- Left: Info --}}
     <div class="contact-info-card">
       <div>
-        <h2>معلومات التواصل</h2>
-        <p class="subtitle">نسعد بتواصلك معنا في أي وقت وسنرد عليك في أقرب وقت ممكن</p>
+        <h2>{{ __('contact_info_title') }}</h2>
+        <p class="subtitle">{{ __('contact_info_sub') }}</p>
       </div>
 
       <div class="contact-item">
         <div class="contact-icon orange">📞</div>
         <div class="contact-item-body">
-          <strong>رقم الهاتف</strong>
+          <strong>{{ __('contact_phone') }}</strong>
           <a href="tel:+970598191312" dir="ltr">+970 598 191 312</a>
         </div>
       </div>
@@ -190,7 +190,7 @@
       <div class="contact-item">
         <div class="contact-icon blue">📧</div>
         <div class="contact-item-body">
-          <strong>البريد الإلكتروني</strong>
+          <strong>{{ __('contact_email') }}</strong>
           <a href="mailto:faredahmad615@gmail.com">faredahmad615@gmail.com</a>
         </div>
       </div>
@@ -198,7 +198,7 @@
       <div class="contact-item">
         <div class="contact-icon green"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="#fff"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg></div>
         <div class="contact-item-body">
-          <strong>واتساب</strong>
+          <strong>{{ __('contact_whatsapp') }}</strong>
           <a href="https://wa.me/970598191312" target="_blank">+970 598 191 312</a>
         </div>
       </div>
@@ -206,33 +206,33 @@
       <div class="contact-item">
         <div class="contact-icon purple">📍</div>
         <div class="contact-item-body">
-          <strong>الموقع</strong>
-          <span>فلسطين — الخليل</span>
+          <strong>{{ __('contact_location') }}</strong>
+          <span>{{ __('contact_location_val') }}</span>
         </div>
       </div>
 
       <div class="contact-item">
         <div class="contact-icon orange">🕐</div>
         <div class="contact-item-body">
-          <strong>أوقات العمل</strong>
-          <span>السبت — الخميس: 9ص — 6م</span>
+          <strong>{{ __('contact_hours') }}</strong>
+          <span>{{ __('contact_hours_val') }}</span>
         </div>
       </div>
 
       <div>
-        <p style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:10px;">تابعنا على</p>
+        <p style="font-size:12px;font-weight:800;color:var(--text);margin-bottom:10px;">{{ __('contact_follow') }}</p>
         <div class="social-row">
-          <a href="https://wa.me/970598191312" target="_blank" class="social-chip whatsapp"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-inline-end:6px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>واتساب</a>
-          <a href="https://www.facebook.com/HUDACENTERHEBRON" target="_blank" class="social-chip facebook">📘 فيسبوك</a>
-          <a href="https://www.tiktok.com/@huda.center" target="_blank" class="social-chip tiktok">🎵 تيك توك</a>
+          <a href="https://wa.me/970598191312" target="_blank" class="social-chip whatsapp"><svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" style="vertical-align:-2px;margin-inline-end:6px;"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>{{ __('contact_whatsapp') }}</a>
+          <a href="https://www.facebook.com/HUDACENTERHEBRON" target="_blank" class="social-chip facebook">{{ __('contact_facebook') }}</a>
+          <a href="https://www.tiktok.com/@huda.center" target="_blank" class="social-chip tiktok">{{ __('contact_tiktok') }}</a>
         </div>
       </div>
     </div>
 
     {{-- Right: Form --}}
     <div class="contact-form-card">
-      <h2>أرسل لنا رسالة</h2>
-      <p class="subtitle">املأ النموذج وسيتم إرسال رسالتك مباشرة الينا</p>
+      <h2>{{ __('contact_form_title') }}</h2>
+      <p class="subtitle">{{ __('contact_form_sub') }}</p>
 
       <form action="{{ route('contact.send') }}" method="POST">
         @csrf
@@ -245,31 +245,31 @@
         <input type="hidden" name="loaded_at" value="{{ now()->timestamp }}"/>
         <div class="form-row">
           <div class="form-group">
-            <label>الاسم الكامل *</label>
-            <input type="text" name="name" placeholder="محمد أحمد" required value="{{ old('name') }}"/>
+            <label>{{ __('contact_f_name') }}</label>
+            <input type="text" name="name" placeholder="{{ __('contact_f_name_ph') }}" required value="{{ old('name') }}"/>
             @error('name')<span style="color:var(--danger);font-size:11px;">{{ $message }}</span>@enderror
           </div>
           <div class="form-group">
-            <label>رقم الهاتف *</label>
+            <label>{{ __('contact_f_phone') }}</label>
             <input type="tel" name="phone" placeholder="+970 5XX XXX XXX" required dir="ltr" value="{{ old('phone') }}"/>
             @error('phone')<span style="color:var(--danger);font-size:11px;">{{ $message }}</span>@enderror
           </div>
         </div>
 
         <div class="form-group">
-          <label>الموضوع *</label>
-          <input type="text" name="subject" placeholder="استفسار عن منتج / طلب / شكوى..." required value="{{ old('subject') }}"/>
+          <label>{{ __('contact_f_subject') }}</label>
+          <input type="text" name="subject" placeholder="{{ __('contact_f_subject_ph') }}" required value="{{ old('subject') }}"/>
           @error('subject')<span style="color:var(--danger);font-size:11px;">{{ $message }}</span>@enderror
         </div>
 
         <div class="form-group">
-          <label>الرسالة *</label>
-          <textarea name="message" rows="5" placeholder="اكتب رسالتك هنا..." required>{{ old('message') }}</textarea>
+          <label>{{ __('contact_f_message') }}</label>
+          <textarea name="message" rows="5" placeholder="{{ __('contact_f_message_ph') }}" required>{{ old('message') }}</textarea>
           @error('message')<span style="color:var(--danger);font-size:11px;">{{ $message }}</span>@enderror
         </div>
 
         <button type="submit" class="btn-submit">
-          ارسال
+          {{ __('contact_f_send') }}
         </button>
       </form>
     </div>
@@ -278,7 +278,7 @@
 
   {{-- Map --}}
   <div class="map-section">
-    <h2>📍 موقعنا على الخريطة</h2>
+    <h2>{{ __('contact_map_title') }}</h2>
     <iframe
       class="map-frame"
       src="https://maps.google.com/maps?q=31.553731,35.084007&z=17&output=embed"
