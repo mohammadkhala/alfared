@@ -34,11 +34,14 @@ class HeroSlide extends Model
         );
     }
 
-    /** Public URL of the background image, with a sensible fallback. */
+    /** The original hero photo, used when a slide has no image of its own. */
+    public const DEFAULT_IMAGE = 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=700&q=85';
+
+    /** Public URL of the background image, falling back to the original hero photo. */
     public function imageUrl(): string
     {
         if (! $this->image) {
-            return asset('images/banner.png');
+            return self::DEFAULT_IMAGE;
         }
         return str_starts_with($this->image, 'http')
             ? $this->image

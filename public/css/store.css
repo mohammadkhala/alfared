@@ -1134,3 +1134,11 @@ body.mobile-drawer-open { overflow: hidden; }
 }
 .hero-dot:hover{ background:rgba(255,255,255,0.6); }
 .hero-dot.is-active{ width:28px; border-radius:6px; background:var(--orange); }
+
+/* Mobile slider override — must come AFTER the base .hero-slide{position:absolute}
+   block above so it wins on equal specificity within the media query. */
+@media(max-width:1100px){
+  .hero-slider .hero-slide{ position:relative; opacity:1; visibility:visible; }
+  .hero-slider .hero-slide:not(.is-active){ display:none; }
+  .hero-dots{ position:static; transform:none; margin-top:18px; }
+}
