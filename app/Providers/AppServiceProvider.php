@@ -54,7 +54,7 @@ class AppServiceProvider extends ServiceProvider
             foreach (['ar', 'he', 'en'] as $loc) {
                 foreach ([
                     'hero','categories','featured','new','bestsellers','brands',
-                    'sale','hero_cards','offer_banners','promo_banners',
+                    'sale','hero_cards','hero_slides','offer_banners','promo_banners',
                 ] as $key) {
                     Cache::forget("home:{$loc}:{$key}");
                 }
@@ -96,5 +96,7 @@ class AppServiceProvider extends ServiceProvider
         Category::deleted($bustCategory);
         Brand::saved($bustBrand);
         Brand::deleted($bustBrand);
+        \App\Models\HeroSlide::saved($bust);
+        \App\Models\HeroSlide::deleted($bust);
     }
 }

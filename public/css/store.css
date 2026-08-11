@@ -1106,3 +1106,25 @@ body.mobile-drawer-open { overflow: hidden; }
 .flash-countdown { display:inline-flex; gap:4px; align-items:center; font-weight:900; direction:ltr; }
 .flash-countdown .fc-block { background:var(--orange); color:#fff; border-radius:6px; padding:2px 7px; font-size:15px; font-weight:900; min-width:32px; text-align:center; }
 .flash-countdown .fc-sep { color:var(--orange); font-weight:900; font-size:16px; }
+
+/* ── Hero slider ───────────────────────────────────────────────────────── */
+/* Each slide is an absolute layer that crossfades; .hero keeps its own height
+   so the absolute slides have a box to fill. */
+.hero-slider .hero-slide{
+  position:absolute; inset:0; display:flex; align-items:stretch;
+  opacity:0; visibility:hidden; transition:opacity .8s ease; z-index:1;
+}
+.hero-slider .hero-slide.is-active{ opacity:1; visibility:visible; z-index:2; }
+/* A single slide (no admin slides yet) shouldn't be hidden by the fade default. */
+.hero-slider .hero-slide:only-of-type{ opacity:1; visibility:visible; position:relative; }
+
+.hero-dots{
+  position:absolute; bottom:16px; left:50%; transform:translateX(-50%);
+  display:flex; gap:9px; z-index:6;
+}
+.hero-dot{
+  width:10px; height:10px; border-radius:50%; border:none; padding:0; cursor:pointer;
+  background:rgba(255,255,255,0.35); transition:width .25s, background .25s;
+}
+.hero-dot:hover{ background:rgba(255,255,255,0.6); }
+.hero-dot.is-active{ width:28px; border-radius:6px; background:var(--orange); }

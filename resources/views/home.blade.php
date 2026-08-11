@@ -5,70 +5,104 @@
 @section('content')
 
 {{-- ═══════════════════ HERO ═══════════════════ --}}
-<div class="hero">
+@php
+  // The default slide reproduces the original hero from translation strings, so
+  // the storefront looks identical until an admin adds slides.
+  $defaultSlide = (object) [
+    'badge'    => __('hero_pill'),
+    'title'    => __('hero_line1') . ' ' . __('hero_line2'),
+    'highlight'=> __('hero_brand'),
+    'subtitle' => __('hero_desc_1') . ' ' . __('hero_desc_2') . ' ' . __('hero_desc_3'),
+    'btn1_text'=> __('btn_shop_now'), 'btn1_url' => route('products.index'),
+    'btn2_text'=> __('btn_contact'),  'btn2_url' => 'https://wa.me/970598191312',
+    'image'    => 'https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=700&q=85',
+    'is_default' => true,
+  ];
+  $slides = ($heroSlides ?? collect())->isNotEmpty() ? $heroSlides : collect([$defaultSlide]);
+@endphp
+
+<div class="hero hero-slider" data-autoplay="6000">
   <div class="orb orb-1"></div>
   <div class="orb orb-2"></div>
   <div class="particle" style="top:20%;right:52%;"></div>
   <div class="particle" style="top:65%;right:44%;width:6px;height:6px;animation-delay:1s;"></div>
   <div class="particle" style="top:40%;right:36%;width:3px;height:3px;animation-delay:2s;"></div>
 
-  {{-- LEFT: text content --}}
-  <div class="hero-left">
-    <div class="hero-content">
-      <div class="hero-pill">{{ __('hero_pill') }}</div>
-      <h2>{{ __('hero_line1') }}<br/>{{ __('hero_line2') }}<br/><em>{{ __('hero_brand') }}</em></h2>
-      <p class="hero-desc">
-        {{ __('hero_desc_1') }}<br/>
-        {{ __('hero_desc_2') }}<br/>
-        {{ __('hero_desc_3') }}
-      </p>
-      <div class="hero-btns">
-        <a href="{{ route('products.index') }}" class="btn-orange">{{ __('btn_shop_now') }}</a>
-        <a href="https://wa.me/970598191312" target="_blank" class="btn-ghost">{{ __('btn_contact') }}</a>
+  @foreach($slides as $i => $slide)
+    @php
+      // Model slides expose text() / imageUrl(); the default slide is a plain object.
+      $badge    = isset($slide->is_default) ? $slide->badge     : $slide->text('badge');
+      $title    = isset($slide->is_default) ? $slide->title     : $slide->text('title');
+      $highlight= isset($slide->is_default) ? $slide->highlight  : $slide->text('highlight');
+      $subtitle = isset($slide->is_default) ? $slide->subtitle   : $slide->text('subtitle');
+      $b1t = isset($slide->is_default) ? $slide->btn1_text : $slide->text('btn1_text');
+      $b2t = isset($slide->is_default) ? $slide->btn2_text : $slide->text('btn2_text');
+      $b1u = $slide->btn1_url ?: null;
+      $b2u = $slide->btn2_url ?: null;
+      $bg  = isset($slide->is_default) ? $slide->image : $slide->imageUrl();
+    @endphp
+    <div class="hero-slide {{ $i === 0 ? 'is-active' : '' }}">
+
+      {{-- LEFT: text content --}}
+      <div class="hero-left">
+        <div class="hero-content">
+          @if($badge)<div class="hero-pill">{{ $badge }}</div>@endif
+          <h2>{{ $title }}@if($highlight)<br/><em>{{ $highlight }}</em>@endif</h2>
+          @if($subtitle)<p class="hero-desc">{{ $subtitle }}</p>@endif
+          <div class="hero-btns">
+            @if($b1t)<a href="{{ $b1u ?? route('products.index') }}" class="btn-orange">{{ $b1t }}</a>@endif
+            @if($b2t)<a href="{{ $b2u ?? '#' }}" @if($b2u && \Illuminate\Support\Str::startsWith($b2u,'http')) target="_blank" @endif class="btn-ghost">{{ $b2t }}</a>@endif
+          </div>
+          <div class="hero-kpis">
+            <div class="kpi-item">
+              <div class="kpi-num"><b>+</b><span class="kpi-counter" data-target="5000" data-format="comma">0</span></div>
+              <div class="kpi-label">{{ __('kpi_products') }}</div>
+            </div>
+            <div class="kpi-item">
+              <div class="kpi-num"><b>+</b><span class="kpi-counter" data-target="50">0</span></div>
+              <div class="kpi-label">{{ __('kpi_brands') }}</div>
+            </div>
+            <div class="kpi-item">
+              <div class="kpi-num"><b>+</b><span class="kpi-counter" data-target="10000" data-format="comma">0</span></div>
+              <div class="kpi-label">{{ __('kpi_customers') }}</div>
+            </div>
+            <div class="kpi-item">
+              <div class="kpi-num"><span class="kpi-counter" data-target="4.9" data-format="decimal">0</span><b>★</b></div>
+              <div class="kpi-label">{{ __('kpi_rating') }}</div>
+            </div>
+          </div>
+        </div>
       </div>
-      <div class="hero-kpis">
-        <div class="kpi-item">
-          <div class="kpi-num"><b>+</b><span class="kpi-counter" data-target="5000" data-format="comma">0</span></div>
-          <div class="kpi-label">{{ __('kpi_products') }}</div>
-        </div>
-        <div class="kpi-item">
-          <div class="kpi-num"><b>+</b><span class="kpi-counter" data-target="50">0</span></div>
-          <div class="kpi-label">{{ __('kpi_brands') }}</div>
-        </div>
-        <div class="kpi-item">
-          <div class="kpi-num"><b>+</b><span class="kpi-counter" data-target="10000" data-format="comma">0</span></div>
-          <div class="kpi-label">{{ __('kpi_customers') }}</div>
-        </div>
-        <div class="kpi-item">
-          <div class="kpi-num"><span class="kpi-counter" data-target="4.9" data-format="decimal">0</span><b>★</b></div>
-          <div class="kpi-label">{{ __('kpi_rating') }}</div>
-        </div>
+
+      {{-- RIGHT: full-bleed image + floating product cards --}}
+      <div class="hero-right">
+        <img src="{{ $bg }}" alt="{{ __('company_name') }}"/>
+        <div class="hero-img-overlay"></div>
+        @foreach(($heroProducts ?? collect())->take(3) as $j => $hp)
+          @php
+            $pos = ['fc-top','fc-mid','fc-bot'][$j] ?? 'fc-bot';
+            $img = $hp->main_image
+              ? (str_starts_with($hp->main_image,'http') ? $hp->main_image : asset('storage/'.$hp->main_image))
+              : asset('images/placeholder.svg');
+          @endphp
+          <a href="{{ route('products.show', $hp->slug) }}" class="float-card {{ $pos }}">
+            <img class="fc-img" src="{{ $img }}" alt="{{ $hp->name }}" loading="lazy"/>
+            <div class="fc-name">{{ \Illuminate\Support\Str::limit($hp->name, 20) }}</div>
+            <div class="fc-price">{{ number_format($hp->price, 0) }} ₪</div>
+          </a>
+        @endforeach
+        <div class="sale-ribbon">{{ __('sale_ribbon') }}</div>
       </div>
     </div>
-  </div>
+  @endforeach
 
-  {{-- RIGHT: full-bleed image --}}
-  <div class="hero-right">
-    <img src="https://images.unsplash.com/photo-1487412947147-5cebf100ffc2?w=700&q=85" alt="{{ __('company_name') }}"/>
-    <div class="hero-img-overlay"></div>
-    {{-- Real products, so the photo, price and link are all genuine. Falls
-         back to nothing rather than showing invented brands if the store has
-         no products yet. --}}
-    @foreach(($heroProducts ?? collect())->take(3) as $i => $hp)
-      @php
-        $pos = ['fc-top','fc-mid','fc-bot'][$i] ?? 'fc-bot';
-        $img = $hp->main_image
-          ? (str_starts_with($hp->main_image,'http') ? $hp->main_image : asset('storage/'.$hp->main_image))
-          : asset('images/placeholder.svg');
-      @endphp
-      <a href="{{ route('products.show', $hp->slug) }}" class="float-card {{ $pos }}">
-        <img class="fc-img" src="{{ $img }}" alt="{{ $hp->name }}" loading="lazy"/>
-        <div class="fc-name">{{ \Illuminate\Support\Str::limit($hp->name, 20) }}</div>
-        <div class="fc-price">{{ number_format($hp->price, 0) }} ₪</div>
-      </a>
-    @endforeach
-    <div class="sale-ribbon">{{ __('sale_ribbon') }}</div>
-  </div>
+  @if($slides->count() > 1)
+    <div class="hero-dots">
+      @foreach($slides as $i => $slide)
+        <button type="button" class="hero-dot {{ $i === 0 ? 'is-active' : '' }}" data-slide="{{ $i }}" aria-label="شريحة {{ $i + 1 }}"></button>
+      @endforeach
+    </div>
+  @endif
 </div>
 
 {{-- ═══════════════════ PROMO POPUP BANNER ═══════════════════ --}}
@@ -761,6 +795,39 @@
       animateCounter(el);
     });
   });
+})();
+</script>
+<script>
+// Hero slider: crossfade + autoplay + dots. Pauses on hover, resumes on leave.
+(function () {
+  const hero = document.querySelector('.hero-slider');
+  if (!hero) return;
+  const slides = Array.from(hero.querySelectorAll('.hero-slide'));
+  if (slides.length < 2) return;
+
+  const dots = Array.from(hero.querySelectorAll('.hero-dot'));
+  const delay = parseInt(hero.dataset.autoplay || '6000', 10);
+  let current = 0;
+  let timer = null;
+
+  function go(n) {
+    current = (n + slides.length) % slides.length;
+    slides.forEach((s, i) => s.classList.toggle('is-active', i === current));
+    dots.forEach((d, i) => d.classList.toggle('is-active', i === current));
+  }
+  function next() { go(current + 1); }
+  function start() { stop(); timer = setInterval(next, delay); }
+  function stop() { if (timer) clearInterval(timer); timer = null; }
+
+  dots.forEach((d) => d.addEventListener('click', () => {
+    go(parseInt(d.dataset.slide, 10));
+    start();  // reset the clock after a manual pick
+  }));
+
+  hero.addEventListener('mouseenter', stop);
+  hero.addEventListener('mouseleave', start);
+
+  start();
 })();
 </script>
 <script>

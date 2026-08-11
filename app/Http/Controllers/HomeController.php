@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use App\Models\Category;
 use App\Models\Banner;
+use App\Models\HeroSlide;
 use App\Models\Brand;
 use App\Models\FlashSale;
 use Illuminate\Support\Collection;
@@ -116,10 +117,15 @@ class HomeController extends Controller
             );
         });
 
+        // Homepage hero slider. Cached with the rest of the home data and
+        // busted on the 'hero_slides' key when a slide is saved.
+        $heroSlides = Cache::remember("home:{$loc}:hero_slides", $ttl, fn () =>
+            HeroSlide::active()->get());
+
         return view('home', compact(
             'heroBanners', 'categories', 'featuredProducts',
             'newProducts', 'bestSellers', 'brands', 'heroProducts',
-            'offerProducts', 'offerBanners', 'promoBanners', 'flashSale'
+            'offerProducts', 'offerBanners', 'promoBanners', 'flashSale', 'heroSlides'
         ));
     }
 
