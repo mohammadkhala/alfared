@@ -820,6 +820,12 @@ footer { background:var(--blue-dk); color:#CBD5E1; padding:60px 0 0; }
 
   /* — Hero stacks vertically — */
   .hero { height:auto; min-height:auto; padding:32px 0 48px; flex-direction:column; }
+  /* The desktop crossfade stacks slides with position:absolute; on mobile that
+     leaves the hero with no height and nothing shows. Let the active slide flow
+     normally and hide the rest. */
+  .hero-slider .hero-slide { position:relative; opacity:1; visibility:visible; flex-direction:column; }
+  .hero-slider .hero-slide:not(.is-active) { display:none; }
+  .hero-dots { position:static; transform:none; margin-top:18px; }
   .hero-left { padding:0 24px; flex:none; }
   .hero-content { max-width:100%; padding-top:0; }
   .hero-right { display:none; }
