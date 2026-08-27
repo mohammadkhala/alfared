@@ -53,7 +53,10 @@ class SecurityHeaders
                 "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://fonts.bunny.net",
                 "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://analytics.tiktok.com https://ads.tiktok.com",
                 "connect-src 'self' wss: https: https://analytics.tiktok.com https://ads.tiktok.com",
-                "frame-src 'self' https://www.google.com https://maps.google.com",
+                // Product videos are embedded from YouTube/Vimeo; without these
+                // the browser blocks the iframe ("هذا المحتوى محظور").
+                "frame-src 'self' https://www.google.com https://maps.google.com "
+                    . "https://www.youtube.com https://www.youtube-nocookie.com https://player.vimeo.com",
                 "frame-ancestors 'self'",
                 "base-uri 'self'",
                 "form-action 'self' https://alfared.ps https://alfared.online https://checkout.lahza.io",
