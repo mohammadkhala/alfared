@@ -229,6 +229,12 @@ class CatalogController extends Controller
                     ]))->merge(
                         $product->images->map(fn($i) => str_starts_with($i->image_url, 'http') ? $i->image_url : url('storage/' . $i->image_url))
                     )->unique()->values()->all(),
+                    // The app can play an embed in a webview or a file in a
+                    // native player, so it needs to know which it got.
+                    'video_url'    => $product->embedUrl() ?? $product->videoUrl(),
+                    'video_type'   => $product->hasVideo()
+                        ? ($product->embedUrl() ? 'embed' : 'file')
+                        : null,
                     'variants'     => $product->variants
                         ->where('is_active', true)
                         ->groupBy('type')

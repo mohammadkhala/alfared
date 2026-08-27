@@ -209,6 +209,42 @@ class ProductResource extends Resource
                         ->helperText('📐 الأبعاد المثالية: 800 × 800 بكسل (مربع 1:1) · 🗜️ تُضغط تلقائياً وتُحوّل إلى WebP · 📁 الحد الأقصى: 5 MB · 💡 استخدم خلفية بيضاء أو شفافة')
                         ->columnSpanFull(),
 
+                    // Either a hosted link (costs no disk space — preferred on
+                    // shared hosting) or an uploaded file. The two inputs write
+                    // to the same column, so only one is shown at a time.
+                    Forms\Components\Radio::make('video_source')
+                        ->label('🎬 فيديو المنتج (اختياري)')
+                        ->options([
+                            'none'  => 'بدون فيديو',
+                            'link'  => 'رابط يوتيوب / Vimeo (موصى به — لا يستهلك مساحة)',
+                            'upload'=> 'رفع ملف فيديو',
+                        ])
+                        ->default(fn ($record) => match (true) {
+                            ! $record || blank($record->video) => 'none',
+                            (bool) $record->embedUrl()          => 'link',
+                            default                             => 'upload',
+                        })
+                        ->live()
+                        ->dehydrated(false)   // a UI switch only; never saved
+                        ->columnSpanFull(),
+
+                    Forms\Components\TextInput::make('video')
+                        ->label('رابط الفيديو')
+                        ->url()
+                        ->placeholder('https://www.youtube.com/watch?v=...')
+                        ->helperText('الصق رابط الفيديو من يوتيوب أو Vimeo.')
+                        ->visible(fn (Forms\Get $get) => $get('video_source') === 'link')
+                        ->columnSpanFull(),
+
+                    Forms\Components\FileUpload::make('video')
+                        ->label('ملف الفيديو')
+                        ->directory('products/videos')
+                        ->acceptedFileTypes(['video/mp4','video/webm','video/quicktime'])
+                        ->maxSize(51200)
+                        ->helperText('MP4 أو WebM · الحد الأقصى 50 MB · يُفضّل فيديو قصير (أقل من دقيقة).')
+                        ->visible(fn (Forms\Get $get) => $get('video_source') === 'upload')
+                        ->columnSpanFull(),
+
                     Forms\Components\Repeater::make('images')
                         ->label('صور إضافية')->relationship('images')
                         ->schema([

@@ -15,7 +15,7 @@ class Product extends Model
     protected $fillable = [
         'name_ar', 'name_he', 'name_en', 'slug', 'description_ar', 'description_he', 'description_en',
         'short_description', 'short_description_en', 'short_description_he', 'category_id', 'brand_id', 'price', 'compare_price',
-        'cost_price', 'sku', 'stock_quantity', 'low_stock_alert', 'main_image',
+        'cost_price', 'sku', 'stock_quantity', 'low_stock_alert', 'main_image', 'video',
         'weight', 'is_active', 'is_featured', 'is_new', 'is_published', 'track_quantity',
         'allow_backorder', 'views_count', 'sales_count', 'rating_avg',
         'rating_count', 'reviews_count', 'meta_title', 'meta_description',
@@ -63,6 +63,53 @@ class Product extends Model
             return round((1 - $this->price / $this->compare_price) * 100);
         }
         return null;
+    }
+
+    // ── Video ────────────────────────────────────────────────────────────
+    // `video` holds either an uploaded file path or a YouTube/Vimeo URL. A
+    // hosted link costs no disk space, which matters on shared hosting.
+
+    public function hasVideo(): bool
+    {
+        return filled($this->video);
+    }
+
+    /** True when the value is a YouTube/Vimeo link rather than an upload. */
+    public function isEmbeddedVideo(): bool
+    {
+        return $this->hasVideo() && (bool) $this->embedUrl();
+    }
+
+    /** Player URL for a YouTube/Vimeo link, or null for an uploaded file. */
+    public function embedUrl(): ?string
+    {
+        $v = trim((string) $this->video);
+        if ($v === '' || ! str_starts_with($v, 'http')) {
+            return null;
+        }
+
+        // youtu.be/ID  |  youtube.com/watch?v=ID  |  youtube.com/shorts/ID
+        if (preg_match('~(?:youtu\.be/|youtube\.com/(?:watch\?v=|embed/|shorts/))([A-Za-z0-9_-]{6,})~', $v, $m)) {
+            return 'https://www.youtube.com/embed/' . $m[1];
+        }
+
+        if (preg_match('~vimeo\.com/(?:video/)?(\d+)~', $v, $m)) {
+            return 'https://player.vimeo.com/video/' . $m[1];
+        }
+
+        return null;
+    }
+
+    /** Direct URL of an uploaded video file, or null when it is an embed. */
+    public function videoUrl(): ?string
+    {
+        if (! $this->hasVideo() || $this->embedUrl()) {
+            return null;
+        }
+
+        return str_starts_with($this->video, 'http')
+            ? $this->video
+            : asset('storage/' . $this->video);
     }
 
     public function getIsOnSaleAttribute(): bool

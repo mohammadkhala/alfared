@@ -1142,3 +1142,10 @@ body.mobile-drawer-open { overflow: hidden; }
   .hero-slider .hero-slide:not(.is-active){ display:none; }
   .hero-dots{ position:static; transform:none; margin-top:18px; }
 }
+
+/* ── Product video (detail page) ────────────────────────────────────────── */
+.product-video{ margin-top:14px; border-radius:16px; overflow:hidden; background:#000; }
+.product-video iframe,
+.product-video video{
+  display:block; width:100%; aspect-ratio:16/9; border:0; background:#000;
+}

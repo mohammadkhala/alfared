@@ -32,6 +32,23 @@
           <div class="product-badge sale" style="position:absolute;top:16px;inset-inline-start:16px;">-{{ $product->discount_percent }}%</div>
         @endif
       </div>
+      {{-- Video, when the admin added one: an embed for a YouTube/Vimeo link,
+           a native player for an uploaded file. --}}
+      @if($product->hasVideo())
+        <div class="product-video">
+          @if($embed = $product->embedUrl())
+            <iframe src="{{ $embed }}" title="{{ $product->name_ar }}"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowfullscreen loading="lazy"></iframe>
+          @else
+            <video controls preload="metadata" playsinline
+              @if($product->main_image) poster="{{ asset('storage/'.$product->main_image) }}" @endif>
+              <source src="{{ $product->videoUrl() }}"/>
+            </video>
+          @endif
+        </div>
+      @endif
+
       @if($product->images && count($product->images) > 1)
         <div class="gallery-thumbs">
           @foreach($product->images as $img)
