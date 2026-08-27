@@ -228,20 +228,24 @@ class ProductResource extends Resource
                         ->dehydrated(false)   // a UI switch only; never saved
                         ->columnSpanFull(),
 
-                    Forms\Components\TextInput::make('video')
+                    // Separate names: a FileUpload sharing the 'video' name would
+                    // receive the URL string and blow up expecting an array.
+                    Forms\Components\TextInput::make('video_link')
                         ->label('رابط الفيديو')
                         ->url()
                         ->placeholder('https://www.youtube.com/watch?v=...')
                         ->helperText('الصق رابط الفيديو من يوتيوب أو Vimeo.')
+                        ->dehydrated(false)
                         ->visible(fn (Forms\Get $get) => $get('video_source') === 'link')
                         ->columnSpanFull(),
 
-                    Forms\Components\FileUpload::make('video')
+                    Forms\Components\FileUpload::make('video_file')
                         ->label('ملف الفيديو')
                         ->directory('products/videos')
                         ->acceptedFileTypes(['video/mp4','video/webm','video/quicktime'])
                         ->maxSize(51200)
                         ->helperText('MP4 أو WebM · الحد الأقصى 50 MB · يُفضّل فيديو قصير (أقل من دقيقة).')
+                        ->dehydrated(false)
                         ->visible(fn (Forms\Get $get) => $get('video_source') === 'upload')
                         ->columnSpanFull(),
 
